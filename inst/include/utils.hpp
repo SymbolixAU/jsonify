@@ -12,7 +12,7 @@ namespace utils {
   }
   
   template< typename Writer>
-  inline void writer_starter( Writer& writer, int& n_elements, bool& has_names ) {
+  inline void writer_starter( Writer& writer, int n_elements, bool& has_names ) {
     if ( n_elements > 1 ) {
       if ( has_names ) {
         writer.StartObject();
@@ -22,7 +22,7 @@ namespace utils {
     }
   }
   template< typename Writer>
-  inline void writer_ender( Writer& writer, int& n_elements, bool& has_names ) {
+  inline void writer_ender( Writer& writer, int n_elements, bool& has_names ) {
     if ( n_elements > 1 ) {
       if ( has_names ) {
         writer.EndObject();

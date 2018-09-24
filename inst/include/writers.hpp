@@ -76,12 +76,16 @@ namespace writers {
   template< typename Writer>
   inline void write_value( Writer& writer, SEXP list_element ) {
     
+    int n_elements;
+    
     switch( TYPEOF( list_element ) ) {
     case VECSXP: {
+      
       //Rcpp::Rcout << "list element list " << std::endl;
       Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
       int n = lst.size();
       
+      // LIST NAMES
       Rcpp::IntegerVector int_names = Rcpp::seq(1, lst.size());
       Rcpp::CharacterVector list_names = Rcpp::as< Rcpp::CharacterVector >( int_names );
       bool has_names = Rf_isNull(lst.names()) ? false : true;
@@ -93,10 +97,8 @@ namespace writers {
           list_names[i] = temp_names[i] == "" ? list_names[i] : temp_names[i];
         }
       }
-      //Rcpp::Rcout << "list names: " << list_names << std::endl;
-      // IF NO NAMES, it's an array of arrays
-      // if named, it's an object, some of which are named 
-      
+      // END LIST NAMES
+
       jsonify::utils::writer_starter( writer, n, has_names );
       
       for ( int i = 0; i < n; i++ ) {
@@ -115,29 +117,29 @@ namespace writers {
     case REALSXP: {
       //Rcpp::Rcout << "list element REAL " << std::endl;
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
-      int n = nv.size();
-      write_value( writer, nv, n);
+      n_elements = nv.size();
+      write_value( writer, nv, n_elements);
       break;
     }
     case INTSXP: { 
       //Rcpp::Rcout << "list element INT " << std::endl;
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
-      int n = iv.size();
-      write_value( writer, nv, n);
+      n_elements = iv.size();
+      write_value( writer, iv, n_elements);
       break;
     }
     case LGLSXP: {
       //Rcpp::Rcout << "list element LGL " << std::endl;
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_element );
-      int n = lv.size();
-      write_value( writer, nv, n);
+      n_elements = lv.size();
+      write_value( writer, lv, n_elements);
       break;
     }
     default: {
       //Rcpp::Rcout << "list element default " << std::endl;
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_element );
-      int n = sv.size();
-      write_value( writer, nv, n);
+      n_elements = sv.size();
+      write_value( writer, sv, n_elements);
       break;
     }
     }
