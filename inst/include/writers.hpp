@@ -2,6 +2,7 @@
 #define R_JSONIFY_WRITERS_H
 
 #include <Rcpp.h>
+#include "utils.hpp"
 //#include "listwriter.hpp"
 
 namespace jsonify {
@@ -62,6 +63,15 @@ namespace writers {
     }
     writer.EndArray();
   }
+  
+  template <typename Writer, typename T>
+  inline void write_value( Writer& writer, T& t, int& n) {
+    if ( n > 0 ) {
+      write_value( writer, t );
+    } else {
+      write_value( writer, t[0] );
+    }
+  }
 
   template< typename Writer>
   inline void write_value( Writer& writer, SEXP list_element ) {
@@ -87,13 +97,8 @@ namespace writers {
       // IF NO NAMES, it's an array of arrays
       // if named, it's an object, some of which are named 
       
-      if ( n > 1 ) {
-        if ( has_names ) {
-          writer.StartObject();
-        } else {
-          writer.StartArray();
-        }
-      }
+      jsonify::utils::writer_starter( writer, n, has_names );
+      
       for ( int i = 0; i < n; i++ ) {
         SEXP recursive_list = lst[ i ];
         if ( has_names ) {
@@ -102,225 +107,41 @@ namespace writers {
         }
         write_value( writer, recursive_list );
       }
-      if ( n > 1 ) {
-        if ( has_names ) {
-          writer.EndObject();
-        } else {
-          writer.EndArray();
-        }
-      }
-      // list
+      
+      jsonify::utils::writer_ender( writer, n, has_names );
+
       break;
     }
     case REALSXP: {
       //Rcpp::Rcout << "list element REAL " << std::endl;
-      // real
-      // IF n_elemnts > 0; vector : else value
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
       int n = nv.size();
-      if ( n > 0 ) {
-        write_value( writer, nv );
-      } else {
-        write_value( writer, nv[0] );
-      }
+      write_value( writer, nv, n);
       break;
     }
     case INTSXP: { 
       //Rcpp::Rcout << "list element INT " << std::endl;
-      // int
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
       int n = iv.size();
-      if ( n > 0 ) {
-        write_value( writer, iv );
-      } else {
-        write_value( writer, iv[0] );
-      }
+      write_value( writer, nv, n);
       break;
     }
     case LGLSXP: {
       //Rcpp::Rcout << "list element LGL " << std::endl;
-      // logical
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_element );
       int n = lv.size();
-      if ( n > 0 ) {
-        write_value( writer, lv );
-      } else {
-        write_value( writer, lv[0] );
-      }
+      write_value( writer, nv, n);
       break;
     }
     default: {
       //Rcpp::Rcout << "list element default " << std::endl;
-      // string
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_element );
       int n = sv.size();
-      if ( n > 0 ) {
-        write_value( writer, sv );
-      } else {
-        const char *s = sv[0];
-        write_value( writer, s );
-      }
+      write_value( writer, nv, n);
       break;
     }
     }
   }
-
-  template <typename Writer>
-  inline void should_start_array( Writer& writer, int n_elements ) {
-    if( n_elements > 1 ) {
-      writer.StartArray();
-    }
-  }
-  
-  template <typename Writer>
-  inline void should_end_array( Writer& writer, int n_elements ) {
-    if( n_elements > 1 ) {
-      writer.EndArray();
-    }
-  }
-  
-  // template <typename Writer>
-  // inline void write_list( Writer& writer, Rcpp::List& lst, int row, int& lst_counter) {
-  //   
-  //   SEXP list_vec = lst[ row ];
-  //   
-  //   switch( TYPEOF( list_vec ) ) {
-  //   case VECSXP: {
-  //     Rcpp::Rcout << "list vecsxp" << std::endl;
-  //     Rcpp::List lst = Rcpp::as< Rcpp::List >( list_vec);
-  //     //Rcpp::List lst2 = lst[ lst_counter ];
-  //     //write_list( writer, lst2, 0, lst_counter);
-  //     //write_value( writer, lst, 0, lst_counter );
-  //     //lst_counter++;
-  //     break;
-  //   }
-  //   case REALSXP: {
-  //     Rcpp::Rcout << "real vecsxp" << std::endl;
-  //     Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_vec );
-  //     Rcpp::Rcout << nv.size() << std::endl;
-  //     for (int i = 0; i < nv.size(); i++) {
-  //       write_value( writer, nv[i] );
-  //     }
-  //     break;
-  //   }
-  //   case INTSXP: {
-  //     Rcpp::Rcout << "int vecsxp" << std::endl;
-  //     Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_vec );
-  //     Rcpp::Rcout << iv.size() << std::endl;
-  //     for (int i = 0; i < iv.size(); i++) {
-  //       write_value( writer, iv[i] );
-  //     }
-  //     break;
-  //   }
-  //   case LGLSXP: {
-  //     Rcpp::Rcout << "lgl vecsxp" << std::endl;
-  //     Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_vec );
-  //     Rcpp::Rcout << lv.size() << std::endl;
-  //     for (int i = 0; i < lv.size(); i++) {
-  //       write_value( writer, lv[i] );
-  //     }
-  //     break;
-  //   }
-  //   default: {
-  //     Rcpp::Rcout << "str vecsxp" << std::endl;
-  //     Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_vec );
-  //     Rcpp::Rcout << sv.size() << std::endl;
-  //     for (int i = 0; i < sv.size(); i++) {
-  //       write_value( writer, sv[i] );
-  //     }
-  //     break;
-  //   }
-  //   }
-  // }
-
-  // TODO
-  // - If the row of a data.frame is a vector, ned to outptu all elements in ARRAY
-  // - IFF the vector (REALSXP/INTSXP, etc) cases have been 'recursed' into, they need to 
-  // - be iterated over into an array
-  // template <typename Writer>
-  // inline void write_value( Writer& writer, SEXP& this_vec ) {
-
-    //int list_counter = 0;
-    
-    // switch( TYPEOF( this_vec ) ) {
-    // case VECSXP: {
-    //   //Rcpp::Rcout << "VECSXP" << std::endl;
-    //   int list_counter = 0;
-    //   Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-    //   lst = lst[ row ];
-    //   Rcpp::Rcout << "list size: " << lst.size() << std::endl;
-    //   //row = list_counter;
-    //   // for (Rcpp::List::iterator it = lst.begin(); it != lst.end(); it++) {
-    //   //   SEXP recursive_vec = *it;
-    //   //   write_value( writer, recursive_vec, row);
-    //   //   list_counter++;
-    //   // }
-    //   // if( lst.size() > 0 ) {
-    //   //   writer.StartObject();
-    //   // }
-    //   for (int i = 0; i < lst.size(); i++) {
-    //     //writer.StartArray();
-    //     writer.StartObject();
-    //     SEXP recursive_vec = lst[ i ];
-    //     write_value( writer, recursive_vec );
-    //     writer.EndObject();
-    //     //writer.EndArray();
-    //   }
-    //   // if( lst.size() > 0 ) {
-    //   //   writer.EndObject();
-    //   // }
-    //   
-    //   //write_value( writer, recursive_vec, 0);
-    //   
-    //   //write_list( writer, lst, row, list_counter );
-    //   //list_counter++;
-    //   // The list is the entire column. 
-    //   // I Need to extract the column
-    //   
-    //   break;
-    // }
-    // case REALSXP: {
-    //   Rcpp::Rcout << "REALSXP" << std::endl;
-    //   Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-    //   Rcpp::Rcout << "nv: " << nv << std::endl;
-    // 
-    //   // Rcpp::Rcout << "has rescursed: " << has_recursed << std::endl;
-    //   // 
-    //   // if( has_recursed ){ 
-    //   //   writer.StartArray();
-    //   //   for (int i = 0; i < nv.size(); i++) {
-    //   //     write_value( writer, nv[i] );
-    //   //   }
-    //   //   writer.EndArray();
-    //   // } else {
-    //   //   write_value( writer, nv[ row ]);
-    //   // }
-    //   write_value( writer, nv[ row ]);
-    // 
-    //   break;
-    // }
-    // case INTSXP: {
-    //   Rcpp::Rcout << "INTSXP" << std::endl;
-    //   Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-    //   write_value( writer, iv[ row ] );
-    //   break;
-    // }
-    // case LGLSXP: {
-    //   Rcpp::Rcout << "LGLSXP" << std::endl;
-    //   Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-    //   //bool b = lv[ row ];
-    //   write_value( writer, lv[ row ]);
-    //   break;
-    // }
-    // default: {
-    //   Rcpp::Rcout << "default" << std::endl;
-    //   Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-    //   const char *s = sv[ row ];
-    //   write_value( writer, s );
-    //   break;
-    // }
-    // }
-  //}
 
 } // namespace writers
 } // namespace jsonify

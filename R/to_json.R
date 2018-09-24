@@ -30,16 +30,21 @@ handle_dates <- function( x ) {
 #   return(x)
 # }
 # 
-# n <- 1e5
+
+# n <- 1e6
 # df <- data.frame(id = 1:n, dte = sample(seq(as.Date("2018-01-01"), as.Date("2018-01-31"), length.out = n)))
 # 
 # library(microbenchmark)
 # microbenchmark(
-#   one = {
-#     handle_dates( df )
+#   numeric = {
+#     jsonify::to_json( df )
 #   },
-#   two ={
-#     handle_dates2( df )
+#   character ={
+#     jsonify::to_json( jsonify:::handle_dates( df ) )
 #   },
-#   times = 10
+#   times = 5
 # )
+# Unit: milliseconds
+#      expr       min       lq     mean   median       uq      max neval
+#   numeric  982.7153 1113.085 1117.633 1140.885 1149.160 1202.320     5
+# character 4802.2583 4829.550 5130.051 4916.636 5146.547 5955.265     5
