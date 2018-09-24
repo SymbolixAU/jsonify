@@ -1,0 +1,21 @@
+Package: jsonify
+Type: Package
+Title: Converts Data Frames to Javascript Object Notation (JSON)
+Version: 0.1.0
+Date: 2018-09-21
+Authors@R: c(
+    person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre"))
+    )
+Description: Converts data frames into Javascript Object Notation (JSON). 
+License: GPL (>= 2)
+Imports: 
+  Rcpp (>= 0.12.18),
+  rapidjsonr
+LinkingTo: 
+  Rcpp,
+  rapidjsonr
+RoxygenNote: 6.0.1
+Suggests:
+    microbenchmark,
+    jsonlite,
+    testthat
