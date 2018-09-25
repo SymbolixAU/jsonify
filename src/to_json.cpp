@@ -22,18 +22,15 @@ Rcpp::StringVector rcpp_integer_to_json( Rcpp::IntegerVector iv ) {
   return jsonify::vectors::to_json( iv );
 }
 
-
 // [[Rcpp::export]]
 Rcpp::StringVector rcpp_logical_to_json( Rcpp::LogicalVector iv ) {
   return jsonify::vectors::to_json( iv );
 }
 
-
-// // [[Rcpp::export]]
-// Rcpp::StringVector rcpp_list_to_json( SEXP lst ) {
-//   return jsonify::vectors::to_json( lst );
-// }
-
+// [[Rcpp::export]]
+Rcpp::StringVector rcpp_list_to_json( SEXP lst ) {
+  return jsonify::vectors::to_json( lst );
+}
 
 // // [[Rcpp::export]]
 // Rcpp::StringVector class_test( Rcpp::DataFrame df ) {

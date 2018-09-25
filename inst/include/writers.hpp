@@ -93,6 +93,7 @@ namespace writers {
       
       if ( has_names ) {
         Rcpp::CharacterVector temp_names = lst.names();
+        //Rcpp::Rcout << "has names: " << temp_names << std::endl;
         //list_names = lst.names();
         for( int i = 0; i < n; i++ ) {
           list_names[i] = temp_names[i] == "" ? list_names[i] : temp_names[i];
@@ -100,7 +101,7 @@ namespace writers {
       }
       // END LIST NAMES
 
-      jsonify::utils::writer_starter( writer, n, has_names );
+      jsonify::utils::writer_starter( writer, has_names );
       
       for ( int i = 0; i < n; i++ ) {
         SEXP recursive_list = lst[ i ];
@@ -111,7 +112,7 @@ namespace writers {
         write_value( writer, recursive_list );
       }
       
-      jsonify::utils::writer_ender( writer, n, has_names );
+      jsonify::utils::writer_ender( writer, has_names );
 
       break;
     }

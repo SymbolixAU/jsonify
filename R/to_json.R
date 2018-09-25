@@ -7,37 +7,61 @@
 #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character
 #' @export
 to_json <- function( x, numeric_dates = TRUE ) {
-  if(!numeric_dates) x <- handle_dates( x ) 
-  convert_to_json( x )
+  #if(!numeric_dates) x <- handle_dates( x ) 
+  convert_to_json( x, numeric_dates )
 }
 
-convert_to_json <- function( x ) UseMethod("convert_to_json") 
+convert_to_json <- function( x, numeric_dates = TRUE ) UseMethod("convert_to_json") 
 
 #' @export
-convert_to_json.data.frame <- function( x ) rcpp_df_to_json( x )
+convert_to_json.data.frame <- function( x, numeric_dates = TRUE ) {
+  if(!numeric_dates) x <- handle_dates( x ) 
+  rcpp_df_to_json( x )
+}
 
 #' @export
-convert_to_json.numeric <- function( x ) rcpp_numeric_to_json( x )
+convert_to_json.numeric <- function( x, ... ) rcpp_numeric_to_json( x )
 
 #' @export
-convert_to_json.character <- function( x ) rcpp_character_to_json( x )
+convert_to_json.character <- function( x, ... ) rcpp_character_to_json( x )
 
 #' @export
-convert_to_json.integer <- function( x ) rcpp_integer_to_json( x ) 
+convert_to_json.integer <- function( x, ... ) rcpp_integer_to_json( x ) 
 
 #' @export
-convert_to_json.logical <- function( x ) rcpp_logical_to_json( x )
-
-#' #' @export
-#' to_json.list <- function( x ) rcpp_list_to_json( x )
+convert_to_json.logical <- function( x, ... ) rcpp_logical_to_json( x )
 
 #' @export
-convert_to_json.default <- function( x ) stop("this type is not supported")
+convert_to_json.Date <- function( x, numeric_dates = TRUE ) {
+  if( numeric_dates ) return( rcpp_numeric_to_json( x ) ) 
+  return( rcpp_character_to_json( as.character( x ) ) )
+}
+
+#' @export
+convert_to_json.POSIXct <- function( x, numeric_dates = TRUE ) {
+  if( numeric_dates ) return( rcpp_numeric_to_json( x ) ) 
+  return( rcpp_character_to_json( as.character( x ) ) )
+}
+
+#' @export
+convert_to_json.POSIXlt <- function( x, numeric_dates = TRUE ) {
+  if( numeric_dates ) return( rcpp_list_to_json( x ) ) 
+  return( rcpp_character_to_json( as.character( x ) ) )
+}
+
+
+
+#' @export
+convert_to_json.list <- function( x, ... ) rcpp_list_to_json( x )
+
+#' @export
+convert_to_json.default <- function( x, ... ) stop("this type is not supported")
 
 
 # col_classes <- function( df ) vapply( df, function(x) class(x)[[1]], "")
 
-date_columns <- function( sf ) names(which(vapply(sf , function(x) { inherits(x, "Date") || inherits(x, "POSIXct") }, T)))
+## TOD(handle dates for lists & vectors)
+date_columns <- function( df ) names(which(vapply(df , function(x) { inherits(x, "Date") || inherits(x, "POSIXct") }, T)))
 
 handle_dates <- function( x ) {
   dte <- date_columns( x )

@@ -12,24 +12,24 @@ namespace utils {
   }
   
   template< typename Writer>
-  inline void writer_starter( Writer& writer, int n_elements, bool& has_names ) {
-    if ( n_elements > 1 ) {
+  inline void writer_starter( Writer& writer, bool& has_names ) {
+    //if ( n_elements > 1 ) {
       if ( has_names ) {
         writer.StartObject();
       } else {
         writer.StartArray();
       }
-    }
+    //}
   }
   template< typename Writer>
-  inline void writer_ender( Writer& writer, int n_elements, bool& has_names ) {
-    if ( n_elements > 1 ) {
+  inline void writer_ender( Writer& writer, bool& has_names ) {
+    //if ( n_elements > 1 ) {
       if ( has_names ) {
         writer.EndObject();
       } else {
         writer.EndArray();
       }
-    }
+    //}
   }
   
 

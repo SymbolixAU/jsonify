@@ -21,3 +21,7 @@ rcpp_logical_to_json <- function(iv) {
     .Call(`_jsonify_rcpp_logical_to_json`, iv)
 }
 
+rcpp_list_to_json <- function(lst) {
+    .Call(`_jsonify_rcpp_list_to_json`, lst)
+}
+

@@ -43,8 +43,6 @@
 # 
 # jsonlite::toJSON( df )
 
-
-
 # df <- data.frame(
 #   id = 1:3
 #   , norm = c(1.1, 2.2, 3.3)
@@ -55,3 +53,26 @@
 # jsonify::to_json( df )
 # 
 # jsonlite::toJSON( df )
+
+
+# lst <- list(x = 1:5, c("a","b"), y = list("z"), z = list(a = list( b = list( d = 20)), ab = 1))
+# 
+# jsonlite::toJSON( lst )
+# 
+# to_json( lst )
+# 
+# 
+# jsonlite::toJSON( lst$z )
+# jsonify::to_json( lst$z )
+
+# plt <- as.POSIXlt("2018-01-01 01:00:00", tz = "GMT")
+# 
+# str( plt )
+# jsonlite::toJSON( plt, POSIXt = "string") 
+# jsonlite::toJSON( plt, POSIXt = "ISO8601") 
+# jsonlite::toJSON( plt, POSIXt = "epoch") 
+# jsonlite::toJSON( plt, POSIXt = "mongo") 
+
+
+
+
