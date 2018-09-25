@@ -50,6 +50,17 @@ microbenchmark(
   times = 5
 )
 
+n <- 1e7
+x <- rnorm(n = n)
+microbenchmark(
+  jsonlite = {
+    js <- jsonlite::toJSON( x )
+  },
+  jsonify = {
+    js <- jsonify::to_json( x )
+  },
+  times = 5
+)
 ```
 
 ### What doesn't it do?
@@ -58,13 +69,23 @@ Quite a lot, it's still in development!
 
 ### There's no 'Date' type in JSON, how have you handled this?
 
-At the moment I haven't. At its core in R, `Dates` are numeric, so they're treated as numbers when convrted to JSON. 
+I've currently left this up to the user. At its core in R, `Dates` are numeric, so they're treated as numbers when converted to JSON. 
 
-I haven't fully decided how to handle dates yet.
+I've given the option to the user to coerce to character through the `numeric_dates` argument. 
 
 ```{r}
 df <- data.frame(dte = as.Date("2018-01-01"))
 jsonify::to_json( df )
+
+df <- data.frame(dte = as.Date("2018-01-01"))
+jsonify::to_json( df, numeric_dates = FALSE )
+
+df <- data.frame(dte = as.POSIXct("2018-01-01 01:01:01"))
+jsonify::to_json( df )
+
+df <- data.frame(dte = as.POSIXct("2018-01-01 01:01:01"))
+jsonify::to_json( df, numeric_dates = FALSE )
+
 ```
 
 

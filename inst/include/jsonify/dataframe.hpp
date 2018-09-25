@@ -11,7 +11,7 @@ namespace jsonify {
 namespace dataframe {
 
   template <typename Writer>
-  inline void dataframe_cell( Writer& writer, SEXP& this_vec, int row) {
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row) {
 
     switch( TYPEOF( this_vec ) ) {
     case VECSXP: {
@@ -55,7 +55,7 @@ namespace dataframe {
     
     size_t n_cols = df.ncol();
     size_t n_rows = df.nrows();
-    int i, j;
+    size_t i, j;
     Rcpp::StringVector column_names = df.names();
     
     writer.StartArray();

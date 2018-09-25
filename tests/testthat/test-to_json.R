@@ -11,13 +11,12 @@ test_that("data.frame - all R data types are converted", {
   expect_equal('[{"id":"a"},{"id":"b"}]', to_json(df))
   df <- data.frame(id = c(T,FALSE))                       ## logical
   expect_equal('[{"id":true},{"id":false}]', to_json(df))
-  ## TODO
-  # df <- data.frame(id = as.Date("2018-01-01"))            ## Date
-  # expect_equal('[{"id":"2018-01-01"}]', to_json(df))
-  # df <- data.frame(id = as.POSIXct("2018-01-01 00:00:59"))            ## Posixct
-  # expect_equal('[{"id":"2018-01-01 00:00:59"}]', to_json(df))
-  # df <- data.frame(id = as.POSIXlt("2018-01-01 00:00:59"))            ## Posixct
-  # expect_equal('[{"id":"2018-01-01 00:00:59"}]', to_json(df))
+  df <- data.frame(id = as.Date("2018-01-01"))            ## Date
+  expect_equal('[{"id":"2018-01-01"}]', to_json(df, numeric_dates = F))
+  df <- data.frame(id = as.POSIXct("2018-01-01 00:00:59"))            ## Posixct
+  expect_equal('[{"id":"2018-01-01 00:00:59"}]', to_json(df, numeric_dates = F))
+  df <- data.frame(id = as.POSIXlt("2018-01-01 00:00:59"))            ## Posixct
+  expect_equal('[{"id":"2018-01-01 00:00:59"}]', to_json(df, numeric_dates = F))
 })
 
 test_that("data.frame - complex columns are jsonified", {

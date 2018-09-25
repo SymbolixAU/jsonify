@@ -2,42 +2,46 @@
 #' 
 #' Converts a data.frame to JSON
 #' 
-#' @param df data.frame to convert to JSON
-#' 
+#' @param x object to convert to JSON
+#' @param numeric_dates logical indicating if dates should be treated as numerics. 
+#' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character
 #' @export
-to_json <- function( x ) UseMethod("to_json") 
+to_json <- function( x, numeric_dates = TRUE ) {
+  if(!numeric_dates) x <- handle_dates( x ) 
+  convert_to_json( x )
+}
+
+convert_to_json <- function( x ) UseMethod("convert_to_json") 
 
 #' @export
-to_json.data.frame <- function(x) rcpp_df_to_json( x )
+convert_to_json.data.frame <- function( x ) rcpp_df_to_json( x )
 
 #' @export
-to_json.numeric <- function( x ) rcpp_numeric_to_json( x )
+convert_to_json.numeric <- function( x ) rcpp_numeric_to_json( x )
 
 #' @export
-to_json.character <- function( x ) rcpp_character_to_json( x )
+convert_to_json.character <- function( x ) rcpp_character_to_json( x )
 
 #' @export
-to_json.integer <- function( x ) rcpp_integer_to_json( x ) 
+convert_to_json.integer <- function( x ) rcpp_integer_to_json( x ) 
 
 #' @export
-to_json.logical <- function( x ) rcpp_logical_to_json( x )
+convert_to_json.logical <- function( x ) rcpp_logical_to_json( x )
 
 #' #' @export
 #' to_json.list <- function( x ) rcpp_list_to_json( x )
 
 #' @export
-to_json.default <- function( x ) stop("this type not supported")
+convert_to_json.default <- function( x ) stop("this type is not supported")
 
 
-col_classes <- function( df ) vapply( df, function(x) class(x)[[1]], "")
+# col_classes <- function( df ) vapply( df, function(x) class(x)[[1]], "")
 
 date_columns <- function( sf ) names(which(vapply(sf , function(x) { inherits(x, "Date") || inherits(x, "POSIXct") }, T)))
 
 handle_dates <- function( x ) {
   dte <- date_columns( x )
-  for ( i in dte ) {
-    x[[i]] <- as.character(x[[i]])
-  }
+  for ( i in dte ) x[[i]] <- as.character(x[[i]])
   return( x )
 }
 

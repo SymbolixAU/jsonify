@@ -4,10 +4,13 @@
 \alias{to_json}
 \title{To JSON}
 \usage{
-to_json(x)
+to_json(x, numeric_dates = TRUE)
 }
 \arguments{
-\item{df}{data.frame to convert to JSON}
+\item{x}{object to convert to JSON}
+
+\item{numeric_dates}{logical indicating if dates should be treated as numerics. 
+Defaults to TRUE for speed. If FALSE, the dates will be coerced to character}
 }
 \description{
 Converts a data.frame to JSON
