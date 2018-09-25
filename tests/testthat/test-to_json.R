@@ -1,6 +1,6 @@
-context("datatypes")
+context("dataframes")
 
-test_that("all R data types are converted", {
+test_that("data.frame - all R data types are converted", {
   df <- data.frame(id = 1:2, stringsAsFactors = F)        ## numeric
   expect_equal('[{"id":1},{"id":2}]', to_json(df))
   df <- data.frame(id = 1L:2L, stringsAsFactors = F)      ## integer
@@ -20,7 +20,7 @@ test_that("all R data types are converted", {
   # expect_equal('[{"id":"2018-01-01 00:00:59"}]', to_json(df))
 })
 
-test_that("complex columns are jsonified", {
+test_that("data.frame - complex columns are jsonified", {
   df <- data.frame( id = 1, val = I(list(c(0,0))))
   expect_equal(jsonify::to_json( df ), "[{\"id\":1.0,\"val\":[0.0,0.0]}]")
   

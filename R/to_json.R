@@ -5,8 +5,28 @@
 #' @param df data.frame to convert to JSON
 #' 
 #' @export
-to_json <- function( df ) rcpp_to_json( df )
+to_json <- function( x ) UseMethod("to_json") 
 
+#' @export
+to_json.data.frame <- function(x) rcpp_df_to_json( x )
+
+#' @export
+to_json.numeric <- function( x ) rcpp_numeric_to_json( x )
+
+#' @export
+to_json.character <- function( x ) rcpp_character_to_json( x )
+
+#' @export
+to_json.integer <- function( x ) rcpp_integer_to_json( x ) 
+
+#' @export
+to_json.logical <- function( x ) rcpp_logical_to_json( x )
+
+#' #' @export
+#' to_json.list <- function( x ) rcpp_list_to_json( x )
+
+#' @export
+to_json.default <- function( x ) stop("this type not supported")
 
 
 col_classes <- function( df ) vapply( df, function(x) class(x)[[1]], "")

@@ -4,7 +4,7 @@
 \alias{to_json}
 \title{To JSON}
 \usage{
-to_json(df)
+to_json(x)
 }
 \arguments{
 \item{df}{data.frame to convert to JSON}

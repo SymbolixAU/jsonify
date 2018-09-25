@@ -59,7 +59,8 @@ namespace writers {
   inline void write_value( Writer& writer, Rcpp::LogicalVector& lv ) {
     writer.StartArray();
     for ( int i = 0; i < lv.size(); i++ ) {
-      write_value( writer, lv[i] );
+      bool l = lv[i];             // required for logical vectors
+      write_value( writer, l );
     }
     writer.EndArray();
   }
