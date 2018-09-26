@@ -55,7 +55,8 @@ convert_to_json.POSIXlt <- function( x, numeric_dates = TRUE ) {
 convert_to_json.list <- function( x, ... ) rcpp_list_to_json( x )
 
 #' @export
-convert_to_json.default <- function( x, ... ) stop("this type is not supported")
+convert_to_json.default <- function( x, ... ) convert_to_json.list( x, ... ) 
+# stop("this type is not supported")
 
 
 # col_classes <- function( df ) vapply( df, function(x) class(x)[[1]], "")

@@ -15,12 +15,20 @@ namespace writers {
   
   template <typename Writer>
   inline void write_value( Writer& writer, int& value ) {
-    writer.Int( value );
+    if( ISNAN( value ) ) {
+      write_value( writer, "NA" );
+    } else {
+      writer.Int( value );
+    }
   }
   
   template <typename Writer>
   inline void write_value( Writer& writer, double& value ) {
-    writer.Double( value );
+    if( ISNAN( value ) ) {
+      write_value( writer, "NA" );
+    } else {
+      writer.Double( value );
+    }
   }
   
   template< typename Writer> 
@@ -59,8 +67,13 @@ namespace writers {
   inline void write_value( Writer& writer, Rcpp::LogicalVector& lv ) {
     writer.StartArray();
     for ( int i = 0; i < lv.size(); i++ ) {
-      bool l = lv[i];             // required for logical vectors
-      write_value( writer, l );
+      if (Rcpp::LogicalVector::is_na( lv[i] ) ) {
+        //Rcpp::Rcout << "NA logical found" << std::endl;
+        write_value( writer, "NA" );
+      } else {
+        bool l = lv[i];             // required for logical vectors
+        write_value( writer, l );
+      }
     }
     writer.EndArray();
   }
@@ -78,6 +91,13 @@ namespace writers {
   inline void write_value( Writer& writer, SEXP list_element ) {
     
     int n_elements;
+    //Rcpp::Rcout << "inside write_value" << std::endl;
+    if( Rf_isNull( list_element ) ) {
+      //Rcpp::Rcout << "null list element" << std::endl;
+      writer.StartObject();
+      writer.EndObject();
+      return;
+    } 
     
     switch( TYPEOF( list_element ) ) {
     case VECSXP: {
@@ -85,6 +105,8 @@ namespace writers {
       //Rcpp::Rcout << "list element list " << std::endl;
       Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
       int n = lst.size();
+      
+      //Rcpp::Rcout << "list size: " << n << std::endl;
       
       // LIST NAMES
       Rcpp::IntegerVector int_names = Rcpp::seq(1, lst.size());

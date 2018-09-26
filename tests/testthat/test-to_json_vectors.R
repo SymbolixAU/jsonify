@@ -12,9 +12,30 @@ test_that("different vector types work", {
   expect_equal(to_json(as.POSIXct("2018-01-01 01:00:00", tz = "GMT"), numeric_dates = F), "[\"2018-01-01 01:00:00\"]")
   expect_equal(to_json(as.POSIXlt("2018-01-01 01:00:00", tz = "GMT")), "{\"sec\":[0.0],\"min\":[0],\"hour\":[1],\"mday\":[1],\"mon\":[0],\"year\":[118],\"wday\":[1],\"yday\":[0],\"isdst\":[0]}")
   expect_equal(to_json(as.POSIXct("2018-01-01 01:00:00", tz = "GMT"), numeric_dates = F), "[\"2018-01-01 01:00:00\"]")
-  
-  expect_error(to_json(complex(1)), "this type is not supported")
+  expect_equal(to_json(complex(1)),"[\"0+0i\"]")
   
 })
 
+
+test_that("NAs, NULLS and Infs work", {
+  to_json( NA ) ## logical
+  to_json( NA_character_ )
+  to_json( NA_complex_ )
+  to_json( NA_integer_ )
+  to_json( NA_real_ )
+  to_json( NaN )
+  
+  expect_equal(to_json(NULL), "{}")
+  expect_equal(to_json(list(a="a",b=NULL)),"{\"a\":[\"a\"],\"b\":{}}")
+  expect_equal(to_json(data.frame()), "[]")
+})
+
+# x <- list( a = "a", b = NULL)
+# jsonlite::toJSON( x )
+# to_json( x )
+# 
+# jsonlite::toJSON( NULL )
+# to_json( NULL )
+# 
+# fromJSON('{"x":null, "y":[1,null,3]}')
 

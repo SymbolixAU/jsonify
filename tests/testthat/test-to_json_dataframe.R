@@ -36,6 +36,5 @@ test_that("data.frame - complex columns are jsonified", {
     jsonify::to_json( df ) , 
     "[{\"id\":1,\"norm\":1.1,\"letters\":\"a\",\"val\":[0.0,0.0]},{\"id\":2,\"norm\":2.2,\"letters\":\"x\",\"val\":[1.0]},{\"id\":3,\"norm\":3.3,\"letters\":\"B\",\"val\":{\"1\":[2.0,3.0],\"myname\":[4.0,5.0],\"3\":[\"a\"]}}]"
   )
-  
-
 })
+
