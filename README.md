@@ -1,4 +1,9 @@
 
+[![Travis build
+status](https://travis-ci.org/SymbolixAU/jsonify.svg?branch=master)](https://travis-ci.org/SymbolixAU/jsonify)
+[![Coverage
+status](https://codecov.io/gh/SymbolixAU/jsonify/branch/master/graph/badge.svg)](https://codecov.io/github/SymbolixAU/jsonify?branch=master)
+
 # jsonify
 
 jsonify converts a data.frame to JSON.
@@ -40,9 +45,9 @@ microbenchmark(
   times = 5
 )
 #  Unit: milliseconds
-#       expr      min        lq     mean   median       uq      max neval
-#   jsonlite 1759.266 2263.9875 2508.686 2412.173 3004.970 3103.036     5
-#    jsonify  872.291  909.7027 1080.204 1055.942 1197.295 1365.789     5
+#       expr       min        lq     mean   median       uq     max neval
+#   jsonlite 2050.6168 2428.0362 2596.670 2585.298 2675.907 3243.49     5
+#    jsonify  938.8224  945.1567 1077.529 1065.923 1150.350 1287.39     5
 
 n <- 1e7
 x <- rnorm(n = n)
@@ -57,8 +62,8 @@ microbenchmark(
 )
 #  Unit: seconds
 #       expr      min       lq     mean   median       uq      max neval
-#   jsonlite 1.506279 1.507953 1.623385 1.605283 1.609443 1.887967     5
-#    jsonify 1.646821 1.665439 1.693968 1.673506 1.690018 1.794058     5
+#   jsonlite 1.533383 1.606570 1.617233 1.617311 1.645076 1.683823     5
+#    jsonify 1.604660 1.627856 1.719328 1.643991 1.716037 2.004097     5
 ```
 
 ### What doesn’t it do?
