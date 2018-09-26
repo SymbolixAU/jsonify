@@ -19,15 +19,20 @@ test_that("different vector types work", {
 
 test_that("NAs, NULLS and Infs work", {
   to_json( NA ) ## logical
-  to_json( NA_character_ )
-  to_json( NA_complex_ )
-  to_json( NA_integer_ )
-  to_json( NA_real_ )
-  to_json( NaN )
+  
+  ## TODO ( should these all be JSON null values, rather than "NA" string?)
+  expect_equal(to_json( NA_character_ ), "[\"NA\"]")
+  expect_equal(to_json( NA_complex_ ), "[\"NA\"]")
+  expect_equal(to_json( NA_integer_ ), "[\"NA\"]")
+  expect_equal(to_json( NA_real_ ), "[\"NA\"]")
+  expect_equal(to_json( NaN ), "[\"NA\"]")
   
   expect_equal(to_json(NULL), "{}")
   expect_equal(to_json(list(a="a",b=NULL)),"{\"a\":[\"a\"],\"b\":{}}")
   expect_equal(to_json(data.frame()), "[]")
+  
+  #to_json( data.frame(x = NA_integer_))
+  
 })
 
 # x <- list( a = "a", b = NULL)

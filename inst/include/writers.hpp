@@ -15,17 +15,21 @@ namespace writers {
   
   template <typename Writer>
   inline void write_value( Writer& writer, int& value ) {
-    if( ISNAN( value ) ) {
-      write_value( writer, "NA" );
-    } else {
+    // if( ISNAN( value ) ) {
+    //  write_value( writer, "NA" );
+    // } else {
+    // NA handled at the vector
+    
+    // TODO ( need to handle C++ int NA type)
       writer.Int( value );
-    }
+    // }
   }
   
   template <typename Writer>
   inline void write_value( Writer& writer, double& value ) {
     if( ISNAN( value ) ) {
-      write_value( writer, "NA" );
+      //write_value( writer, "NA" );
+      writer.Null();
     } else {
       writer.Double( value );
     }
@@ -49,7 +53,12 @@ namespace writers {
   inline void write_value( Writer& writer, Rcpp::IntegerVector& iv ) {
     writer.StartArray();
     for ( int i = 0; i < iv.size(); i++ ) {
-      write_value( writer, iv[i] );
+      if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
+        //write_value( writer, "NA" );
+        writer.Null();
+      } else {
+        write_value( writer, iv[i] );
+      }
     }
     writer.EndArray();
   }
@@ -69,7 +78,8 @@ namespace writers {
     for ( int i = 0; i < lv.size(); i++ ) {
       if (Rcpp::LogicalVector::is_na( lv[i] ) ) {
         //Rcpp::Rcout << "NA logical found" << std::endl;
-        write_value( writer, "NA" );
+        // write_value( writer, "NA" );
+        writer.Null();
       } else {
         bool l = lv[i];             // required for logical vectors
         write_value( writer, l );
