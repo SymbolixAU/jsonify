@@ -4,6 +4,14 @@
 #include <Rcpp.h>
 #include "writers.hpp"
 
+// [[Rcpp::depends(rapidjsonr)]]
+
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
+
+using namespace rapidjson;
+
 namespace jsonify {
 namespace vectors {
 
@@ -12,8 +20,7 @@ namespace vectors {
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
     jsonify::writers::write_value( writer, nv );
-    Rcpp::StringVector js = sb.GetString();
-    return js;
+    return jsonify::utils::finalise_json( sb );
       
   }
 
@@ -22,8 +29,7 @@ namespace vectors {
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
     jsonify::writers::write_value( writer, sv );
-    Rcpp::StringVector js = sb.GetString();
-    return js;
+    return jsonify::utils::finalise_json( sb );
   }
 
   inline Rcpp::StringVector to_json( Rcpp::IntegerVector& iv ) {
@@ -31,8 +37,7 @@ namespace vectors {
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
     jsonify::writers::write_value( writer, iv );
-    Rcpp::StringVector js = sb.GetString();
-    return js;
+    return jsonify::utils::finalise_json( sb );
   }
 
   inline Rcpp::StringVector to_json( Rcpp::LogicalVector& lv ) {
@@ -40,8 +45,7 @@ namespace vectors {
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
     jsonify::writers::write_value( writer, lv );
-    Rcpp::StringVector js = sb.GetString();
-    return js;
+    return jsonify::utils::finalise_json( sb );
   }
 
   inline Rcpp::StringVector to_json( SEXP& lst ) {
@@ -49,12 +53,10 @@ namespace vectors {
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
     jsonify::writers::write_value( writer, lst );
-    Rcpp::StringVector js = sb.GetString();
-    return js;
+    return jsonify::utils::finalise_json( sb );
   }
 
-
 } // namespace vectors
-} // namespace // jsonify
+} // namespace jsonify
 
 #endif
