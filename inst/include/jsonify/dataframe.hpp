@@ -2,10 +2,15 @@
 #define R_JSONIFY_DATAFRAME_H
 
 #include <Rcpp.h>
+
+// [[Rcpp::depends(rapidjsonr)]]
+
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 #include "writers.hpp"
+
+using namespace rapidjson;
 
 namespace jsonify {
 namespace dataframe {
@@ -22,26 +27,42 @@ namespace dataframe {
     }
     case REALSXP: {
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-      double n = nv[ row ];
-      jsonify::writers::write_value( writer, n );
+      if ( Rcpp::NumericVector::is_na( nv[ row ] ) ) { 
+        writer.Null();
+      } else {
+        double n = nv[ row ];
+        jsonify::writers::write_value( writer, n );
+      }
       break;
     }
     case INTSXP: { 
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-      int i = iv[ row ];
-      jsonify::writers::write_value( writer, i );
+      if ( Rcpp::IntegerVector::is_na( iv[ row ] ) ) {
+        writer.Null();
+      } else {
+        int i = iv[ row ];
+        jsonify::writers::write_value( writer, i );
+      }
       break;
     }
     case LGLSXP: {
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-      bool l = lv[ row ];
-      jsonify::writers::write_value( writer, l );
+      if ( Rcpp::LogicalVector::is_na( lv[ row ] ) ) { 
+        writer.Null();
+      } else {
+        bool l = lv[ row ];
+        jsonify::writers::write_value( writer, l );
+      }
       break;
     }
     default: {
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-      const char *s = sv[ row ];
-      jsonify::writers::write_value( writer, s );
+      if ( Rcpp::StringVector::is_na( sv[ row ] ) ) {
+        writer.Null();
+      } else {
+        const char *s = sv[ row ];
+        jsonify::writers::write_value( writer, s );
+      }
       break;
     }
     }
@@ -75,8 +96,8 @@ namespace dataframe {
     }
     writer.EndArray();
     
-    Rcpp::StringVector js = sb.GetString();
-    return js;
+    
+    return jsonify::utils::finalise_json( sb );
   }
 
 } // namespace dataframe

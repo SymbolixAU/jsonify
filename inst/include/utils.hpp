@@ -3,12 +3,19 @@
 
 #include <Rcpp.h>
 
+// [[Rcpp::depends(rapidjsonr)]]
+
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
+
 namespace jsonify {
 namespace utils {
 
-  template< typename Writer>
-  inline void writer_starter( Writer& writer, int& n_elements ) {
-    
+  Rcpp::StringVector finalise_json( rapidjson::StringBuffer& sb ) {
+    Rcpp::StringVector js = sb.GetString();
+    js.attr("class") = "json";
+    return js;
   }
   
   template< typename Writer>

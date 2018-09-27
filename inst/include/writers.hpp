@@ -3,6 +3,15 @@
 
 #include <Rcpp.h>
 #include "utils.hpp"
+
+// [[Rcpp::depends(rapidjsonr)]]
+
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
+
+using namespace rapidjson;
+
 //#include "listwriter.hpp"
 
 namespace jsonify {
@@ -15,20 +24,16 @@ namespace writers {
   
   template <typename Writer>
   inline void write_value( Writer& writer, int& value ) {
-    // if( ISNAN( value ) ) {
-    //  write_value( writer, "NA" );
-    // } else {
-    // NA handled at the vector
-    
-    // TODO ( need to handle C++ int NA type)
+     if( std::isnan( value ) ) {
+      writer.Null();
+    } else {
       writer.Int( value );
-    // }
+    }
   }
   
   template <typename Writer>
   inline void write_value( Writer& writer, double& value ) {
-    if( ISNAN( value ) ) {
-      //write_value( writer, "NA" );
+    if(std::isnan( value ) ) {
       writer.Null();
     } else {
       writer.Double( value );
@@ -44,7 +49,11 @@ namespace writers {
   inline void write_value( Writer& writer, Rcpp::NumericVector& nv ) {
     writer.StartArray();
     for ( int i = 0; i < nv.size(); i++ ) {
-      write_value( writer, nv[i] );
+      if( Rcpp::NumericVector::is_na( nv[i] ) ) {
+        writer.Null();
+      } else {
+        write_value( writer, nv[i] );
+      }
     }
     writer.EndArray();
   }
@@ -67,7 +76,11 @@ namespace writers {
   inline void write_value( Writer& writer, Rcpp::StringVector& sv ) {
     writer.StartArray();
     for ( int i = 0; i < sv.size(); i++ ) {
-      write_value( writer, sv[i] );
+      if (Rcpp::StringVector::is_na( sv[i] ) ) {
+        writer.Null();
+      } else{
+        write_value( writer, sv[i] );
+      }
     }
     writer.EndArray();
   }
