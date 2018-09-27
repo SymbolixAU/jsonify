@@ -91,3 +91,35 @@ microbenchmark(
 #     expr       min        lq     mean   median       uq      max neval
 # jsonlite 18.518717 23.558636 24.79996 24.47630 24.77023 32.67592     5
 #  jsonify  9.265547  9.407197 13.29851 12.50761 17.08521 18.22700     5
+
+
+
+
+## forcing 
+
+library(microbenchmark)
+library(jsonlite)
+
+n <- 1e7
+df <- data.frame(
+  id = 1:n
+  , value = sample(letters, size = n, replace = T)
+  , val2 = rnorm(n = n)
+  , log = sample(c(T,F), size = n, replace = T)
+  #, dte = sample(seq(as.Date("2018-01-01"), as.Date("2018-01-31"), length.out = n), size = n, replace = T)
+)
+
+microbenchmark(
+  force = {
+    js <- jsonify::to_json( df, force = TRUE )
+  },
+  dontforce = {
+    js <- jsonify::to_json( df, force = FALSE )
+  },
+  times = 5
+)
+# Unit: seconds
+#       expr      min       lq     mean   median       uq      max neval
+#     force 9.889725 10.03111 10.23549 10.05032 10.38913 10.81715     5
+# dontforce 9.981074 10.02546 10.16957 10.12311 10.25727 10.46095     5
+

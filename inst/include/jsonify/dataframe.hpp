@@ -17,7 +17,7 @@ namespace dataframe {
 
   template <typename Writer>
   inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row) {
-
+    
     switch( TYPEOF( this_vec ) ) {
     case VECSXP: {
       Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
@@ -68,7 +68,6 @@ namespace dataframe {
     }
   }
 
-  
   inline Rcpp::StringVector to_json( Rcpp::DataFrame& df ) {
     
     rapidjson::StringBuffer sb;
@@ -95,7 +94,6 @@ namespace dataframe {
       writer.EndObject();
     }
     writer.EndArray();
-    
     
     return jsonify::utils::finalise_json( sb );
   }

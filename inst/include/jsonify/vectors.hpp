@@ -56,7 +56,6 @@ namespace vectors {
     return jsonify::utils::finalise_json( sb );
   }
 
-
 } // namespace vectors
 } // namespace jsonify
 

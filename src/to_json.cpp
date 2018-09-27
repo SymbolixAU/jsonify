@@ -31,15 +31,3 @@ Rcpp::StringVector rcpp_logical_to_json( Rcpp::LogicalVector iv ) {
 Rcpp::StringVector rcpp_list_to_json( SEXP lst ) {
   return jsonify::vectors::to_json( lst );
 }
-
-// // [[Rcpp::export]]
-// Rcpp::StringVector class_test( Rcpp::DataFrame df ) {
-//   int n_cols = df.ncol();
-//   Rcpp::StringVector classes( n_cols );
-//   
-//   for (int i = 0; i < n_cols; i++) {
-//     SEXP v = df[ i ];
-//     classes[i] = jsonify::get_r_class( v );
-//   }
-//   return classes;
-// }

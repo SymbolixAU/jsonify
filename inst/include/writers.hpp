@@ -12,8 +12,6 @@
 
 using namespace rapidjson;
 
-//#include "listwriter.hpp"
-
 namespace jsonify {
 namespace writers {
 
@@ -35,6 +33,9 @@ namespace writers {
   inline void write_value( Writer& writer, double& value ) {
     if(std::isnan( value ) ) {
       writer.Null();
+    } else if ( std::isinf( value ) ) {
+      std::string str = std::to_string( value );
+      writer.String( str.c_str() );
     } else {
       writer.Double( value );
     }
@@ -111,12 +112,10 @@ namespace writers {
   }
 
   template< typename Writer>
-  inline void write_value( Writer& writer, SEXP list_element ) {
+  inline void write_value( Writer& writer, SEXP& list_element ) {
     
     int n_elements;
-    //Rcpp::Rcout << "inside write_value" << std::endl;
     if( Rf_isNull( list_element ) ) {
-      //Rcpp::Rcout << "null list element" << std::endl;
       writer.StartObject();
       writer.EndObject();
       return;
@@ -124,13 +123,8 @@ namespace writers {
     
     switch( TYPEOF( list_element ) ) {
     case VECSXP: {
-      
-      //Rcpp::Rcout << "list element list " << std::endl;
       Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
       int n = lst.size();
-      
-      //Rcpp::Rcout << "list size: " << n << std::endl;
-      
       // LIST NAMES
       Rcpp::IntegerVector int_names = Rcpp::seq(1, lst.size());
       Rcpp::CharacterVector list_names = Rcpp::as< Rcpp::CharacterVector >( int_names );
@@ -138,8 +132,6 @@ namespace writers {
       
       if ( has_names ) {
         Rcpp::CharacterVector temp_names = lst.names();
-        //Rcpp::Rcout << "has names: " << temp_names << std::endl;
-        //list_names = lst.names();
         for( int i = 0; i < n; i++ ) {
           list_names[i] = temp_names[i] == "" ? list_names[i] : temp_names[i];
         }
@@ -162,28 +154,24 @@ namespace writers {
       break;
     }
     case REALSXP: {
-      //Rcpp::Rcout << "list element REAL " << std::endl;
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
       n_elements = nv.size();
       write_value( writer, nv, n_elements);
       break;
     }
     case INTSXP: { 
-      //Rcpp::Rcout << "list element INT " << std::endl;
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
       n_elements = iv.size();
       write_value( writer, iv, n_elements);
       break;
     }
     case LGLSXP: {
-      //Rcpp::Rcout << "list element LGL " << std::endl;
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_element );
       n_elements = lv.size();
       write_value( writer, lv, n_elements);
       break;
     }
     default: {
-      //Rcpp::Rcout << "list element default " << std::endl;
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_element );
       n_elements = sv.size();
       write_value( writer, sv, n_elements);
