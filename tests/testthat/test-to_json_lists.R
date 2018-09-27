@@ -1,5 +1,11 @@
 context("lists")
 
+test_that("empty lists are handled", {
+  
+  expect_equal( as.character(to_json(list())), "[]")
+  expect_equal( as.character(to_json(list(x = 1, y = list()))), "{\"x\":[1.0],\"y\":[]}")
+})
+
 test_that("list structures jsonified", {
 
   lst <- list(x = 1, y = c("a","b","c"), z = list("hello", b = "world"))

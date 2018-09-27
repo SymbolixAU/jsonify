@@ -125,6 +125,13 @@ namespace writers {
     case VECSXP: {
       Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
       int n = lst.size();
+      
+      if ( n == 0 ) {
+        writer.StartArray();
+        writer.EndArray();
+        break;
+      }
+      
       // LIST NAMES
       Rcpp::IntegerVector int_names = Rcpp::seq(1, lst.size());
       Rcpp::CharacterVector list_names = Rcpp::as< Rcpp::CharacterVector >( int_names );
