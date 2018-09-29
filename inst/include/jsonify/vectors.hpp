@@ -6,9 +6,9 @@
 
 // [[Rcpp::depends(rapidjsonr)]]
 
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
+//#include "rapidjson/writer.h"
+//#include "rapidjson/stringbuffer.h"
+//#include "rapidjson/prettywriter.h"
 
 using namespace rapidjson;
 
