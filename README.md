@@ -44,9 +44,9 @@ microbenchmark(
   times = 3
 )
 #  Unit: seconds
-#       expr      min       lq     mean   median       uq      max neval
-#   jsonlite 57.40755 63.37556 72.78637 69.34357 80.47578 91.60799     3
-#    jsonify 20.59097 20.89254 21.65002 21.19411 22.17954 23.16496     3
+#       expr       min        lq     mean    median       uq      max neval
+#   jsonlite 22.585821 26.050425 29.05018 29.515029 32.28236 35.04969     3
+#    jsonify  9.257935  9.315703 11.57512  9.373472 12.73372 16.09396     3
 
 n <- 1e6
 x <- rnorm(n = n)
@@ -61,8 +61,8 @@ microbenchmark(
 )
 #  Unit: milliseconds
 #       expr      min       lq     mean   median       uq      max neval
-#   jsonlite 333.6543 335.5269 340.0416 335.5291 336.3519 359.1459     5
-#    jsonify 259.0698 259.3488 265.4889 259.8535 271.1880 277.9843     5
+#   jsonlite 136.7371 138.4160 146.2242 147.6025 153.9232 154.4420     5
+#    jsonify 150.4853 150.8432 152.1658 151.5055 153.3850 154.6102     5
 
 n <- 1e4
 x <- list(
@@ -88,9 +88,9 @@ microbenchmark(
   times = 5
 )
 #  Unit: milliseconds
-#       expr      min       lq     mean   median      uq      max neval
-#   jsonlite 37.73224 37.79566 43.88612 39.74001 45.9684 58.19430     5
-#    jsonify 13.70859 14.13956 16.00623 16.12565 17.9036 18.15375     5
+#       expr       min        lq     mean    median        uq      max neval
+#   jsonlite 20.686503 20.816496 21.82861 20.948203 21.741090 24.95077     5
+#    jsonify  7.655508  8.037006  8.64225  8.226437  8.367374 10.92492     5
 ```
 
 ### There’s no ‘Date’ type in JSON, how have you handled this?
@@ -141,13 +141,19 @@ jsonify::to_json( x, numeric_dates = FALSE)
 #  ["2018-01-01 01:00:00"]
 ```
 
+### Why doesn’t `numeric_dates` work for lists?
+
+Because the purpose of this library is speed. A lot of overhead is
+incurred iterating over a list to find and convert objects from one type
+to another.
+
 ### What do you mean by ‘available at the source’ ?
 
 I want to be able to call the C++ code from another package, without
 going to & from R. Therefore, the C++ code is imlemented in headers, so
-you can `LinkTo` it in your own package.
+you can “link to” it in your own package.
 
-For example, the LinkingTo section in DESCRIPTION will look something
+For example, the `LinkingTo` section in DESCRIPTION will look something
 like
 
 ``` r

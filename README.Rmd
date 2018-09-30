@@ -137,9 +137,9 @@ Because the purpose of this library is speed. A lot of overhead is incurred iter
 
 ### What do you mean by 'available at the source' ?
 
-I want to be able to call the C++ code from another package, without going to & from R. Therefore, the C++ code is imlemented in headers, so you can `LinkTo` it in your own package. 
+I want to be able to call the C++ code from another package, without going to & from R. Therefore, the C++ code is imlemented in headers, so you can "link to" it in your own package. 
 
-For example, the LinkingTo section in DESCRIPTION will look something like
+For example, the `LinkingTo` section in DESCRIPTION will look something like
 
 ```r
 LinkingTo: 
