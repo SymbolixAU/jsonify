@@ -3,6 +3,7 @@
 #' Converts a data.frame to JSON
 #' 
 #' @param x object to convert to JSON
+#' @param ... arguments passed to other methods
 #' @export
 to_json <- function( x, ... ) UseMethod("to_json")
 
@@ -10,7 +11,7 @@ to_json <- function( x, ... ) UseMethod("to_json")
 #' @export
 #' @param numeric_dates logical indicating if dates should be treated as numerics. 
 #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character
-to_json.data.frame <- function( x, numeric_dates = TRUE ) {
+to_json.data.frame <- function( x, ..., numeric_dates = TRUE ) {
   if(!numeric_dates) x <- handle_dates( x ) 
   rcpp_df_to_json( x )
 }
@@ -34,7 +35,7 @@ to_json.logical <- function( x, ... ) rcpp_logical_to_json( x )
 #' @rdname to_json
 #' @export
 #' @inheritParams convert_to_json.data.frame
-to_json.Date <- function( x, numeric_dates = TRUE ) {
+to_json.Date <- function( x, ..., numeric_dates = TRUE ) {
   if( numeric_dates ) return( rcpp_numeric_to_json( x ) ) 
   return( rcpp_character_to_json( as.character( x ) ) )
 }
@@ -42,7 +43,7 @@ to_json.Date <- function( x, numeric_dates = TRUE ) {
 #' @rdname to_json
 #' @export
 #' @inheritParams convert_to_json.data.frame
-to_json.POSIXct <- function( x, numeric_dates = TRUE ) {
+to_json.POSIXct <- function( x, ..., numeric_dates = TRUE ) {
   if( numeric_dates ) return( rcpp_numeric_to_json( x ) ) 
   return( rcpp_character_to_json( as.character( x ) ) )
 }
@@ -50,7 +51,7 @@ to_json.POSIXct <- function( x, numeric_dates = TRUE ) {
 #' @rdname to_json
 #' @export
 #' @inheritParams convert_to_json.data.frame
-to_json.POSIXlt <- function( x, numeric_dates = TRUE ) {
+to_json.POSIXlt <- function( x, ..., numeric_dates = TRUE ) {
   if( numeric_dates ) return( rcpp_list_to_json( x ) ) 
   return( rcpp_character_to_json( as.character( x ) ) )
 }

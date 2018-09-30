@@ -16,7 +16,7 @@
 \usage{
 to_json(x, ...)
 
-\method{to_json}{data.frame}(x, numeric_dates = TRUE)
+\method{to_json}{data.frame}(x, ..., numeric_dates = TRUE)
 
 \method{to_json}{numeric}(x, ...)
 
@@ -26,11 +26,11 @@ to_json(x, ...)
 
 \method{to_json}{logical}(x, ...)
 
-\method{to_json}{Date}(x, numeric_dates = TRUE)
+\method{to_json}{Date}(x, ..., numeric_dates = TRUE)
 
-\method{to_json}{POSIXct}(x, numeric_dates = TRUE)
+\method{to_json}{POSIXct}(x, ..., numeric_dates = TRUE)
 
-\method{to_json}{POSIXlt}(x, numeric_dates = TRUE)
+\method{to_json}{POSIXlt}(x, ..., numeric_dates = TRUE)
 
 \method{to_json}{list}(x, ...)
 
@@ -38,6 +38,8 @@ to_json(x, ...)
 }
 \arguments{
 \item{x}{object to convert to JSON}
+
+\item{...}{arguments passed to other methods}
 
 \item{numeric_dates}{logical indicating if dates should be treated as numerics. 
 Defaults to TRUE for speed. If FALSE, the dates will be coerced to character}
