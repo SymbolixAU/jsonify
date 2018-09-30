@@ -34,7 +34,7 @@ It does alright
 library(microbenchmark)
 library(jsonlite)
 
-n <- 1e7
+n <- 5e6
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -61,7 +61,7 @@ microbenchmark(
   jsonify = {
     js <- jsonify::to_json( x )
   },
-  times = 5
+  times = 3
 )
 
 n <- 1e4
@@ -137,7 +137,7 @@ Because the purpose of this library is speed. A lot of overhead is incurred iter
 
 ### What do you mean by 'available at the source' ?
 
-I want to be able to call the C++ code from another package, without going to & from R. Therefore, the C++ code is imlemented in headers, so you can "link to" it in your own package. 
+I want to be able to call the C++ code from another package, without going to & from R. Therefore, the C++ code is implemented in headers, so you can "link to" it in your own package. 
 
 For example, the `LinkingTo` section in DESCRIPTION will look something like
 
@@ -146,7 +146,7 @@ LinkingTo:
     Rcpp,
     jsonify
 ```
-And in a c++ source file so you can `#include` the header and use the available functions
+And in a c++ source file you can `#include` the header and use the available functions
 
 ```c++
 #include "jsonify.hpp"

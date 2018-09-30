@@ -26,7 +26,7 @@ It does alright
 library(microbenchmark)
 library(jsonlite)
 
-n <- 1e7
+n <- 5e6
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -44,9 +44,9 @@ microbenchmark(
   times = 3
 )
 #  Unit: seconds
-#       expr       min        lq     mean    median       uq      max neval
-#   jsonlite 22.585821 26.050425 29.05018 29.515029 32.28236 35.04969     3
-#    jsonify  9.257935  9.315703 11.57512  9.373472 12.73372 16.09396     3
+#       expr       min       lq      mean    median       uq      max neval
+#   jsonlite 10.688327 11.35715 13.018182 12.025966 14.18311 16.34025     3
+#    jsonify  5.007351  5.94386  8.447721  6.880368 10.16791 13.45545     3
 
 n <- 1e6
 x <- rnorm(n = n)
@@ -57,12 +57,12 @@ microbenchmark(
   jsonify = {
     js <- jsonify::to_json( x )
   },
-  times = 5
+  times = 3
 )
 #  Unit: milliseconds
 #       expr      min       lq     mean   median       uq      max neval
-#   jsonlite 136.7371 138.4160 146.2242 147.6025 153.9232 154.4420     5
-#    jsonify 150.4853 150.8432 152.1658 151.5055 153.3850 154.6102     5
+#   jsonlite 140.7063 147.9194 152.5384 155.1325 158.4544 161.7763     3
+#    jsonify 147.9468 150.8111 152.5364 153.6753 154.8312 155.9872     3
 
 n <- 1e4
 x <- list(
@@ -88,9 +88,12 @@ microbenchmark(
   times = 5
 )
 #  Unit: milliseconds
-#       expr       min        lq     mean    median        uq      max neval
-#   jsonlite 20.686503 20.816496 21.82861 20.948203 21.741090 24.95077     5
-#    jsonify  7.655508  8.037006  8.64225  8.226437  8.367374 10.92492     5
+#       expr       min        lq      mean    median        uq       max
+#   jsonlite 18.389754 19.815930 20.676191 20.716126 21.336017 23.123128
+#    jsonify  7.867568  7.908302  8.250311  8.052828  8.213474  9.209385
+#   neval
+#       5
+#       5
 ```
 
 ### There’s no ‘Date’ type in JSON, how have you handled this?
@@ -150,7 +153,7 @@ to another.
 ### What do you mean by ‘available at the source’ ?
 
 I want to be able to call the C++ code from another package, without
-going to & from R. Therefore, the C++ code is imlemented in headers, so
+going to & from R. Therefore, the C++ code is implemented in headers, so
 you can “link to” it in your own package.
 
 For example, the `LinkingTo` section in DESCRIPTION will look something
@@ -162,7 +165,7 @@ LinkingTo:
     jsonify
 ```
 
-And in a c++ source file so you can `#include` the header and use the
+And in a c++ source file you can `#include` the header and use the
 available functions
 
 ``` cpp
