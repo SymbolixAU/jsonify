@@ -2,9 +2,39 @@
 % Please edit documentation in R/to_json.R
 \name{to_json}
 \alias{to_json}
+\alias{to_json.data.frame}
+\alias{to_json.numeric}
+\alias{to_json.character}
+\alias{to_json.integer}
+\alias{to_json.logical}
+\alias{to_json.Date}
+\alias{to_json.POSIXct}
+\alias{to_json.POSIXlt}
+\alias{to_json.list}
+\alias{to_json.default}
 \title{To JSON}
 \usage{
-to_json(x, numeric_dates = TRUE)
+to_json(x, ...)
+
+\method{to_json}{data.frame}(x, numeric_dates = TRUE)
+
+\method{to_json}{numeric}(x, ...)
+
+\method{to_json}{character}(x, ...)
+
+\method{to_json}{integer}(x, ...)
+
+\method{to_json}{logical}(x, ...)
+
+\method{to_json}{Date}(x, numeric_dates = TRUE)
+
+\method{to_json}{POSIXct}(x, numeric_dates = TRUE)
+
+\method{to_json}{POSIXlt}(x, numeric_dates = TRUE)
+
+\method{to_json}{list}(x, ...)
+
+\method{to_json}{default}(x, ...)
 }
 \arguments{
 \item{x}{object to convert to JSON}
