@@ -34,7 +34,7 @@ It does alright
 library(microbenchmark)
 library(jsonlite)
 
-n <- 5e6
+n <- 1e6
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -52,17 +52,6 @@ microbenchmark(
   times = 3
 )
 
-n <- 1e6
-x <- rnorm(n = n)
-microbenchmark(
-  jsonlite = {
-    js <- jsonlite::toJSON( x )
-  },
-  jsonify = {
-    js <- jsonify::to_json( x )
-  },
-  times = 3
-)
 
 n <- 1e4
 x <- list(

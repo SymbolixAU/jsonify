@@ -26,7 +26,7 @@ It does alright
 library(microbenchmark)
 library(jsonlite)
 
-n <- 5e6
+n <- 1e6
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -43,26 +43,11 @@ microbenchmark(
   },
   times = 3
 )
-#  Unit: seconds
-#       expr       min       lq      mean    median       uq      max neval
-#   jsonlite 10.688327 11.35715 13.018182 12.025966 14.18311 16.34025     3
-#    jsonify  5.007351  5.94386  8.447721  6.880368 10.16791 13.45545     3
-
-n <- 1e6
-x <- rnorm(n = n)
-microbenchmark(
-  jsonlite = {
-    js <- jsonlite::toJSON( x )
-  },
-  jsonify = {
-    js <- jsonify::to_json( x )
-  },
-  times = 3
-)
 #  Unit: milliseconds
-#       expr      min       lq     mean   median       uq      max neval
-#   jsonlite 140.7063 147.9194 152.5384 155.1325 158.4544 161.7763     3
-#    jsonify 147.9468 150.8111 152.5364 153.6753 154.8312 155.9872     3
+#       expr       min        lq     mean    median       uq      max neval
+#   jsonlite 2225.8286 2238.2178 2507.095 2250.6071 2647.728 3044.849     3
+#    jsonify  895.2017  941.6577 1024.498  988.1136 1089.147 1190.180     3
+
 
 n <- 1e4
 x <- list(
@@ -89,8 +74,8 @@ microbenchmark(
 )
 #  Unit: milliseconds
 #       expr       min        lq      mean    median        uq       max
-#   jsonlite 18.389754 19.815930 20.676191 20.716126 21.336017 23.123128
-#    jsonify  7.867568  7.908302  8.250311  8.052828  8.213474  9.209385
+#   jsonlite 21.897356 22.112638 23.021601 22.629408 23.801456 24.667146
+#    jsonify  8.635326  8.698786  8.905396  8.892434  8.940992  9.359441
 #   neval
 #       5
 #       5
