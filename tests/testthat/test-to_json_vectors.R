@@ -31,8 +31,8 @@ test_that("NAs, NULLS and Infs work", {
   expect_equal(as.character(to_json( NA_integer_ )), "[null]")
   expect_equal(as.character(to_json( NA_real_ )), "[null]")
   expect_equal(as.character(to_json( NaN )), "[null]")
-  expect_equal(as.character(to_json( Inf )), "[\"inf\"]")
-  expect_equal(as.character(to_json( -Inf )), "[\"-inf\"]")
+  expect_equal(as.character(to_json( Inf )), "[\"Inf\"]")
+  expect_equal(as.character(to_json( -Inf )), "[\"-Inf\"]")
   expect_equal(as.character(to_json(NULL)), "{}")
   expect_equal(as.character(to_json(list(a="a",b=NULL))),"{\"a\":[\"a\"],\"b\":{}}")
   expect_equal(as.character(to_json(data.frame())), "[]")
@@ -56,3 +56,4 @@ test_that("round trips with jsonlite work", {
   expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
 })
 
+## TODO( test list of all mixed types, inc Date, POSIXct and POSIXlt)

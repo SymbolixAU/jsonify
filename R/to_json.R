@@ -49,19 +49,12 @@ convert_to_json.POSIXlt <- function( x, numeric_dates = TRUE ) {
   return( rcpp_character_to_json( as.character( x ) ) )
 }
 
-
-
 #' @export
 convert_to_json.list <- function( x, ... ) rcpp_list_to_json( x )
 
 #' @export
-convert_to_json.default <- function( x, ... ) convert_to_json.list( x, ... ) 
-# stop("this type is not supported")
+convert_to_json.default <- function( x, ... ) rcpp_list_to_json( x ) # stop("this type is not supported")
 
-
-# col_classes <- function( df ) vapply( df, function(x) class(x)[[1]], "")
-
-## TOD(handle dates for lists & vectors)
 date_columns <- function( df ) names(which(vapply(df , function(x) { inherits(x, "Date") || inherits(x, "POSIXct") }, T)))
 
 handle_dates <- function( x ) {
@@ -69,31 +62,3 @@ handle_dates <- function( x ) {
   for ( i in dte ) x[[i]] <- as.character(x[[i]])
   return( x )
 }
-
-
-# handle_dates2 <- function( x ) {
-#   dte <- date_columns( x )
-#   for ( i in dte ) {
-#     x[[i]] <- as.character(x[[i]])
-#   }
-#   return(x)
-# }
-# 
-
-# n <- 1e6
-# df <- data.frame(id = 1:n, dte = sample(seq(as.Date("2018-01-01"), as.Date("2018-01-31"), length.out = n)))
-# 
-# library(microbenchmark)
-# microbenchmark(
-#   numeric = {
-#     jsonify::to_json( df )
-#   },
-#   character ={
-#     jsonify::to_json( jsonify:::handle_dates( df ) )
-#   },
-#   times = 5
-# )
-# Unit: milliseconds
-#      expr       min       lq     mean   median       uq      max neval
-#   numeric  982.7153 1113.085 1117.633 1140.885 1149.160 1202.320     5
-# character 4802.2583 4829.550 5130.051 4916.636 5146.547 5955.265     5
