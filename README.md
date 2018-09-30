@@ -6,7 +6,7 @@ status](https://codecov.io/gh/SymbolixAU/jsonify/branch/master/graph/badge.svg)]
 
 # jsonify
 
-jsonify converts a data.frame to JSON.
+jsonify converts R objects to JSON.
 
 ### Aren’t there already data.frame to JSON converters?
 
@@ -26,7 +26,7 @@ It does alright
 library(microbenchmark)
 library(jsonlite)
 
-n <- 1e6
+n <- 1e7
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -41,12 +41,12 @@ microbenchmark(
   jsonify = {
     js <- jsonify::to_json( df )
   },
-  times = 5
+  times = 3
 )
 #  Unit: seconds
 #       expr      min       lq     mean   median       uq      max neval
-#   jsonlite 3.784345 3.901516 4.928768 4.787375 5.038220 7.132385     5
-#    jsonify 1.962421 2.004886 2.889840 3.009741 3.682872 3.789279     5
+#   jsonlite 57.40755 63.37556 72.78637 69.34357 80.47578 91.60799     3
+#    jsonify 20.59097 20.89254 21.65002 21.19411 22.17954 23.16496     3
 
 n <- 1e6
 x <- rnorm(n = n)
@@ -61,8 +61,8 @@ microbenchmark(
 )
 #  Unit: milliseconds
 #       expr      min       lq     mean   median       uq      max neval
-#   jsonlite 337.7843 357.4031 360.4379 358.4674 371.8704 376.6641     5
-#    jsonify 287.1586 293.5292 300.2759 298.1050 300.5953 321.9915     5
+#   jsonlite 333.6543 335.5269 340.0416 335.5291 336.3519 359.1459     5
+#    jsonify 259.0698 259.3488 265.4889 259.8535 271.1880 277.9843     5
 
 n <- 1e4
 x <- list(
@@ -88,9 +88,9 @@ microbenchmark(
   times = 5
 )
 #  Unit: milliseconds
-#       expr      min       lq     mean   median       uq      max neval
-#   jsonlite 36.74542 42.13514 47.74987 46.15347 50.55273 63.16261     5
-#    jsonify 13.85580 14.09951 14.89491 15.28431 15.28559 15.94935     5
+#       expr      min       lq     mean   median      uq      max neval
+#   jsonlite 37.73224 37.79566 43.88612 39.74001 45.9684 58.19430     5
+#    jsonify 13.70859 14.13956 16.00623 16.12565 17.9036 18.15375     5
 ```
 
 ### There’s no ‘Date’ type in JSON, how have you handled this?
