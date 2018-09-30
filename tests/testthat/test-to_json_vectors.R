@@ -14,6 +14,10 @@ test_that("different vector types work", {
   expect_equal(as.character(to_json(as.POSIXct("2018-01-01 01:00:00", tz = "GMT"), numeric_dates = F)), "[\"2018-01-01 01:00:00\"]")
   expect_equal(as.character(to_json(complex(1))),"[\"0+0i\"]")
   
+  ## Numeric dates not implemented for lists
+  expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = F)), '{"x":[17532.0]}')
+  expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = T)), '{"x":[17532.0]}')
+  
 })
 
 
@@ -29,19 +33,26 @@ test_that("NAs, NULLS and Infs work", {
   expect_equal(as.character(to_json( NaN )), "[null]")
   expect_equal(as.character(to_json( Inf )), "[\"inf\"]")
   expect_equal(as.character(to_json( -Inf )), "[\"-inf\"]")
-  
   expect_equal(as.character(to_json(NULL)), "{}")
   expect_equal(as.character(to_json(list(a="a",b=NULL))),"{\"a\":[\"a\"],\"b\":{}}")
   expect_equal(as.character(to_json(data.frame())), "[]")
   
 })
 
-# x <- list( a = "a", b = NULL)
-# jsonlite::toJSON( x )
-# to_json( x )
-# 
-# jsonlite::toJSON( NULL )
-# to_json( NULL )
-# 
-# fromJSON('{"x":null, "y":[1,null,3]}')
+
+
+test_that("round trips with jsonlite work", {
+  x <- c(1L, NA_integer_)
+  expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
+  x <- c(1.0, NA_real_)
+  expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
+  x <- c("1", NA_character_)
+  expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
+  x <- c(T,F, NA)
+  expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
+  x <- c(1, Inf, -Inf)
+  expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
+  x <- list()
+  expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
+})
 

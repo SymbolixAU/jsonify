@@ -34,7 +34,14 @@ namespace writers {
     if(std::isnan( value ) ) {
       writer.Null();
     } else if ( std::isinf( value ) ) {
+      
       std::string str = std::to_string( value );
+      // https://stackoverflow.com/a/14744016/5977215
+      if ( str[0] == '-') { 
+        str[1] = toupper( str[1] );
+      } else {
+        str[0] = toupper(str[0]);
+      }
       writer.String( str.c_str() );
     } else {
       writer.Double( value );

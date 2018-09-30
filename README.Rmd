@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 # jsonify
 
-jsonify converts a data.frame to JSON. 
+jsonify converts R objects to JSON. 
 
 ### Aren't there already data.frame to JSON converters?
 
@@ -34,13 +34,12 @@ It does alright
 library(microbenchmark)
 library(jsonlite)
 
-n <- 1e6
+n <- 1e7
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
   , val2 = rnorm(n = n)
   , log = sample(c(T,F), size = n, replace = T)
-  #, dte = sample(seq(as.Date("2018-01-01"), as.Date("2018-01-31"), length.out = n), size = n, replace = T)
 )
 
 microbenchmark(
@@ -50,10 +49,10 @@ microbenchmark(
   jsonify = {
     js <- jsonify::to_json( df )
   },
-  times = 5
+  times = 3
 )
 
-n <- 1e7
+n <- 1e6
 x <- rnorm(n = n)
 microbenchmark(
   jsonlite = {
@@ -64,17 +63,39 @@ microbenchmark(
   },
   times = 5
 )
+
+n <- 1e4
+x <- list(
+  x = rnorm(n = n)
+  , y = list(x = rnorm(n = n))
+  , z = list( list( x = rnorm(n = n)))
+  , xx = rnorm(n = n)
+  , yy = data.frame(
+      id = 1:n
+      , value = sample(letters, size = n, replace = T)
+      , val2 = rnorm(n = n)
+      , log = sample(c(T,F), size = n, replace = T)
+    )
+)
+
+microbenchmark(
+  jsonlite = {
+    js <- jsonlite::toJSON( x )
+  },
+  jsonify = {
+    js <- jsonify::to_json( x )
+  },
+  times = 5
+)
+
 ```
-
-### What doesn't it do?
-
-Quite a lot, it's still in development!
 
 ### There's no 'Date' type in JSON, how have you handled this?
 
-I've currently left this up to the user. At its core in R, `Dates` are numeric, so they're treated as numbers when converted to JSON. 
+At its core `Dates` in R are numeric, so they're treated as numbers when converted to JSON. However, I've given the option to the user to coerce to character through the `numeric_dates` argument. 
 
-I've given the option to the user to coerce to character through the `numeric_dates` argument. 
+**This argument only works for data.frames and vectors, not lists**
+
 
 ```{r}
 df <- data.frame(dte = as.Date("2018-01-01"))
@@ -91,6 +112,28 @@ jsonify::to_json( df, numeric_dates = FALSE )
 
 ```
 
+### And `POSIXct` and `POSIXlt`?
+
+`POSIXct` work the same as `Date`
+
+```{r}
+df <- data.frame(dte = as.POSIXct("2018-01-01 10:00:00"))
+jsonify::to_json( df )
+jsonify::to_json( df, numeric_dates = FALSE)
+
+```
+
+`POSIXlt` will return each component of the date-time
+
+```{r}
+x <- as.POSIXlt("2018-01-01 01:00:00", tz = "GMT")
+jsonify::to_json( x )
+jsonify::to_json( x, numeric_dates = FALSE)
+```
+
+### Why doesn't `numeric_dates` work for lists?
+
+Because the purpose of this library is speed. A lot of overhead is incurred iterating over a list to find and convert objects from one type to another. 
 
 ### What do you mean by 'available at the source' ?
 
