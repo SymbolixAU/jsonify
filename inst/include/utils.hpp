@@ -49,6 +49,20 @@ namespace utils {
     }
   }
   
+  template< typename Writer >
+  inline void should_start_array_single( Writer& writer, int& n ) {
+    if ( n == 1 ) {
+      writer.StartArray();
+    }
+  }
+  
+  template< typename Writer >
+  inline void should_end_array_single( Writer& writer, int& n ) {
+    if ( n  == 1 ) {
+      writer.EndArray();
+    }
+  }
+  
 
 } // namespace utils
 } // namespace jsonify
