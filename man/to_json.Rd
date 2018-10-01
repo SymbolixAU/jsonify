@@ -47,3 +47,11 @@ Defaults to TRUE for speed. If FALSE, the dates will be coerced to character}
 \description{
 Converts a data.frame to JSON
 }
+\examples{
+
+to_json(1:3)
+to_json(letters[1:3])
+to_json(data.frame(x = 1:3, y = letters[1:3]))
+to_json(list(x = 1:3, y = list(z = letters[1:3])))
+
+}

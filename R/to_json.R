@@ -4,6 +4,14 @@
 #' 
 #' @param x object to convert to JSON
 #' @param ... arguments passed to other methods
+#' 
+#' @examples 
+#' 
+#' to_json(1:3)
+#' to_json(letters[1:3])
+#' to_json(data.frame(x = 1:3, y = letters[1:3]))
+#' to_json(list(x = 1:3, y = list(z = letters[1:3])))
+#' 
 #' @export
 to_json <- function( x, ... ) UseMethod("to_json")
 
