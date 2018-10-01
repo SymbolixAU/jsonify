@@ -42,6 +42,11 @@ to_json.logical <- function( x, ... ) rcpp_logical_to_json( x )
 
 #' @rdname to_json
 #' @export
+to_json.complex <- function( x, ... ) rcpp_character_to_json( x )
+
+
+#' @rdname to_json
+#' @export
 #' @inheritParams convert_to_json.data.frame
 to_json.Date <- function( x, ..., numeric_dates = TRUE ) {
   if( numeric_dates ) return( rcpp_numeric_to_json( x ) ) 
