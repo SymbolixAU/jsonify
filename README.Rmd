@@ -26,7 +26,7 @@ Yep.
 
 Because I wanted it available at the source ( C++ ) level for integrating into other packages.
 
-### Is it fast
+### Is it fast?
 
 It does alright
 

@@ -1,23 +1,20 @@
 
-[![Travis build
-status](https://travis-ci.org/SymbolixAU/jsonify.svg?branch=master)](https://travis-ci.org/SymbolixAU/jsonify)
-[![Coverage
-status](https://codecov.io/gh/SymbolixAU/jsonify/branch/master/graph/badge.svg)](https://codecov.io/github/SymbolixAU/jsonify?branch=master)
+[![Travis build status](https://travis-ci.org/SymbolixAU/jsonify.svg?branch=master)](https://travis-ci.org/SymbolixAU/jsonify) [![Coverage status](https://codecov.io/gh/SymbolixAU/jsonify/branch/master/graph/badge.svg)](https://codecov.io/github/SymbolixAU/jsonify?branch=master)
 
-# jsonify
+jsonify
+=======
 
 jsonify converts R objects to JSON.
 
-### Aren’t there already data.frame to JSON converters?
+### Aren't there already data.frame to JSON converters?
 
 Yep.
 
 ### So why did you build this one?
 
-Because I wanted it available at the source ( C++ ) level for
-integrating into other packages.
+Because I wanted it available at the source ( C++ ) level for integrating into other packages.
 
-### Is it fast
+### Is it fast?
 
 It does alright
 
@@ -79,11 +76,9 @@ microbenchmark(
 #   jsonify  8.009139  8.109407  8.540984  8.117278  8.874733  9.594362     5
 ```
 
-### There’s no ‘Date’ type in JSON, how have you handled this?
+### There's no 'Date' type in JSON, how have you handled this?
 
-At its core `Dates` in R are numeric, so they’re treated as numbers when
-converted to JSON. However, I’ve given the option to the user to coerce
-to character through the `numeric_dates` argument.
+At its core `Dates` in R are numeric, so they're treated as numbers when converted to JSON. However, I've given the option to the user to coerce to character through the `numeric_dates` argument.
 
 **This argument only works for data.frames and vectors, not lists**
 
@@ -143,20 +138,15 @@ jsonify::to_json( x, numeric_dates = FALSE)
 #  [1] "json"
 ```
 
-### Why doesn’t `numeric_dates` work for lists?
+### Why doesn't `numeric_dates` work for lists?
 
-Because the purpose of this library is speed. A lot of overhead is
-incurred iterating over a list to find and convert objects from one type
-to another.
+Because the purpose of this library is speed. A lot of overhead is incurred iterating over a list to find and convert objects from one type to another.
 
-### What do you mean by ‘available at the source’ ?
+### What do you mean by 'available at the source' ?
 
-I want to be able to call the C++ code from another package, without
-going to & from R. Therefore, the C++ code is implemented in headers, so
-you can “link to” it in your own package.
+I want to be able to call the C++ code from another package, without going to & from R. Therefore, the C++ code is implemented in headers, so you can "link to" it in your own package.
 
-For example, the `LinkingTo` section in DESCRIPTION will look something
-like
+For example, the `LinkingTo` section in DESCRIPTION will look something like
 
 ``` r
 LinkingTo: 
@@ -164,8 +154,7 @@ LinkingTo:
     jsonify
 ```
 
-And in a c++ source file you can `#include` the header and use the
-available functions
+And in a c++ source file you can `#include` the header and use the available functions
 
 ``` cpp
 #include "jsonify.hpp"
