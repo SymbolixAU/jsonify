@@ -79,7 +79,7 @@ microbenchmark(
 #   jsonify  8.009139  8.109407  8.540984  8.117278  8.874733  9.594362     5
 ```
 
-### There’s no ‘Date’ type in JSON, how have you handled this?
+### There’s no `Date` type in JSON, how have you handled this?
 
 At its core `Dates` in R are numeric, so they’re treated as numbers when
 converted to JSON. However, I’ve given the option to the user to coerce
@@ -149,7 +149,7 @@ Because the purpose of this library is speed. A lot of overhead is
 incurred iterating over a list to find and convert objects from one type
 to another.
 
-### What do you mean by ‘available at the source’ ?
+### What do you mean by “available at the source” ?
 
 I want to be able to call the C++ code from another package, without
 going to & from R. Therefore, the C++ code is implemented in headers, so
