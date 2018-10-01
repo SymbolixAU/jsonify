@@ -25,3 +25,7 @@ rcpp_list_to_json <- function(lst) {
     .Call(`_jsonify_rcpp_list_to_json`, lst)
 }
 
+rcpp_validate_json <- function(geojson) {
+    .Call(`_jsonify_rcpp_validate_json`, geojson)
+}
+

@@ -25,7 +25,7 @@ test_that("data.frame - complex columns are jsonified", {
   
   df <- data.frame( id = 1, val = I(list(letters[1:5])))
   expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[\"a\",\"b\",\"c\",\"d\",\"e\"]}]")
-  expect_true( jsonlite::validate( to_json( df ) ) ) 
+  expect_true( jsonify::validate( to_json( df ) ) ) 
   
   df <- data.frame(
     id = 1:3
@@ -38,7 +38,7 @@ test_that("data.frame - complex columns are jsonified", {
     as.character( to_json( df ) ) , 
     "[{\"id\":1,\"norm\":1.1,\"letters\":\"a\",\"val\":[0.0,0.0]},{\"id\":2,\"norm\":2.2,\"letters\":\"x\",\"val\":[1.0]},{\"id\":3,\"norm\":3.3,\"letters\":\"B\",\"val\":{\"1\":[2.0,3.0],\"myname\":[4.0,5.0],\"3\":[\"a\"]}}]"
   )
-  expect_true(jsonlite::validate( to_json( df ) ) )
+  expect_true(jsonify::validate( to_json( df ) ) )
 })
 
 test_that("Nulls, NAs and Infs work",{

@@ -71,6 +71,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_validate_json
+Rcpp::LogicalVector rcpp_validate_json(Rcpp::StringVector geojson);
+RcppExport SEXP _jsonify_rcpp_validate_json(SEXP geojsonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type geojson(geojsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_validate_json(geojson));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_df_to_json", (DL_FUNC) &_jsonify_rcpp_df_to_json, 1},
@@ -79,6 +90,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_integer_to_json", (DL_FUNC) &_jsonify_rcpp_integer_to_json, 1},
     {"_jsonify_rcpp_logical_to_json", (DL_FUNC) &_jsonify_rcpp_logical_to_json, 1},
     {"_jsonify_rcpp_list_to_json", (DL_FUNC) &_jsonify_rcpp_list_to_json, 1},
+    {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
     {NULL, NULL, 0}
 };
 
