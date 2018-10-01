@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+
 # jsonify
 
 jsonify converts R objects to JSON. 
@@ -29,12 +30,12 @@ Because I wanted it available at the source ( C++ ) level for integrating into o
 
 It does alright
 
-```{r}
+```{r, eval=FALSE}
 
 library(microbenchmark)
 library(jsonlite)
 
-n <- 1e6
+n <- 5e6
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -52,6 +53,10 @@ microbenchmark(
   times = 3
 )
 
+# Unit: seconds
+#      expr       min        lq      mean    median        uq      max neval
+#  jsonlite 13.422896 13.767812 15.178853 14.112728 16.056832 18.00094     3
+#   jsonify  7.152847  7.238169  7.294133  7.323491  7.364776  7.40606     3
 
 n <- 1e4
 x <- list(
@@ -77,6 +82,10 @@ microbenchmark(
   times = 5
 )
 
+# Unit: milliseconds
+#      expr       min        lq      mean    median        uq       max neval
+#  jsonlite 21.806105 21.911735 22.143469 21.943781 22.499527 22.556196     5
+#   jsonify  8.009139  8.109407  8.540984  8.117278  8.874733  9.594362     5
 ```
 
 ### There's no 'Date' type in JSON, how have you handled this?
@@ -163,7 +172,7 @@ jsonify::to_json( df )
 
 Install the development version from [GitHub](https://github.com/) with:
 
-``` r
+```{r, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("SymbolixAU/jsonify")
 ```

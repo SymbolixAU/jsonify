@@ -26,7 +26,7 @@ It does alright
 library(microbenchmark)
 library(jsonlite)
 
-n <- 1e6
+n <- 5e6
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -43,11 +43,11 @@ microbenchmark(
   },
   times = 3
 )
-#  Unit: milliseconds
-#       expr       min        lq     mean    median       uq      max neval
-#   jsonlite 2225.8286 2238.2178 2507.095 2250.6071 2647.728 3044.849     3
-#    jsonify  895.2017  941.6577 1024.498  988.1136 1089.147 1190.180     3
 
+# Unit: seconds
+#      expr       min        lq      mean    median        uq      max neval
+#  jsonlite 13.422896 13.767812 15.178853 14.112728 16.056832 18.00094     3
+#   jsonify  7.152847  7.238169  7.294133  7.323491  7.364776  7.40606     3
 
 n <- 1e4
 x <- list(
@@ -72,13 +72,11 @@ microbenchmark(
   },
   times = 5
 )
-#  Unit: milliseconds
-#       expr       min        lq      mean    median        uq       max
-#   jsonlite 21.897356 22.112638 23.021601 22.629408 23.801456 24.667146
-#    jsonify  8.635326  8.698786  8.905396  8.892434  8.940992  9.359441
-#   neval
-#       5
-#       5
+
+# Unit: milliseconds
+#      expr       min        lq      mean    median        uq       max neval
+#  jsonlite 21.806105 21.911735 22.143469 21.943781 22.499527 22.556196     5
+#   jsonify  8.009139  8.109407  8.540984  8.117278  8.874733  9.594362     5
 ```
 
 ### There’s no ‘Date’ type in JSON, how have you handled this?
@@ -92,19 +90,27 @@ to character through the `numeric_dates` argument.
 ``` r
 df <- data.frame(dte = as.Date("2018-01-01"))
 jsonify::to_json( df )
-#  [{"dte":17532.0}]
+#  [1] "[{\"dte\":17532.0}]"
+#  attr(,"class")
+#  [1] "json"
 
 df <- data.frame(dte = as.Date("2018-01-01"))
 jsonify::to_json( df, numeric_dates = FALSE )
-#  [{"dte":"2018-01-01"}]
+#  [1] "[{\"dte\":\"2018-01-01\"}]"
+#  attr(,"class")
+#  [1] "json"
 
 df <- data.frame(dte = as.POSIXct("2018-01-01 01:01:01"))
 jsonify::to_json( df )
-#  [{"dte":1514728861.0}]
+#  [1] "[{\"dte\":1514728861.0}]"
+#  attr(,"class")
+#  [1] "json"
 
 df <- data.frame(dte = as.POSIXct("2018-01-01 01:01:01"))
 jsonify::to_json( df, numeric_dates = FALSE )
-#  [{"dte":"2018-01-01 01:01:01"}]
+#  [1] "[{\"dte\":\"2018-01-01 01:01:01\"}]"
+#  attr(,"class")
+#  [1] "json"
 ```
 
 ### And `POSIXct` and `POSIXlt`?
@@ -114,9 +120,13 @@ jsonify::to_json( df, numeric_dates = FALSE )
 ``` r
 df <- data.frame(dte = as.POSIXct("2018-01-01 10:00:00"))
 jsonify::to_json( df )
-#  [{"dte":1514761200.0}]
+#  [1] "[{\"dte\":1514761200.0}]"
+#  attr(,"class")
+#  [1] "json"
 jsonify::to_json( df, numeric_dates = FALSE)
-#  [{"dte":"2018-01-01 10:00:00"}]
+#  [1] "[{\"dte\":\"2018-01-01 10:00:00\"}]"
+#  attr(,"class")
+#  [1] "json"
 ```
 
 `POSIXlt` will return each component of the date-time
@@ -124,9 +134,13 @@ jsonify::to_json( df, numeric_dates = FALSE)
 ``` r
 x <- as.POSIXlt("2018-01-01 01:00:00", tz = "GMT")
 jsonify::to_json( x )
-#  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}
+#  [1] "{\"sec\":[0.0],\"min\":[0],\"hour\":[1],\"mday\":[1],\"mon\":[0],\"year\":[118],\"wday\":[1],\"yday\":[0],\"isdst\":[0]}"
+#  attr(,"class")
+#  [1] "json"
 jsonify::to_json( x, numeric_dates = FALSE)
-#  ["2018-01-01 01:00:00"]
+#  [1] "[\"2018-01-01 01:00:00\"]"
+#  attr(,"class")
+#  [1] "json"
 ```
 
 ### Why doesn’t `numeric_dates` work for lists?
@@ -173,7 +187,9 @@ df <- data.frame(
   , stringsAsFactors = FALSE 
   )
 jsonify::to_json( df )
-#  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]
+#  [1] "[{\"id\":1,\"val\":\"a\"},{\"id\":2,\"val\":\"b\"},{\"id\":3,\"val\":\"c\"}]"
+#  attr(,"class")
+#  [1] "json"
 ```
 
 ### How do I install it?
