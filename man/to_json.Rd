@@ -56,5 +56,7 @@ to_json(1:3)
 to_json(letters[1:3])
 to_json(data.frame(x = 1:3, y = letters[1:3]))
 to_json(list(x = 1:3, y = list(z = letters[1:3])))
+to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5))
+to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5), numeric_dates = F)
 
 }
