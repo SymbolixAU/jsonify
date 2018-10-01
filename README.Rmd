@@ -139,7 +139,7 @@ I want to be able to call the C++ code from another package, without going to & 
 
 For example, the `LinkingTo` section in DESCRIPTION will look something like
 
-```r
+```yaml
 LinkingTo: 
     Rcpp,
     jsonify

@@ -21,3 +21,4 @@ Suggests:
     jsonlite,
     testthat,
     covr
+Encoding: UTF-8

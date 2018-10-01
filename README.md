@@ -158,7 +158,7 @@ you can “link to” it in your own package.
 For example, the `LinkingTo` section in DESCRIPTION will look something
 like
 
-``` r
+``` yaml
 LinkingTo: 
     Rcpp,
     jsonify
