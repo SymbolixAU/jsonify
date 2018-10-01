@@ -7,6 +7,7 @@
 \alias{to_json.character}
 \alias{to_json.integer}
 \alias{to_json.logical}
+\alias{to_json.complex}
 \alias{to_json.Date}
 \alias{to_json.POSIXct}
 \alias{to_json.POSIXlt}
@@ -25,6 +26,8 @@ to_json(x, ...)
 \method{to_json}{integer}(x, ...)
 
 \method{to_json}{logical}(x, ...)
+
+\method{to_json}{complex}(x, ...)
 
 \method{to_json}{Date}(x, ..., numeric_dates = TRUE)
 
