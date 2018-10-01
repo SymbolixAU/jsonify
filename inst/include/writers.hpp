@@ -55,21 +55,23 @@ namespace writers {
   
   template< typename Writer>
   inline void write_value( Writer& writer, Rcpp::NumericVector& nv ) {
-    writer.StartArray();
-    for ( int i = 0; i < nv.size(); i++ ) {
+    int n = nv.size();
+    jsonify::utils::should_start_array( writer, n );
+    for ( int i = 0; i < n; i++ ) {
       if( Rcpp::NumericVector::is_na( nv[i] ) ) {
         writer.Null();
       } else {
         write_value( writer, nv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::should_end_array( writer, n );
   }
   
   template <typename Writer>
   inline void write_value( Writer& writer, Rcpp::IntegerVector& iv ) {
-    writer.StartArray();
-    for ( int i = 0; i < iv.size(); i++ ) {
+    int n = iv.size();
+    jsonify::utils::should_start_array( writer, n );
+    for ( int i = 0; i < n; i++ ) {
       if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
         //write_value( writer, "NA" );
         writer.Null();
@@ -77,25 +79,27 @@ namespace writers {
         write_value( writer, iv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::should_end_array( writer, n );
   }
   
   template <typename Writer>
   inline void write_value( Writer& writer, Rcpp::StringVector& sv ) {
-    writer.StartArray();
-    for ( int i = 0; i < sv.size(); i++ ) {
+    int n = sv.size();
+    jsonify::utils::should_start_array( writer, n );
+    for ( int i = 0; i < n; i++ ) {
       if (Rcpp::StringVector::is_na( sv[i] ) ) {
         writer.Null();
       } else{
         write_value( writer, sv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::should_end_array( writer, n );
   }
   
   template <typename Writer>
   inline void write_value( Writer& writer, Rcpp::LogicalVector& lv ) {
-    writer.StartArray();
+    int n = lv.size();
+    jsonify::utils::should_start_array( writer, n );
     for ( int i = 0; i < lv.size(); i++ ) {
       if (Rcpp::LogicalVector::is_na( lv[i] ) ) {
         //Rcpp::Rcout << "NA logical found" << std::endl;
@@ -106,7 +110,7 @@ namespace writers {
         write_value( writer, l );
       }
     }
-    writer.EndArray();
+    jsonify::utils::should_end_array( writer, n );
   }
   
   template <typename Writer, typename T>
