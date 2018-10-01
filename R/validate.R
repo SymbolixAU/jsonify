@@ -27,4 +27,3 @@ validate.json <- function( json ) rcpp_validate_json( json )
 
 #' @export
 validate.default <- function( json ) stop("Only character vectors are accepted")
-
