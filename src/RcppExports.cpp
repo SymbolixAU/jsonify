@@ -5,6 +5,17 @@
 
 using namespace Rcpp;
 
+// test
+Rcpp::List test(Rcpp::StringVector json);
+RcppExport SEXP _jsonify_test(SEXP jsonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type json(jsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(test(json));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_df_to_json
 Rcpp::StringVector rcpp_df_to_json(Rcpp::DataFrame df);
 RcppExport SEXP _jsonify_rcpp_df_to_json(SEXP dfSEXP) {
@@ -73,6 +84,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_jsonify_test", (DL_FUNC) &_jsonify_test, 1},
     {"_jsonify_rcpp_df_to_json", (DL_FUNC) &_jsonify_rcpp_df_to_json, 1},
     {"_jsonify_rcpp_numeric_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_to_json, 1},
     {"_jsonify_rcpp_character_to_json", (DL_FUNC) &_jsonify_rcpp_character_to_json, 1},
