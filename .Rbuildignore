@@ -4,3 +4,4 @@
 ^\.travis\.yml$
 ^codecov\.yml$
 ^tests/benchmarks.R
+^cran-comments\.md$
