@@ -164,8 +164,8 @@ And in a c++ source file you can `#include` the header and use the
 available functions
 
 ``` cpp
-#include "jsonify.hpp"
 // [[Rcpp::depends(jsonify)]]
+#include "jsonify/to_json.hpp"
 
 Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
   return jsonify::to_json( df );
