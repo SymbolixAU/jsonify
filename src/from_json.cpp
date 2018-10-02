@@ -44,28 +44,58 @@ void get_property_keys(const rapidjson::Value& v, std::set< std::string >& prope
   }
 }
 
-void parse_objecct(const rapidjson::Value& v) {
+void parse_object(const rapidjson::Value& v) {
   
 }
 
 void parse_array(const rapidjson::Value& v) {
   
+  static const char* kTypeNames[] = { "Null", "False", "True", "Object", "Array", "String", "Number" };
+  int n = v.Size();
+  Rcpp::Rcout << "array size: " << n << std::endl;
+  
+  // for ( rapidjson::Value::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr) {
+  //   printf("Type of member %s is %s\n", itr->name.GetString(), kTypeNames[itr->value.GetType()]);
+  // }
+
+  // for ( auto& x : v.GetObject() ) {
+  //   std::string key = x.name.GetString();
+  //   Rcpp::Rcout << "key: " << key << std::endl;
+  // }
+  
 }
 
-void parse_json(const rapidjson::Value& v) {
-  // can dispatch into eithe rparse object or parse array
+Rcpp::List parse_json(rapidjson::Document& d) {
+  // can dispatch into either parse object or parse array
   // and be recursive, to call itself for nested items
+  Rcpp::List res;
+  
+  if (d.IsObject()) {
+    
+    Rcpp::Rcout << "parsing object" << std::endl;
+    parse_object( d );
+    
+  } else if (d.IsArray() ) {
+    
+    Rcpp::Rcout << "parsing array" << std::endl;
+    parse_array( d );
+    
+  } else {
+    
+    Rcpp::stop("unknown javascript type");
+  }
   
   
+  return res;
 }
+
+// if in Object and next is Array, switch. and vice versa
 
 
 // [[Rcpp::export]]
 Rcpp::List test( Rcpp::StringVector json ) {
   
-  Rcpp::List properties;
-  bool is_vector = true;     // keep track of the lowest possible type
-  bool is_data_frame = true; // and negate if it breaks a condition?
+  Rcpp::List res;
   // otherwise it's a list
   
   rapidjson::Document doc;
@@ -76,9 +106,8 @@ Rcpp::List test( Rcpp::StringVector json ) {
   
   //int n = geojson.size();
   
-  std::set< std::string > geometry_types;
-  std::set< std::string > property_keys;   // storing all the 'key' values from 'properties'
-  std::unordered_map< std::string, std::string > property_types;
+  std::set< std::string > keys;   // storing all the 'key' values from 'properties'
+  std::unordered_map< std::string, std::string > types;
   
   const rapidjson::Value& js = doc;
   // the type of JSON object will determine if we need to recurse
@@ -88,26 +117,30 @@ Rcpp::List test( Rcpp::StringVector json ) {
   Rcpp::Rcout << "js is arr: " << js.IsArray() << std::endl;
   
   // the 'size' is the number of 'rows' at the top level?
+  res = parse_json( doc );
   
-  if (doc.IsArray() ) {
-    auto v = doc.GetArray();
-    int n = v.Size();
-    
-    // iterate into the array and find the keys
-    Rcpp::Rcout << "n : " << n << std::endl;
-    Rcpp::List properties( property_keys.size() );
-    for( int i = 0; i < n; i++ ) {
-      const rapidjson::Value& obj = v[i];
-      get_property_keys( obj, property_keys );
-      properties.names() = property_keys;
-      return properties;
-    }
-  }
+  
+  // if (doc.IsArray() ) {
+  //   auto v = doc.GetArray();
+  //   int n = v.Size();
+  //   
+  //   // iterate into the array and find the keys
+  //   Rcpp::Rcout << "n : " << n << std::endl;
+  //   Rcpp::List properties( property_keys.size() );
+  //   for( int i = 0; i < n; i++ ) {
+  //     
+  //     const rapidjson::Value& obj = v[i];
+  //     get_property_keys( obj, property_keys );
+  //     properties.names() = property_keys;
+  //     return properties;
+  //     
+  //   }
+  // }
   
   // only works for objects, arrays need to be iterated into
   //rapidjson::Value& v = doc;
 
-  return properties;
+  return res;
 }
 
 
