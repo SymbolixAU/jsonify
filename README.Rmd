@@ -26,7 +26,7 @@ Because I wanted it available at the source ( C++ ) level for integrating into o
 
 It does alright
 
-```{r}
+```{r, eval = FALSE}
 
 library(microbenchmark)
 library(jsonlite)
@@ -48,6 +48,11 @@ microbenchmark(
   },
   times = 3
 )
+
+# Unit: seconds
+#      expr       min        lq      mean    median        uq       max neval
+#  jsonlite 11.243452 13.174676 14.721483 15.105899 16.460498 17.815098     3
+#   jsonify  4.607378  4.696038  5.419219  4.784698  5.825139  6.865581     3
 
 n <- 1e4
 x <- list(
@@ -72,7 +77,12 @@ microbenchmark(
   },
   times = 5
 )
-
+ 
+# Unit: milliseconds
+#      expr       min        lq      mean    median        uq       max neval
+#  jsonlite 19.226906 19.488125 20.310911 19.768292 21.142979 21.928253     5
+#   jsonify  7.638329  7.715288  7.944044  7.879122  7.924961  8.562521     5
+   
 ```
 
 ### There's no `Date` type in JSON, how have you handled this?
