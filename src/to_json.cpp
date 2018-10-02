@@ -1,6 +1,5 @@
 #include "Rcpp.h"
-#include "to_json/dataframe.hpp"
-#include "to_json/vectors.hpp"
+#include "jsonify/to_json.hpp"
 
 // [[Rcpp::export]]
 Rcpp::StringVector rcpp_df_to_json( Rcpp::DataFrame df ) {

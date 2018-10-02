@@ -2,7 +2,7 @@
 #define R_JSONIFY_WRITERS_H
 
 #include <Rcpp.h>
-#include "utils.hpp"
+#include "jsonify/utils.hpp"
 
 // [[Rcpp::depends(rapidjsonr)]]
 
