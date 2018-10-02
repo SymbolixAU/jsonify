@@ -113,4 +113,7 @@ Rcpp::List test( Rcpp::StringVector json ) {
 
 //js <- '[{"x":1},{"x":2},{"x":3},{"y":1},{"y":2}]'
 
-//js <- '[{"x":1,"y":1},{"x":2,"y":2},{"x":3,"y":3}]'
+//js <- '[{"x":1,"y":1},{"x":2,"y":2},{"x":3,"y":3},{"x":4,"y":4}]'
+
+// If it's just objects, then the size of the array IS the rows of the data.frame
+// then each 'key' can be created wtih an NA vector, and filled iteratively. 
