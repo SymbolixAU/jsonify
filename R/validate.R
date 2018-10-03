@@ -1,4 +1,4 @@
-#' validate
+#' validate JSON
 #' 
 #' Validates JSON
 #' 
@@ -7,23 +7,23 @@
 #' 
 #' @examples
 #' 
-#' validate('[]')
+#' validate_json('[]')
 #' df <- data.frame(id = 1:5, val = letters[1:5])
-#' validate( to_json(df) )
+#' validate_json( to_json(df) )
 #' 
-#' validate('{"x":1,"y":2,"z":"a"}')
+#' validate_json('{"x":1,"y":2,"z":"a"}')
 #' 
-#' validate( c('{"x":1,"y":2,"z":"a"}', to_json(df) ) )
-#' validate( c('{"x":1,"y":2,"z":a}', to_json(df) ) )
+#' validate_json( c('{"x":1,"y":2,"z":"a"}', to_json(df) ) )
+#' validate_json( c('{"x":1,"y":2,"z":a}', to_json(df) ) )
 #' 
 #' @export
-validate <- function( json ) UseMethod("validate")
+validate_json <- function( json ) UseMethod("validate_json")
 
 #' @export
-validate.character <- function( json ) rcpp_validate_json( json )
+validate_json.character <- function( json ) rcpp_validate_json( json )
 
 #' @export
-validate.json <- function( json ) rcpp_validate_json( json )
+validate_json.json <- function( json ) rcpp_validate_json( json )
 
 #' @export
-validate.default <- function( json ) stop("Only character vectors are accepted")
+validate_json.default <- function( json ) stop("Only character vectors are accepted")

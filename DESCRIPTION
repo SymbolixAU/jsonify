@@ -2,7 +2,7 @@ Package: jsonify
 Type: Package
 Title: Converts 'R' Objects to Javascript Object Notation (JSON)
 Version: 0.1.0
-Date: 2018-10-03
+Date: 2018-10-04
 Authors@R: c(
     person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre"))
     )

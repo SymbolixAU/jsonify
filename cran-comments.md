@@ -2,6 +2,7 @@
 
 * Updated DESCRIPTION title to tile-case
 * added link to `rapidjsonr` library in `Description` field. 
+* changed `validate()` to `validate_json()` to avoid conflict with library `jsonlite`
 
 ## Test environments
 * local OS X install, R 3.5.0
