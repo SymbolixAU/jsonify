@@ -1,16 +1,16 @@
 Package: jsonify
 Type: Package
-Title: Converts 'R' objects to Javascript Object Notation (JSON)
+Title: Converts 'R' Objects to Javascript Object Notation (JSON)
 Version: 0.1.0
 Date: 2018-10-03
 Authors@R: c(
     person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre"))
     )
 Description: Converts 'R' objects into Javascript Object Notation (JSON) using 
-    the 'rapidjsonr' library.   
+    the 'rapidjsonr' library <https://CRAN.R-project.org/package=rapidjsonr>. 
 License: GPL (>= 2)
 Imports: 
-  Rcpp (>= 0.12.18),
+  Rcpp (>= 0.12.18), 
   rapidjsonr
 LinkingTo: 
   Rcpp,

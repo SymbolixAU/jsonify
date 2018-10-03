@@ -46,6 +46,9 @@ to_json.logical <- function( x, ... ) rcpp_logical_to_json( x )
 #' @export
 to_json.complex <- function( x, ... ) rcpp_character_to_json( x )
 
+#' @export
+to_json.matrix <- function( x, ... ) stop("currently matrices are not supported")
+
 #' @rdname to_json
 #' @export
 #' @inheritParams convert_to_json.data.frame
