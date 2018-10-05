@@ -3,9 +3,7 @@
 
 #include <Rcpp.h>
 
-// [[Rcpp::depends(rapidjsonr)]]
-
-#include "writers.hpp"
+#include "jsonify/jsonify.hpp"
 
 using namespace rapidjson;
 

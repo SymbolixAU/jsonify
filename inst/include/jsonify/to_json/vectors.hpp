@@ -2,9 +2,7 @@
 #define R_JSONIFY_VECTORS_H
 
 #include <Rcpp.h>
-#include "writers.hpp"
-
-// [[Rcpp::depends(rapidjsonr)]]
+#include "jsonify/jsonify.hpp"
 
 using namespace rapidjson;
 

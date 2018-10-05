@@ -12,7 +12,7 @@
 namespace jsonify {
 namespace utils {
 
-  Rcpp::StringVector finalise_json( rapidjson::StringBuffer& sb ) {
+  inline Rcpp::StringVector finalise_json( rapidjson::StringBuffer& sb ) {
     Rcpp::StringVector js = sb.GetString();
     js.attr("class") = "json";
     return js;
@@ -35,7 +35,6 @@ namespace utils {
     }
   }
   
-
 } // namespace utils
 } // namespace jsonify
 

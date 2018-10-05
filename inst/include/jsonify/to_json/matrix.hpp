@@ -2,12 +2,12 @@
 #define R_JSONIFY_MATRIX_H
 
 #include <Rcpp.h>
-#include "writers.hpp"
+#include "jsonify/jsonify.hpp"
 
 namespace jsonify {
 namespace matrix {
 
-  inline Rcp::StringVector to_json( Rcpp::NmericVector& nm ) {
+  inline Rccp::StringVector to_json( Rcpp::NmericVector& nm ) {
     // TODO(  )
   }
 
