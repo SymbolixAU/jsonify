@@ -85,6 +85,6 @@ date_columns <- function( df ) names(which(vapply(df , function(x) { inherits(x,
 
 handle_dates <- function( x ) {
   dte <- date_columns( x )
-  for ( i in dte ) x[[i]] <- as.character(x[[i]])
+  for ( i in dte ) x[[i]] <- as.character( x[[i]] )
   return( x )
 }

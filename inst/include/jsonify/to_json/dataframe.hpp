@@ -11,7 +11,7 @@ namespace jsonify {
 namespace dataframe {
 
   template <typename Writer>
-  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row) {
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row ) {
     
     switch( TYPEOF( this_vec ) ) {
     case VECSXP: {
