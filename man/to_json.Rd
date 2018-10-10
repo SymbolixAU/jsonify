@@ -51,7 +51,7 @@ to_json(x, ...)
 Defaults to TRUE for speed. If FALSE, the dates will be coerced to character}
 }
 \description{
-Converts a data.frame to JSON
+Converts R objects to JSON
 }
 \examples{
 

@@ -1,6 +1,6 @@
 #' To JSON
 #' 
-#' Converts a data.frame to JSON
+#' Converts R objects to JSON
 #' 
 #' @param x object to convert to JSON
 #' @param ... arguments passed to other methods
