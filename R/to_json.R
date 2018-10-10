@@ -46,8 +46,13 @@ to_json.logical <- function( x, ... ) rcpp_logical_to_json( x )
 #' @export
 to_json.complex <- function( x, ... ) rcpp_character_to_json( x )
 
+#' @rdname  to_json
 #' @export
-to_json.matrix <- function( x, ... ) stop("currently matrices are not supported")
+to_json.matrix <- function( x, ... ) {
+  if( is.integer( x ) ) return( rcpp_integer_matrix_to_json( x ) ) 
+  if( is.numeric( x ) ) return( rcpp_numeric_matrix_to_json( x ) )
+  return( rcpp_character_matrix_to_json( x ) )
+}
 
 #' @rdname to_json
 #' @export
@@ -88,3 +93,8 @@ handle_dates <- function( x ) {
   for ( i in dte ) x[[i]] <- as.character( x[[i]] )
   return( x )
 }
+
+
+
+
+

@@ -4,5 +4,5 @@
 #include "to_json/dataframe.hpp"
 #include "to_json/vectors.hpp"
 #include "to_json/writers.hpp"
-
+#include "to_json/matrix.hpp"
 #endif

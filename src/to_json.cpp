@@ -30,3 +30,18 @@ Rcpp::StringVector rcpp_logical_to_json( Rcpp::LogicalVector iv ) {
 Rcpp::StringVector rcpp_list_to_json( SEXP lst ) {
   return jsonify::vectors::to_json( lst );
 }
+
+// [[Rcpp::export]]
+Rcpp::StringVector rcpp_integer_matrix_to_json( Rcpp::IntegerMatrix m ) {
+  return jsonify::matrix::to_json( m );
+}
+
+// [[Rcpp::export]]
+Rcpp::StringVector rcpp_numeric_matrix_to_json( Rcpp::NumericMatrix m ) {
+  return jsonify::matrix::to_json( m );
+}
+
+// [[Rcpp::export]]
+Rcpp::StringVector rcpp_character_matrix_to_json( Rcpp::CharacterMatrix m ) {
+  return jsonify::matrix::to_json( m );
+}

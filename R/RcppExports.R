@@ -25,6 +25,18 @@ rcpp_list_to_json <- function(lst) {
     .Call(`_jsonify_rcpp_list_to_json`, lst)
 }
 
+rcpp_integer_matrix_to_json <- function(m) {
+    .Call(`_jsonify_rcpp_integer_matrix_to_json`, m)
+}
+
+rcpp_numeric_matrix_to_json <- function(m) {
+    .Call(`_jsonify_rcpp_numeric_matrix_to_json`, m)
+}
+
+rcpp_character_matrix_to_json <- function(m) {
+    .Call(`_jsonify_rcpp_character_matrix_to_json`, m)
+}
+
 rcpp_validate_json <- function(geojson) {
     .Call(`_jsonify_rcpp_validate_json`, geojson)
 }

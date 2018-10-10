@@ -71,6 +71,39 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_integer_matrix_to_json
+Rcpp::StringVector rcpp_integer_matrix_to_json(Rcpp::IntegerMatrix m);
+RcppExport SEXP _jsonify_rcpp_integer_matrix_to_json(SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_integer_matrix_to_json(m));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_numeric_matrix_to_json
+Rcpp::StringVector rcpp_numeric_matrix_to_json(Rcpp::NumericMatrix m);
+RcppExport SEXP _jsonify_rcpp_numeric_matrix_to_json(SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_numeric_matrix_to_json(m));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_character_matrix_to_json
+Rcpp::StringVector rcpp_character_matrix_to_json(Rcpp::CharacterMatrix m);
+RcppExport SEXP _jsonify_rcpp_character_matrix_to_json(SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::CharacterMatrix >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_character_matrix_to_json(m));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_validate_json
 Rcpp::LogicalVector rcpp_validate_json(Rcpp::StringVector geojson);
 RcppExport SEXP _jsonify_rcpp_validate_json(SEXP geojsonSEXP) {
@@ -90,6 +123,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_integer_to_json", (DL_FUNC) &_jsonify_rcpp_integer_to_json, 1},
     {"_jsonify_rcpp_logical_to_json", (DL_FUNC) &_jsonify_rcpp_logical_to_json, 1},
     {"_jsonify_rcpp_list_to_json", (DL_FUNC) &_jsonify_rcpp_list_to_json, 1},
+    {"_jsonify_rcpp_integer_matrix_to_json", (DL_FUNC) &_jsonify_rcpp_integer_matrix_to_json, 1},
+    {"_jsonify_rcpp_numeric_matrix_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_matrix_to_json, 1},
+    {"_jsonify_rcpp_character_matrix_to_json", (DL_FUNC) &_jsonify_rcpp_character_matrix_to_json, 1},
     {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
     {NULL, NULL, 0}
 };
