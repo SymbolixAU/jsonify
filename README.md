@@ -1,4 +1,8 @@
 
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/jsonify)](http://cran.r-project.org/package=jsonify)
+![downloads](http://cranlogs.r-pkg.org/badges/grand-total/jsonify)
+[![CRAN RStudio mirror
+downloads](http://cranlogs.r-pkg.org/badges/jsonify)](http://cran.r-project.org/web/packages/jsonify/index.html)
 [![Travis build
 status](https://travis-ci.org/SymbolixAU/jsonify.svg?branch=master)](https://travis-ci.org/SymbolixAU/jsonify)
 [![Coverage
