@@ -32,6 +32,7 @@ df <- data.frame(
   , value = sample(letters, size = n, replace = T)
   , val2 = rnorm(n = n)
   , log = sample(c(T,F), size = n, replace = T)
+  , stringsAsFactors = FALSE
 )
 
 microbenchmark(
@@ -185,6 +186,27 @@ Yes.
 df <- data.frame(
   id = 1:3
   , val = letters[1:3]
+  )
+jsonify::to_json( df )
+#  [1] "[{\"id\":1,\"val\":1},{\"id\":2,\"val\":2},{\"id\":3,\"val\":3}]"
+#  attr(,"class")
+#  [1] "json"
+```
+
+### Why are there numbers in stead of letters?
+
+Because `factors` are a thing in R. And `jsonify` treats them as
+factors.
+
+### Oh yeah, I forget about factors…
+
+So do a lot of people, especially when working with `tibbles`, which
+sets `stringsAsFactors = FALSE` by default (the opposite of base R)
+
+``` r
+df <- data.frame(
+  id = 1:3
+  , val = letters[1:3]
   , stringsAsFactors = FALSE 
   )
 jsonify::to_json( df )
@@ -195,7 +217,13 @@ jsonify::to_json( df )
 
 ### How do I install it?
 
-Install the development version from [GitHub](https://github.com/) with:
+Get the latest release version from CRAN
+
+``` r
+install.packages("jsonify")
+```
+
+Or the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
