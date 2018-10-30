@@ -5,14 +5,14 @@
 
 using namespace Rcpp;
 
-// test
-Rcpp::List test(Rcpp::StringVector json);
-RcppExport SEXP _jsonify_test(SEXP jsonSEXP) {
+// rcpp_from_json
+Rcpp::List rcpp_from_json(const char * json);
+RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::StringVector >::type json(jsonSEXP);
-    rcpp_result_gen = Rcpp::wrap(test(json));
+    Rcpp::traits::input_parameter< const char * >::type json(jsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -84,7 +84,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_jsonify_test", (DL_FUNC) &_jsonify_test, 1},
+    {"_jsonify_rcpp_from_json", (DL_FUNC) &_jsonify_rcpp_from_json, 1},
     {"_jsonify_rcpp_df_to_json", (DL_FUNC) &_jsonify_rcpp_df_to_json, 1},
     {"_jsonify_rcpp_numeric_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_to_json, 1},
     {"_jsonify_rcpp_character_to_json", (DL_FUNC) &_jsonify_rcpp_character_to_json, 1},
