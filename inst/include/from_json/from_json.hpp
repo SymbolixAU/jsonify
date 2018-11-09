@@ -87,7 +87,7 @@ namespace from_json {
       if(curr_dtype == 2) {
         curr_dtype = 1;
       }
-      if(array[i].GetType() != data_type) {
+      if(curr_dtype != data_type) {
         list_out = true;
         break;
       }
