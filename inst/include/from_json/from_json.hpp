@@ -37,13 +37,13 @@ namespace from_json {
         
       // numeric
       case 6: {
-        if(array[0].IsDouble()) {
-        // double
-        out[i] = array[i].GetDouble();
-      } else {
-        // int
-        out[i] = array[i].GetInt();
-      }
+        if(array[i].IsDouble()) {
+          // double
+          out[i] = array[i].GetDouble();
+        } else {
+          // int
+          out[i] = array[i].GetInt();
+        }
       break;
       }
         
