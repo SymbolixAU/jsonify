@@ -3,7 +3,7 @@
 
 
 // [[Rcpp::export]]
-Rcpp::List rcpp_from_json( const char * json ) {
+SEXP rcpp_from_json( const char * json ) {
   return jsonify::from_json::from_json( json );
 }
 

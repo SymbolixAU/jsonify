@@ -11,10 +11,41 @@ using namespace rapidjson;
 namespace jsonify {
 namespace from_json {
 
+  // Will iterate over an object and return IntegerVector indicating the data
+  // type of each element. Compatible with these rapidjson objects: Document,
+  // Array, Value.
+  template<typename T>
+  Rcpp::IntegerVector get_dtypes(T& doc) {
+    int doc_len = doc.Size();
+    Rcpp::IntegerVector out(doc_len);
+    int curr_dtype;
+    for(int i = 0; i < doc_len; ++i) {
+      curr_dtype = doc[i].GetType();
+      if(curr_dtype == 2) {
+        curr_dtype = 1;
+      }
+      if(curr_dtype == 6) {
+        if(doc[i].IsDouble()) {
+          curr_dtype = 8;
+        } else {
+          curr_dtype = 9;
+        }
+      }
+      
+      out[i] = curr_dtype;
+    }
+    
+    return out;
+  }
+  
+  
   // Dump objects from a rapidjson array to an R list.
-  Rcpp::List array_to_list(rapidjson::Value::ConstArray& array, int& array_len) {
+  // Can handle key/value pair JSON, and JSON that is missing keys.
+  template<typename T>
+  Rcpp::List array_to_list(T& array, int& array_len) {
     Rcpp::List out(array_len);
     for(int i = 0; i < array_len; ++i) {
+      
       switch(array[i].GetType()) {
       
       // bool - false
@@ -44,20 +75,20 @@ namespace from_json {
           // int
           out[i] = array[i].GetInt();
         }
-      break;
+        break;
       }
         
       // array
       case 4: {
         int curr_array_len = array[i].Size();
-        rapidjson::Value::ConstArray curr_array = array[i].GetArray();
-        out[i] = array_to_list(curr_array, curr_array_len);
+        T curr_array = array[i].GetArray();
+        out[i] = array_to_list<T>(curr_array, curr_array_len);
         break;
       }
         
       // some other data type not covered
       default: {
-        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool");
+        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, and array");
       }
         
       }
@@ -69,7 +100,9 @@ namespace from_json {
   
   // Parse an array object, return an SEXP that contains the objects from the
   // array.
-  SEXP parse_array(rapidjson::Value::ConstArray& array) {
+  // Can handle key/value pair JSON, and JSON that is missing keys.
+  template<typename T>
+  SEXP parse_array(T& array) {
     bool list_out = false;
     int array_len = array.Size();
     int data_type = array[0].GetType();
@@ -85,7 +118,7 @@ namespace from_json {
         data_type = 9;
       }
     }
-
+    
     // Check to see if the array has different data types, which means return
     // will be a list. Exception to this rule is for bool types...false has
     // data type of 1, and true has data type of 2. So, effectively, data types
@@ -112,7 +145,7 @@ namespace from_json {
     // If the values in the input array are not all of the same data type,
     // return the array values as an R list.
     if(list_out) {
-      return array_to_list(array, array_len);
+      return array_to_list<T>(array, array_len);
     }
     
     // Get current value
@@ -144,7 +177,8 @@ namespace from_json {
       }
       return out;
     }
-      // int
+      
+    // int
     case 9: {
       Rcpp::IntegerVector out(array_len);
       for(int i = 0; i < array_len; ++i) {
@@ -157,8 +191,8 @@ namespace from_json {
     case 4: {
       Rcpp::List out(array_len);
       for(int i = 0; i < array_len; ++i) {
-        rapidjson::Value::ConstArray curr_array = array[i].GetArray();
-        out[i] = parse_array(curr_array);
+        T curr_array = array[i].GetArray();
+        out[i] = parse_array<T>(curr_array);
       }
       return out;
     }
@@ -168,6 +202,7 @@ namespace from_json {
   }
   
   
+  // Parse rapidjson::Value object.
   Rcpp::List parse_value(const rapidjson::Value& val) {
     int json_len = val.Size();
     Rcpp::List out(json_len);
@@ -203,23 +238,23 @@ namespace from_json {
       // numeric
       case 6: {
         if(itr->value.IsDouble()) {
-        // double
-        out[i] = itr->value.GetDouble();
-      } else {
-        // int
-        out[i] = itr->value.GetInt();
-      }
-      break;
+          // double
+          out[i] = itr->value.GetDouble();
+        } else {
+          // int
+          out[i] = itr->value.GetInt();
+        }
+        break;
       }
         
       // array
       case 4: {
         rapidjson::Value::ConstArray curr_array = itr->value.GetArray();
-        out[i] = parse_array(curr_array);
+        out[i] = parse_array<rapidjson::Value::ConstArray>(curr_array);
         break;
       }
         
-      // json
+      // named json
       case 3: {
         out[i] = parse_value(itr->value);
         break;
@@ -240,6 +275,7 @@ namespace from_json {
   }
   
   
+  // Parse rapidjson::Document object.
   Rcpp::List parse_document(rapidjson::Document& doc) {
     int json_len = doc.Size();
     Rcpp::List out(json_len);
@@ -275,23 +311,23 @@ namespace from_json {
       // numeric
       case 6: {
         if(itr->value.IsDouble()) {
-        // double
-        out[i] = itr->value.GetDouble();
-      } else {
-        // int
-        out[i] = itr->value.GetInt();
-      }
-      break;
+          // double
+          out[i] = itr->value.GetDouble();
+        } else {
+          // int
+          out[i] = itr->value.GetInt();
+        }
+        break;
       }
         
       // array
       case 4: {
         rapidjson::Value::ConstArray curr_array = itr->value.GetArray();
-        out[i] = parse_array(curr_array);
+        out[i] = parse_array<rapidjson::Value::ConstArray>(curr_array);
         break;
       }
         
-      // json
+      // named json
       case 3: {
         const rapidjson::Value& temp_val = itr->value;
         out[i] = parse_value(temp_val);
@@ -312,9 +348,131 @@ namespace from_json {
     return out;
   }
   
-  // Parse JSON string.
-  // Takes a JSON string as input, returns an R list of key-value pairs.
-  Rcpp::List from_json(const char * json) {
+  
+  // Parse rapidjson::Document object that contains "keyless" JSON data of the
+  // same data type. Returns an R vector.
+  SEXP doc_to_vector(rapidjson::Document& doc, int& dtype) {
+    int doc_len = doc.Size();
+    
+    // Get current value
+    switch(dtype) {
+    
+    // bool
+    case 1: {
+      Rcpp::LogicalVector out(doc_len);
+      for(int i = 0; i < doc_len; ++i) {
+        out[i] = doc[i].GetBool();
+      }
+      return out;
+    }
+      
+    // string
+    case 5: {
+      Rcpp::CharacterVector out(doc_len);
+      for(int i = 0; i < doc_len; ++i) {
+        out[i] = doc[i].GetString();
+      }
+      return out;
+    }
+      
+    // double
+    case 8: {
+      Rcpp::NumericVector out(doc_len);
+      for(int i = 0; i < doc_len; ++i) {
+        out[i] = doc[i].GetDouble();
+      }
+      return out;
+    }
+      
+    // int
+    case 9: {
+      Rcpp::IntegerVector out(doc_len);
+      for(int i = 0; i < doc_len; ++i) {
+        out[i] = doc[i].GetInt();
+      }
+      return out;
+    }
+    }
+    
+    return R_NilValue;
+  }
+  
+  
+  // Parse rapidjson::Document object that contains "keyless" JSON data that
+  // contains a variety of data types. Returns an R list.
+  Rcpp::List doc_to_list(rapidjson::Document& doc) {
+    int doc_len = doc.Size();
+    Rcpp::List out(doc_len);
+    
+    for(int i = 0; i < doc_len; ++i) {
+      
+      // Get current value
+      switch(doc[i].GetType()) {
+      
+      // bool - false
+      case 1: {
+        out[i] = doc[i].GetBool();
+        break;
+      }
+        
+      // bool - true
+      case 2: {
+        out[i] = doc[i].GetBool();
+        break;
+      }
+        
+      // string
+      case 5: {
+        out[i] = doc[i].GetString();
+        break;
+      }
+        
+      // numeric
+      case 6: {
+        if(doc[i].IsDouble()) {
+          // double
+          out[i] = doc[i].GetDouble();
+        } else {
+          // int
+          out[i] = doc[i].GetInt();
+        }
+        break;
+      }
+        
+      // array
+      case 4: {
+        rapidjson::Value::Array curr_array = doc[i].GetArray();
+        out[i] = parse_array<rapidjson::Value::Array>(curr_array);
+        break;
+      }
+        
+      // object (named json object).
+      case 3: {
+        const rapidjson::Value& temp_val = doc[i];
+        out[i] = parse_value(temp_val);
+        break;
+      }
+        
+      // some other data type not covered
+      default: {
+        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool");
+      }
+      }
+    }
+    
+    return out;
+  }
+  
+  
+  //' Parse JSON String
+  //'
+  //' Takes a JSON string as input, returns an R list of key-value pairs
+  //'
+  //' @param json const char, JSON string to be parsed. Coming from R, this
+  //'  input should be a character vector of length 1.
+  //' @export
+  // [[Rcpp::export]]
+  SEXP from_json(const char * json) {
     rapidjson::Document doc;
     doc.Parse(json);
     
@@ -330,18 +488,24 @@ namespace from_json {
       return parse_document(doc);
     }
     
-    // Else if input is an array, pass each element of doc through parse_value(),
-    // saving the results of each iteration in an Rcpp::List.
-    int json_len = doc.Size();
-    Rcpp::List out(json_len);
+    // If input in an array, first check the data type of each value in the
+    // array.
+    Rcpp::IntegerVector dtypes = get_dtypes<rapidjson::Document>(doc);
+    Rcpp::IntegerVector u_dtypes = unique(dtypes);
     
-    for(int i = 0; i < json_len; ++i) {
-      const rapidjson::Value& curr_val = doc[i];
-      out[i] = parse_value(curr_val);
+    // If all of the data types are simple and of the same type
+    // (i.e. all strings, ints, double, or bool), then return a vector of values.
+    if(u_dtypes.size() == 1) {
+      int dt = u_dtypes[0];
+      if(dt == 1 || dt == 5 || dt == 8 || dt == 9) {
+        return doc_to_vector(doc, dt);
+      }
     }
     
-    return out;
+    // Otherwise, if there's a variety of data types, return a list of values.
+    return doc_to_list(doc);
   }
+
 
 
 
