@@ -30,6 +30,16 @@ test_that("nested JSON handled properly", {
   expect_equal(from_json(json_str), target)
 })
 
+test_that("nested JSON within an array handled properly", {
+  target <- list(a = 8L, b = list(list(c = 123L, d = 456L), list(e = list(list(f = "cats")))))
+  
+  json_str <- "{\"a\":8, \"b\":[{\"c\":123, \"d\":456}, {\"e\":[{\"f\":\"cats\"}]}]}"
+  expect_equal(from_json(json_str), target)
+  
+  json_str <- jsonify::to_json(target)
+  expect_equal(from_json(json_str), target)
+})
+
 test_that("JSON missing keys handled properly", {
   # vector
   target <- c(1L, 2L, 3L, NA_integer_)

@@ -3,8 +3,7 @@
 
 #include <Rcpp.h>
 
-// [[Rcpp::depends(rapidjsonr)]]
-#include "rapidjson/document.h"
+#include "from_json/utils.hpp"
 
 using namespace rapidjson;
 
@@ -121,7 +120,8 @@ namespace from_json {
     // pass the input array along to array_to_list().
     if(u_dtypes.size() > 2) {
       return array_to_list<T>(array, array_len);
-    } else if(u_dtypes.size() == 2) {
+    }
+    if(u_dtypes.size() == 2) {
       if(u_dtypes[0] == 0) {
         int dt1 = u_dtypes[1];
         if(dt1 == 4) {
@@ -194,6 +194,16 @@ namespace from_json {
     case 0: {
       Rcpp::CharacterVector out(array_len, NA_STRING);
       return out;
+    }
+    
+    // JSON object
+    case 3: {
+      Rcpp::List out(array_len);
+      for(int i = 0; i < array_len; ++i) {
+        const rapidjson::Value& curr_val = array[i];
+        out[i] = parse_value(curr_val);
+      }
+      return(out);
     }
       
     // array
@@ -269,9 +279,10 @@ namespace from_json {
         break;
       }
         
-      // named json
+      // JSON object
       case 3: {
-        out[i] = parse_value(itr->value);
+        const rapidjson::Value& curr_val = itr->value;
+        out[i] = parse_value(curr_val);
         break;
       }
         
@@ -348,7 +359,7 @@ namespace from_json {
         break;
       }
         
-      // named json
+      // JSON object
       case 3: {
         const rapidjson::Value& temp_val = itr->value;
         out[i] = parse_value(temp_val);
@@ -495,7 +506,7 @@ namespace from_json {
         break;
       }
         
-      // object (named json object).
+      // JSON object
       case 3: {
         const rapidjson::Value& temp_val = doc[i];
         out[i] = parse_value(temp_val);
@@ -561,9 +572,6 @@ namespace from_json {
     // Otherwise, if there's a variety of data types, return a list of values.
     return doc_to_list(doc);
   }
-
-
-
 
 } // namespace from_json
 } // namespace jsonify
