@@ -13,6 +13,8 @@ namespace from_json {
 
   Rcpp::List parse_value(const rapidjson::Value& val);
 
+  std::unordered_set<int> dtypes;
+
 } // namespace from_json
 } // namespace jsonify
 

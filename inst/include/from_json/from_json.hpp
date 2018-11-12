@@ -10,19 +10,26 @@ using namespace rapidjson;
 namespace jsonify {
 namespace from_json {
 
-  // Will iterate over an object and return IntegerVector indicating the data
-  // type of each element. Compatible with these rapidjson objects: Document,
-  // Array, Value.
+  // Iterate over a rapidjson object and get the unique data types of each value.
+  // Save unique data types as ints to unordered_set js_vals::dtypes.
+  // Compatible with these rapidjson::Array and rapidjson::Value.
   template<typename T>
-  Rcpp::IntegerVector get_dtypes(T& doc) {
+  void get_dtypes(T& doc, bool scalar_only = false) {
+    // Clear all values from dtypes
+    dtypes.clear();
+    
     int doc_len = doc.Size();
-    Rcpp::IntegerVector out(doc_len);
     int curr_dtype;
     for(int i = 0; i < doc_len; ++i) {
       curr_dtype = doc[i].GetType();
+      // rapidjson uses separate ints for types true (2) and false (1)...combine
+      // them into one value such that bool is 1.
       if(curr_dtype == 2) {
         curr_dtype = 1;
       }
+      
+      // rapidjson uses the same int for types double and int...split them up,
+      // such that double is 8 and int is 9.
       if(curr_dtype == 6) {
         if(doc[i].IsDouble()) {
           curr_dtype = 8;
@@ -31,15 +38,21 @@ namespace from_json {
         }
       }
       
-      out[i] = curr_dtype;
+      dtypes.insert(curr_dtype);
+      
+      // If scalar_only is true, break if the current value is
+      // type 3 (JSON object) or 4 (Array object).
+      if(scalar_only) {
+        if(curr_dtype == 3 || curr_dtype == 4) {
+          break;
+        }
+      }
     }
-    
-    return out;
   }
   
   
   // Dump objects from a rapidjson array to an R list.
-  // Can handle key/value pair JSON, and JSON that is missing keys.
+  // Can handle JSON objects that have keys and those that do not have keys.
   template<typename T>
   Rcpp::List array_to_list(T& array, int& array_len) {
     Rcpp::List out(array_len);
@@ -105,35 +118,45 @@ namespace from_json {
   
   // Parse an array object, return an SEXP that contains the objects from the
   // array.
-  // Can handle key/value pair JSON, and JSON that is missing keys.
+  // Can handle JSON objects that have keys and those that do not have keys.
   template<typename T>
   SEXP parse_array(T& array) {
     int array_len = array.Size();
     
-    // Check the data type of each value in the array.
-    Rcpp::IntegerVector dtypes = get_dtypes<T>(array);
-    Rcpp::IntegerVector u_dtypes = unique(dtypes).sort();
-    int data_type = u_dtypes[0];
+    // Get set of unique data types of each value in the array.
+    get_dtypes<T>(array);
     
-    // If the group of unique data types is longer than two, or if it's length is
-    // two and 0 is NOT one of the two values (0 corresponds to null/NA), then
-    // pass the input array along to array_to_list().
-    if(u_dtypes.size() > 2) {
+    // If there's only one unique data type in the input array, or if the array
+    // is made up a simple data type and nulls (simple being int, double,
+    // string, bool), then return an R vector. Otherwise, return an R list.
+    
+    if(dtypes.size() > 2) {
       return array_to_list<T>(array, array_len);
     }
-    if(u_dtypes.size() == 2) {
-      if(u_dtypes[0] == 0) {
-        int dt1 = u_dtypes[1];
-        if(dt1 == 4) {
+    
+    int data_type;
+    std::vector<int> dtype_vect(dtypes.begin(), dtypes.end());
+    if(dtype_vect.size() == 2) {
+      // Check to see if 0 is in dtypes.
+      if(dtypes.find(0) != dtypes.end()) {
+        // If 0 is in dtypes and dtypes size is two, get the int in dtypes
+        // that is not 0.
+        data_type = dtype_vect[0];
+        if(data_type == 0) {
+          data_type = dtype_vect[1];
+        }
+        if(data_type == 3 || data_type == 4) {
+          // If dtype_vect is [0, 3] or [0, 4], return R list.
           return array_to_list<T>(array, array_len);
-        } else {
-          data_type = dt1;
         }
       } else {
+        // If dtype_vect size is 2 and 0 is not one of the values, return R list.
         return array_to_list<T>(array, array_len);
       }
+    } else {
+      // If dtype_vect size is only 1.
+      data_type = dtype_vect[0];
     }
-    
     
     // Get current value
     switch(data_type) {
@@ -548,29 +571,44 @@ namespace from_json {
       return parse_document(doc);
     }
     
-    // If input in an array, first check the data type of each value in the
-    // array.
-    Rcpp::IntegerVector dtypes = get_dtypes<rapidjson::Document>(doc);
-    Rcpp::IntegerVector u_dtypes = unique(dtypes).sort();
+    // Get set of unique data types in doc.
+    get_dtypes<rapidjson::Document>(doc, true);
+    int dtype_len = dtypes.size();
     
-    // If all of the data types are simple and of the same type
-    // (i.e. all strings, ints, double, or bool), then return a vector of values.
-    if(u_dtypes.size() == 1) {
-      int dt = u_dtypes[0];
-      if(dt == 0 || dt == 1 || dt == 5 || dt == 8 || dt == 9) {
-        return doc_to_vector(doc, dt);
-      }
-    } else if(u_dtypes.size() == 2) {
-      if(u_dtypes[0] == 0) {
-        int dt1 = u_dtypes[1];
-        if(dt1 == 1 || dt1 == 5 || dt1 == 8 || dt1 == 9) {
-          return doc_to_vector(doc, dt1);
-        }
+    // If dtype_len is greater than 2, return an R list of values.
+    if(dtype_len > 2) {
+      return doc_to_list(doc);
+    }
+    
+    // If dtype_len is 2 and 0 does not appear in dtypes, return an
+    // R list of values.
+    if(dtype_len == 2 && dtypes.find(0) == dtypes.end()) {
+      return doc_to_list(doc);
+    }
+    
+    // If 3 or 4 is in dtypes, return an R list of values.
+    if(dtypes.find(3) != dtypes.end() ||
+       dtypes.find(4) != dtypes.end()) {
+      return doc_to_list(doc);
+    }
+    
+    // Dump ints from dtypes to an std vector.
+    std::vector<int> dtype_vect(dtypes.begin(), dtypes.end());
+    int dt = dtype_vect[0];
+    
+    // If dtype_len is 1, return an R vector.
+    if(dtype_len == 1) {
+      return doc_to_vector(doc, dt);
+    }
+    
+    // Else if dtype_len is 2 and 0 is in dtypes, return an R vector.
+    if(dtype_len == 2) {
+      if(dt == 0) {
+        dt = dtype_vect[1];
       }
     }
     
-    // Otherwise, if there's a variety of data types, return a list of values.
-    return doc_to_list(doc);
+    return doc_to_vector(doc, dt);
   }
 
 } // namespace from_json
