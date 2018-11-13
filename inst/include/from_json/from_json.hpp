@@ -311,7 +311,7 @@ namespace from_json {
         
       // some other data type not covered
       default: {
-        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool");
+        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, array, and json");
       }
       }
       
@@ -391,7 +391,7 @@ namespace from_json {
         
       // some other data type not covered
       default: {
-        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool");
+        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, array, and json");
       }
       }
       
@@ -538,7 +538,7 @@ namespace from_json {
         
       // some other data type not covered
       default: {
-        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool");
+        Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, array, and json");
       }
       }
     }
