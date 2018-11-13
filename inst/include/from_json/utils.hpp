@@ -8,6 +8,8 @@
 
 using namespace rapidjson;
 
+#define R_NA_STR Rcpp::CharacterVector(NA_STRING);
+
 namespace jsonify {
 namespace from_json {
 

@@ -92,7 +92,7 @@ namespace from_json {
       
       // null
       case 0: {
-        out[i] = Rcpp::CharacterVector(NA_STRING);
+        out[i] = R_NA_STR;
         break;
       }
         
@@ -291,7 +291,7 @@ namespace from_json {
       
       // null
       case 0: {
-        out[i] = Rcpp::CharacterVector(NA_STRING);
+        out[i] = R_NA_STR;
         break;
       }
         
@@ -371,7 +371,7 @@ namespace from_json {
       
       // null
       case 0: {
-        out[i] = Rcpp::CharacterVector(NA_STRING);
+        out[i] = R_NA_STR;
         break;
       }
         
@@ -518,7 +518,7 @@ namespace from_json {
       
       // null
       case 0: {
-        out[i] = Rcpp::CharacterVector(NA_STRING);
+        out[i] = R_NA_STR;
         break;
       }
         
