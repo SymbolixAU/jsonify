@@ -12,7 +12,7 @@ namespace from_json {
 
   // Iterate over a rapidjson object and get the unique data types of each value.
   // Save unique data types as ints to unordered_set js_vals::dtypes.
-  // Compatible with these rapidjson::Array and rapidjson::Value.
+  // Compatible with rapidjson::Array and rapidjson::Value.
   template<typename T>
   void get_dtypes(T& doc, bool scalar_only = false) {
     // Clear all values from dtypes
