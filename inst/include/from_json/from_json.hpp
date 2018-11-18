@@ -11,7 +11,7 @@ namespace jsonify {
 namespace from_json {
 
   // Iterate over a rapidjson object and get the unique data types of each value.
-  // Save unique data types as ints to unordered_set js_vals::dtypes.
+  // Save unique data types as ints to unordered_set dtypes.
   // Compatible with rapidjson::Array and rapidjson::Value.
   template<typename T>
   void get_dtypes(T& doc, bool scalar_only = false) {
@@ -135,8 +135,12 @@ namespace from_json {
     }
     
     int data_type;
-    std::vector<int> dtype_vect(dtypes.begin(), dtypes.end());
-    if(dtype_vect.size() == 2) {
+    if(dtypes.size() == 1) {
+      data_type = *dtypes.begin();
+    } else {
+      // Dump dtypes values to a vector.
+      std::vector<int> dtype_vect(dtypes.begin(), dtypes.end());
+      
       // Check to see if 0 is in dtypes.
       if(dtypes.find(0) != dtypes.end()) {
         // If 0 is in dtypes and dtypes size is two, get the int in dtypes
@@ -153,9 +157,6 @@ namespace from_json {
         // If dtype_vect size is 2 and 0 is not one of the values, return R list.
         return array_to_list<T>(array, array_len);
       }
-    } else {
-      // If dtype_vect size is only 1.
-      data_type = dtype_vect[0];
     }
     
     // Get current value
