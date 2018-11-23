@@ -14,7 +14,7 @@ namespace from_json {
   // Save unique data types as ints to unordered_set dtypes.
   // Compatible with rapidjson::Array and rapidjson::Value.
   template<typename T>
-  void get_dtypes(T& doc, bool scalar_only = false) {
+  inline void get_dtypes(T& doc, bool scalar_only = false) {
     // Clear all values from dtypes
     dtypes.clear();
     
@@ -54,7 +54,7 @@ namespace from_json {
   // Dump objects from a rapidjson array to an R list.
   // Can handle JSON objects that have keys and those that do not have keys.
   template<typename T>
-  Rcpp::List array_to_list(T& array, int& array_len) {
+  inline Rcpp::List array_to_list(T& array, int& array_len) {
     Rcpp::List out(array_len);
     for(int i = 0; i < array_len; ++i) {
       
@@ -120,7 +120,7 @@ namespace from_json {
   // array.
   // Can handle JSON objects that have keys and those that do not have keys.
   template<typename T>
-  SEXP parse_array(T& array) {
+  inline SEXP parse_array(T& array) {
     int array_len = array.Size();
     
     // Get set of unique data types of each value in the array.
@@ -246,7 +246,7 @@ namespace from_json {
   
   
   // Parse rapidjson::Value object.
-  Rcpp::List parse_value(const rapidjson::Value& val) {
+  inline Rcpp::List parse_value(const rapidjson::Value& val) {
     int json_len = val.Size();
     Rcpp::List out(json_len);
     Rcpp::CharacterVector names(json_len);
@@ -326,7 +326,7 @@ namespace from_json {
   
   
   // Parse rapidjson::Document object.
-  Rcpp::List parse_document(rapidjson::Document& doc) {
+  inline Rcpp::List parse_document(rapidjson::Document& doc) {
     int json_len = doc.Size();
     Rcpp::List out(json_len);
     Rcpp::CharacterVector names(json_len);
@@ -407,7 +407,7 @@ namespace from_json {
   
   // Parse rapidjson::Document object that contains "keyless" JSON data of the
   // same data type. Returns an R vector.
-  SEXP doc_to_vector(rapidjson::Document& doc, int& dtype) {
+  inline SEXP doc_to_vector(rapidjson::Document& doc, int& dtype) {
     int doc_len = doc.Size();
     
     // Get current value
@@ -478,7 +478,7 @@ namespace from_json {
   
   // Parse rapidjson::Document object that contains "keyless" JSON data that
   // contains a variety of data types. Returns an R list.
-  Rcpp::List doc_to_list(rapidjson::Document& doc) {
+  inline Rcpp::List doc_to_list(rapidjson::Document& doc) {
     int doc_len = doc.Size();
     Rcpp::List out(doc_len);
     
@@ -555,8 +555,7 @@ namespace from_json {
   //' @param json const char, JSON string to be parsed. Coming from R, this
   //'  input should be a character vector of length 1.
   //' @export
-  // [[Rcpp::export]]
-  SEXP from_json(const char * json) {
+  inline SEXP from_json(const char * json) {
     rapidjson::Document doc;
     doc.Parse(json);
     
