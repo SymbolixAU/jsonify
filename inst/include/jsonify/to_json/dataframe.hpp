@@ -11,13 +11,13 @@ namespace jsonify {
 namespace dataframe {
 
   template <typename Writer>
-  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row, bool auto_unbox = false ) {
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row, bool unbox = false ) {
     
     switch( TYPEOF( this_vec ) ) {
     case VECSXP: {
       Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
       SEXP s = lst[ row ];
-      jsonify::writers::write_value( writer, s, auto_unbox );
+      jsonify::writers::write_value( writer, s, unbox );
       break;
     }
     case REALSXP: {
@@ -63,7 +63,7 @@ namespace dataframe {
     }
   }
 
-  inline Rcpp::StringVector to_json( Rcpp::DataFrame& df, bool auto_unbox = false ) {
+  inline Rcpp::StringVector to_json( Rcpp::DataFrame& df, bool unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
@@ -83,7 +83,7 @@ namespace dataframe {
         jsonify::writers::write_value( writer, h );
         
         SEXP this_vec = df[ h ];
-        dataframe_cell( writer, this_vec, i, auto_unbox );
+        dataframe_cell( writer, this_vec, i, unbox );
         
       }
       writer.EndObject();

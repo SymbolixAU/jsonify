@@ -16,40 +16,37 @@
 \alias{to_json.default}
 \title{To JSON}
 \usage{
-to_json(x, auto_unbox = FALSE, ...)
+to_json(x, unbox = FALSE, ...)
 
-\method{to_json}{data.frame}(x, auto_unbox = FALSE, ...,
+\method{to_json}{data.frame}(x, unbox = FALSE, ...,
   numeric_dates = TRUE)
 
-\method{to_json}{numeric}(x, auto_unbox = FALSE, ...)
+\method{to_json}{numeric}(x, unbox = FALSE, ...)
 
-\method{to_json}{character}(x, auto_unbox = FALSE, ...)
+\method{to_json}{character}(x, unbox = FALSE, ...)
 
-\method{to_json}{integer}(x, auto_unbox = FALSE, ...)
+\method{to_json}{integer}(x, unbox = FALSE, ...)
 
-\method{to_json}{logical}(x, auto_unbox = FALSE, ...)
+\method{to_json}{logical}(x, unbox = FALSE, ...)
 
-\method{to_json}{complex}(x, auto_unbox = FALSE, ...)
+\method{to_json}{complex}(x, unbox = FALSE, ...)
 
-\method{to_json}{matrix}(x, auto_unbox = FALSE, ...)
+\method{to_json}{matrix}(x, unbox = FALSE, ...)
 
-\method{to_json}{Date}(x, auto_unbox = FALSE, ...,
-  numeric_dates = TRUE)
+\method{to_json}{Date}(x, unbox = FALSE, ..., numeric_dates = TRUE)
 
-\method{to_json}{POSIXct}(x, auto_unbox = FALSE, ...,
-  numeric_dates = TRUE)
+\method{to_json}{POSIXct}(x, unbox = FALSE, ..., numeric_dates = TRUE)
 
-\method{to_json}{POSIXlt}(x, auto_unbox = FALSE, ...,
-  numeric_dates = TRUE)
+\method{to_json}{POSIXlt}(x, unbox = FALSE, ..., numeric_dates = TRUE)
 
-\method{to_json}{list}(x, auto_unbox = FALSE, ...)
+\method{to_json}{list}(x, unbox = FALSE, ...)
 
-\method{to_json}{default}(x, auto_unbox = FALSE, ...)
+\method{to_json}{default}(x, unbox = FALSE, ...)
 }
 \arguments{
 \item{x}{object to convert to JSON}
 
-\item{auto_unbox}{logical indicating if single-value arrays should be 'unboxed', 
+\item{unbox}{logical indicating if single-value arrays should be 'unboxed', 
 that is, not contained inside an array.}
 
 \item{...}{arguments passed to other methods}
@@ -68,5 +65,9 @@ to_json(data.frame(x = 1:3, y = letters[1:3]))
 to_json(list(x = 1:3, y = list(z = letters[1:3])))
 to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5))
 to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5), numeric_dates = FALSE)
+
+## unbox single-value arrays
+to_json(list(x = 1), unbox = TRUE)
+to_json(list(x = 1, y = c("a"), z = list(x = 2, y = c("b"))), unbox = TRUE)
 
 }

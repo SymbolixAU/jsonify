@@ -24,7 +24,7 @@ test_that("data.frame - complex columns are jsonified", {
   expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[0.0]}]")
   
   df <- data.frame( id = 1, val = I(list(c(0))))
-  expect_equal( as.character( to_json( df, auto_unbox = T ) ), "[{\"id\":1.0,\"val\":0.0}]")
+  expect_equal( as.character( to_json( df, unbox = T ) ), "[{\"id\":1.0,\"val\":0.0}]")
   
   df <- data.frame( id = 1, val = I(list(c(0,0))))
   expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[0.0,0.0]}]")
@@ -55,10 +55,10 @@ test_that("data.frame - complex columns are jsonified", {
     , stringsAsFactors = F)
   
   expect_equal(
-    as.character( to_json( df, auto_unbox = T ) ) , 
+    as.character( to_json( df, unbox = T ) ) , 
     "[{\"id\":1,\"norm\":1.1,\"letters\":\"a\",\"val\":0.0},{\"id\":2,\"norm\":2.2,\"letters\":\"x\",\"val\":1.0},{\"id\":3,\"norm\":3.3,\"letters\":\"B\",\"val\":{\"1\":2.0,\"myname\":[4.0,5.0],\"3\":\"a\"}}]"
   )
-  expect_true(jsonify::validate_json( to_json( df, auto_unbox = T ) ) )
+  expect_true(jsonify::validate_json( to_json( df, unbox = T ) ) )
 })
 
 test_that("Nulls, NAs and Infs work",{

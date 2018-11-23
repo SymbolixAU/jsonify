@@ -33,17 +33,17 @@ test_that("NAs, NULLS and Infs work", {
 })
 
 test_that("NAs, NULLS and Infs work and unboxed", {
-  expect_equal(as.character(to_json( NA, auto_unbox = T )), "null")
-  expect_equal(as.character(to_json( NA_character_, auto_unbox = T )), "null")
-  expect_equal(as.character(to_json( NA_complex_, auto_unbox = T )), "null")
-  expect_equal(as.character(to_json( NA_integer_, auto_unbox = T )), "null")
-  expect_equal(as.character(to_json( NA_real_, auto_unbox = T )), "null")
-  expect_equal(as.character(to_json( NaN, auto_unbox = T )), "null")
-  expect_equal(as.character(to_json( Inf, auto_unbox = T )), "\"Inf\"")
-  expect_equal(as.character(to_json( -Inf, auto_unbox = T )), "\"-Inf\"")
-  expect_equal(as.character(to_json(NULL, auto_unbox = T)), "{}")
-  expect_equal(as.character(to_json(list(a="a",b=NULL), auto_unbox = T)),"{\"a\":\"a\",\"b\":{}}")
-  expect_equal(as.character(to_json(data.frame(), auto_unbox = T)), "[]")
+  expect_equal(as.character(to_json( NA, unbox = T )), "null")
+  expect_equal(as.character(to_json( NA_character_, unbox = T )), "null")
+  expect_equal(as.character(to_json( NA_complex_, unbox = T )), "null")
+  expect_equal(as.character(to_json( NA_integer_, unbox = T )), "null")
+  expect_equal(as.character(to_json( NA_real_, unbox = T )), "null")
+  expect_equal(as.character(to_json( NaN, unbox = T )), "null")
+  expect_equal(as.character(to_json( Inf, unbox = T )), "\"Inf\"")
+  expect_equal(as.character(to_json( -Inf, unbox = T )), "\"-Inf\"")
+  expect_equal(as.character(to_json(NULL, unbox = T)), "{}")
+  expect_equal(as.character(to_json(list(a="a",b=NULL), unbox = T)),"{\"a\":\"a\",\"b\":{}}")
+  expect_equal(as.character(to_json(data.frame(), unbox = T)), "[]")
 })
 
 test_that("round trips with jsonlite work", {
@@ -64,5 +64,5 @@ test_that("round trips with jsonlite work", {
 ## TODO( test list of all mixed types, inc Date, POSIXct and POSIXlt)
 
 # lst <- list(x = as.Date("2018-01-01"), y = list(as.POSIXct("2018-01-01 10:00:00")), z = NA)
-# as.character(to_json( lst, numeric_dates = F, auto_unbox = T ))
+# as.character(to_json( lst, numeric_dates = F, unbox = T ))
 

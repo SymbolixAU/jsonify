@@ -18,8 +18,8 @@ namespace utils {
     return js;
   }
 
-  inline bool unbox( int n, bool auto_unbox ) {
-    return ( auto_unbox && n == 1 );
+  inline bool should_unbox( int n, bool unbox ) {
+    return ( unbox && n == 1 );
   }
   
   template< typename Writer >
