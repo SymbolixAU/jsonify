@@ -9,44 +9,44 @@ using namespace rapidjson;
 namespace jsonify {
 namespace vectors {
 
-  inline Rcpp::StringVector to_json( Rcpp::NumericVector& nv) { 
+  inline Rcpp::StringVector to_json( Rcpp::NumericVector& nv, bool auto_unbox = false ) { 
    
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, nv );
+    jsonify::writers::write_value( writer, nv, auto_unbox );
     return jsonify::utils::finalise_json( sb );
       
   }
 
-  inline Rcpp::StringVector to_json( Rcpp::StringVector& sv ) {
+  inline Rcpp::StringVector to_json( Rcpp::StringVector& sv, bool auto_unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, sv );
+    jsonify::writers::write_value( writer, sv, auto_unbox );
     return jsonify::utils::finalise_json( sb );
   }
 
-  inline Rcpp::StringVector to_json( Rcpp::IntegerVector& iv ) {
+  inline Rcpp::StringVector to_json( Rcpp::IntegerVector& iv, bool auto_unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, iv );
+    jsonify::writers::write_value( writer, iv, auto_unbox );
     return jsonify::utils::finalise_json( sb );
   }
 
-  inline Rcpp::StringVector to_json( Rcpp::LogicalVector& lv ) {
+  inline Rcpp::StringVector to_json( Rcpp::LogicalVector& lv, bool auto_unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, lv );
+    jsonify::writers::write_value( writer, lv, auto_unbox );
     return jsonify::utils::finalise_json( sb );
   }
 
-  inline Rcpp::StringVector to_json( SEXP& lst ) {
+  inline Rcpp::StringVector to_json( SEXP& lst, bool auto_unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, lst );
+    jsonify::writers::write_value( writer, lst, auto_unbox );
     return jsonify::utils::finalise_json( sb );
   }
 

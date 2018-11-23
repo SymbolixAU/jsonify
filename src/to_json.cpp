@@ -7,41 +7,41 @@ Rcpp::StringVector rcpp_df_to_json( Rcpp::DataFrame df ) {
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_numeric_to_json( Rcpp::NumericVector nv ) {
-  return jsonify::vectors::to_json( nv );
+Rcpp::StringVector rcpp_numeric_to_json( Rcpp::NumericVector nv, bool auto_unbox = false ) {
+  return jsonify::vectors::to_json( nv, auto_unbox );
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_character_to_json( Rcpp::StringVector sv ) {
-  return jsonify::vectors::to_json( sv );
+Rcpp::StringVector rcpp_character_to_json( Rcpp::StringVector sv, bool auto_unbox = false ) {
+  return jsonify::vectors::to_json( sv, auto_unbox );
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_integer_to_json( Rcpp::IntegerVector iv ) {
-  return jsonify::vectors::to_json( iv );
+Rcpp::StringVector rcpp_integer_to_json( Rcpp::IntegerVector iv, bool auto_unbox = false ) {
+  return jsonify::vectors::to_json( iv, auto_unbox );
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_logical_to_json( Rcpp::LogicalVector iv ) {
-  return jsonify::vectors::to_json( iv );
+Rcpp::StringVector rcpp_logical_to_json( Rcpp::LogicalVector iv, bool auto_unbox = false ) {
+  return jsonify::vectors::to_json( iv, auto_unbox );
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_list_to_json( SEXP lst ) {
-  return jsonify::vectors::to_json( lst );
+Rcpp::StringVector rcpp_list_to_json( SEXP lst, bool auto_unbox = false ) {
+  return jsonify::vectors::to_json( lst, auto_unbox );
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_integer_matrix_to_json( Rcpp::IntegerMatrix m ) {
-  return jsonify::matrix::to_json( m );
+Rcpp::StringVector rcpp_integer_matrix_to_json( Rcpp::IntegerMatrix m, bool auto_unbox = false ) {
+  return jsonify::matrix::to_json( m, auto_unbox );
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_numeric_matrix_to_json( Rcpp::NumericMatrix m ) {
-  return jsonify::matrix::to_json( m );
+Rcpp::StringVector rcpp_numeric_matrix_to_json( Rcpp::NumericMatrix m, bool auto_unbox = false ) {
+  return jsonify::matrix::to_json( m, auto_unbox );
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_character_matrix_to_json( Rcpp::CharacterMatrix m ) {
-  return jsonify::matrix::to_json( m );
+Rcpp::StringVector rcpp_character_matrix_to_json( Rcpp::CharacterMatrix m, bool auto_unbox = false ) {
+  return jsonify::matrix::to_json( m, auto_unbox );
 }

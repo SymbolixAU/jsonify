@@ -5,36 +5,36 @@ rcpp_df_to_json <- function(df) {
     .Call(`_jsonify_rcpp_df_to_json`, df)
 }
 
-rcpp_numeric_to_json <- function(nv) {
-    .Call(`_jsonify_rcpp_numeric_to_json`, nv)
+rcpp_numeric_to_json <- function(nv, auto_unbox = FALSE) {
+    .Call(`_jsonify_rcpp_numeric_to_json`, nv, auto_unbox)
 }
 
-rcpp_character_to_json <- function(sv) {
-    .Call(`_jsonify_rcpp_character_to_json`, sv)
+rcpp_character_to_json <- function(sv, auto_unbox = FALSE) {
+    .Call(`_jsonify_rcpp_character_to_json`, sv, auto_unbox)
 }
 
-rcpp_integer_to_json <- function(iv) {
-    .Call(`_jsonify_rcpp_integer_to_json`, iv)
+rcpp_integer_to_json <- function(iv, auto_unbox = FALSE) {
+    .Call(`_jsonify_rcpp_integer_to_json`, iv, auto_unbox)
 }
 
-rcpp_logical_to_json <- function(iv) {
-    .Call(`_jsonify_rcpp_logical_to_json`, iv)
+rcpp_logical_to_json <- function(iv, auto_unbox = FALSE) {
+    .Call(`_jsonify_rcpp_logical_to_json`, iv, auto_unbox)
 }
 
-rcpp_list_to_json <- function(lst) {
-    .Call(`_jsonify_rcpp_list_to_json`, lst)
+rcpp_list_to_json <- function(lst, auto_unbox = FALSE) {
+    .Call(`_jsonify_rcpp_list_to_json`, lst, auto_unbox)
 }
 
-rcpp_integer_matrix_to_json <- function(m) {
-    .Call(`_jsonify_rcpp_integer_matrix_to_json`, m)
+rcpp_integer_matrix_to_json <- function(m, auto_unbox = FALSE) {
+    .Call(`_jsonify_rcpp_integer_matrix_to_json`, m, auto_unbox)
 }
 
-rcpp_numeric_matrix_to_json <- function(m) {
-    .Call(`_jsonify_rcpp_numeric_matrix_to_json`, m)
+rcpp_numeric_matrix_to_json <- function(m, auto_unbox = FALSE) {
+    .Call(`_jsonify_rcpp_numeric_matrix_to_json`, m, auto_unbox)
 }
 
-rcpp_character_matrix_to_json <- function(m) {
-    .Call(`_jsonify_rcpp_character_matrix_to_json`, m)
+rcpp_character_matrix_to_json <- function(m, auto_unbox = FALSE) {
+    .Call(`_jsonify_rcpp_character_matrix_to_json`, m, auto_unbox)
 }
 
 rcpp_validate_json <- function(geojson) {

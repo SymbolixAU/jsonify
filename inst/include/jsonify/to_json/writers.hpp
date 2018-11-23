@@ -49,22 +49,29 @@ namespace writers {
   }
   
   template< typename Writer>
-  inline void write_value( Writer& writer, Rcpp::NumericVector& nv ) {
-    writer.StartArray();
-    for ( int i = 0; i < nv.size(); i++ ) {
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool auto_unbox = false ) {
+    int n = nv.size();
+    bool unbox = jsonify::utils::unbox( n, auto_unbox );
+    
+    jsonify::utils::start_array( writer, unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
       if( Rcpp::NumericVector::is_na( nv[i] ) ) {
         writer.Null();
       } else {
         write_value( writer, nv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::end_array( writer, unbox );
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv ) {
-    writer.StartArray();
-    for ( int i = 0; i < iv.size(); i++ ) {
+  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, bool auto_unbox = false ) {
+    int n = iv.size();
+    bool unbox = jsonify::utils::unbox( n, auto_unbox );
+    jsonify::utils::start_array( writer, unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
       if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
         //write_value( writer, "NA" );
         writer.Null();
@@ -72,26 +79,32 @@ namespace writers {
         write_value( writer, iv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::end_array( writer, unbox );
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::StringVector& sv ) {
-    writer.StartArray();
-    for ( int i = 0; i < sv.size(); i++ ) {
+  inline void write_value( Writer& writer, Rcpp::StringVector& sv, bool auto_unbox = false ) {
+    int n = sv.size();
+    bool unbox = jsonify::utils::unbox( n, auto_unbox );
+    jsonify::utils::start_array( writer, unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
       if (Rcpp::StringVector::is_na( sv[i] ) ) {
         writer.Null();
       } else{
         write_value( writer, sv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::end_array( writer, unbox );
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv ) {
-    writer.StartArray();
-    for ( int i = 0; i < lv.size(); i++ ) {
+  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, bool auto_unbox = false ) {
+    int n = lv.size();
+    bool unbox = jsonify::utils::unbox( n, auto_unbox );
+    jsonify::utils::start_array( writer, unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
       if (Rcpp::LogicalVector::is_na( lv[i] ) ) {
         //Rcpp::Rcout << "NA logical found" << std::endl;
         // write_value( writer, "NA" );
@@ -101,20 +114,20 @@ namespace writers {
         write_value( writer, l );
       }
     }
-    writer.EndArray();
+    jsonify::utils::end_array( writer, unbox );
   }
   
   template <typename Writer, typename T>
-  inline void write_value( Writer& writer, T& t, int& n) {
+  inline void write_value( Writer& writer, T& t, int& n, bool auto_unbox = false ) {
     if ( n > 0 ) {
-      write_value( writer, t );
+      write_value( writer, t, auto_unbox );
     } else {
       write_value( writer, t[0] );
     }
   }
 
   template< typename Writer>
-  inline void write_value( Writer& writer, SEXP& list_element ) {
+  inline void write_value( Writer& writer, SEXP& list_element, bool auto_unbox = false ) {
     
     int n_elements;
     if( Rf_isNull( list_element ) ) {
@@ -155,7 +168,7 @@ namespace writers {
           const char *s = list_names[ i ];
           write_value( writer, s );
         }
-        write_value( writer, recursive_list );
+        write_value( writer, recursive_list, auto_unbox );
       }
       
       jsonify::utils::writer_ender( writer, has_names );
@@ -165,25 +178,25 @@ namespace writers {
     case REALSXP: {
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
       n_elements = nv.size();
-      write_value( writer, nv, n_elements);
+      write_value( writer, nv, n_elements, auto_unbox );
       break;
     }
     case INTSXP: { 
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
       n_elements = iv.size();
-      write_value( writer, iv, n_elements);
+      write_value( writer, iv, n_elements, auto_unbox );
       break;
     }
     case LGLSXP: {
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_element );
       n_elements = lv.size();
-      write_value( writer, lv, n_elements);
+      write_value( writer, lv, n_elements, auto_unbox );
       break;
     }
     default: {
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_element );
       n_elements = sv.size();
-      write_value( writer, sv, n_elements);
+      write_value( writer, sv, n_elements, auto_unbox );
       break;
     }
     }
