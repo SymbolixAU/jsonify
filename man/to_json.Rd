@@ -20,27 +20,30 @@ to_json(x, ...)
 
 \method{to_json}{data.frame}(x, ..., numeric_dates = TRUE)
 
-\method{to_json}{numeric}(x, ...)
+\method{to_json}{numeric}(x, auto_unbox = FALSE, ...)
 
-\method{to_json}{character}(x, ...)
+\method{to_json}{character}(x, auto_unbox = FALSE, ...)
 
-\method{to_json}{integer}(x, ...)
+\method{to_json}{integer}(x, auto_unbox = FALSE, ...)
 
-\method{to_json}{logical}(x, ...)
+\method{to_json}{logical}(x, auto_unbox = FALSE, ...)
 
-\method{to_json}{complex}(x, ...)
+\method{to_json}{complex}(x, auto_unbox = FALSE, ...)
 
-\method{to_json}{matrix}(x, ...)
+\method{to_json}{matrix}(x, auto_unbox = FALSE, ...)
 
-\method{to_json}{Date}(x, ..., numeric_dates = TRUE)
+\method{to_json}{Date}(x, auto_unbox = FALSE, ...,
+  numeric_dates = TRUE)
 
-\method{to_json}{POSIXct}(x, ..., numeric_dates = TRUE)
+\method{to_json}{POSIXct}(x, auto_unbox = FALSE, ...,
+  numeric_dates = TRUE)
 
-\method{to_json}{POSIXlt}(x, ..., numeric_dates = TRUE)
+\method{to_json}{POSIXlt}(x, auto_unbox = FALSE, ...,
+  numeric_dates = TRUE)
 
-\method{to_json}{list}(x, ...)
+\method{to_json}{list}(x, auto_unbox = FALSE, ...)
 
-\method{to_json}{default}(x, ...)
+\method{to_json}{default}(x, auto_unbox = FALSE, ...)
 }
 \arguments{
 \item{x}{object to convert to JSON}
@@ -49,6 +52,9 @@ to_json(x, ...)
 
 \item{numeric_dates}{logical indicating if dates should be treated as numerics. 
 Defaults to TRUE for speed. If FALSE, the dates will be coerced to character}
+
+\item{auto_unbox}{logical indicating if single-value arrays should be 'unboxed', 
+that is, not contained inside an array.}
 }
 \description{
 Converts R objects to JSON
