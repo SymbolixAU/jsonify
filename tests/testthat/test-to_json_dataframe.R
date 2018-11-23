@@ -20,6 +20,12 @@ test_that("data.frame - all R data types are converted", {
 })
 
 test_that("data.frame - complex columns are jsonified", {
+  df <- data.frame( id = 1, val = I(list(c(0))))
+  expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[0.0]}]")
+  
+  df <- data.frame( id = 1, val = I(list(c(0))))
+  expect_equal( as.character( to_json( df, auto_unbox = T ) ), "[{\"id\":1.0,\"val\":0.0}]")
+  
   df <- data.frame( id = 1, val = I(list(c(0,0))))
   expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[0.0,0.0]}]")
   
@@ -39,6 +45,20 @@ test_that("data.frame - complex columns are jsonified", {
     "[{\"id\":1,\"norm\":1.1,\"letters\":\"a\",\"val\":[0.0,0.0]},{\"id\":2,\"norm\":2.2,\"letters\":\"x\",\"val\":[1.0]},{\"id\":3,\"norm\":3.3,\"letters\":\"B\",\"val\":{\"1\":[2.0,3.0],\"myname\":[4.0,5.0],\"3\":[\"a\"]}}]"
   )
   expect_true(jsonify::validate_json( to_json( df ) ) )
+  
+  
+  df <- data.frame(
+    id = 1:3
+    , norm = c(1.1, 2.2, 3.3)
+    , letters = c("a","x","B")
+    , val = I(list(c(0),1,list(c(2), myname = c(4,5), c("a"))))
+    , stringsAsFactors = F)
+  
+  expect_equal(
+    as.character( to_json( df, auto_unbox = T ) ) , 
+    "[{\"id\":1,\"norm\":1.1,\"letters\":\"a\",\"val\":0.0},{\"id\":2,\"norm\":2.2,\"letters\":\"x\",\"val\":1.0},{\"id\":3,\"norm\":3.3,\"letters\":\"B\",\"val\":{\"1\":2.0,\"myname\":[4.0,5.0],\"3\":\"a\"}}]"
+  )
+  expect_true(jsonify::validate_json( to_json( df, auto_unbox = T ) ) )
 })
 
 test_that("Nulls, NAs and Infs work",{
@@ -49,8 +69,8 @@ test_that("Nulls, NAs and Infs work",{
   expect_equal(as.character(to_json(data.frame(x = NA_complex_))), "[{\"x\":null}]"  )
   expect_equal(as.character(to_json(data.frame(x = NaN))), "[{\"x\":null}]"  )
   
-  # expect_equal(as.character(to_json(data.frame(x = Inf)))  )  ## TODO
-  # expect_equal(as.character(to_json(data.frame(x = -Inf))) ) ## TODO
+  expect_equal(as.character(to_json(data.frame(x = Inf))), '[{"x":"Inf"}]' )  
+  expect_equal(as.character(to_json(data.frame(x = -Inf))), '[{"x":"-Inf"}]') 
   
   expect_equal(as.character(to_json(data.frame(x = NULL))), "[]")
   expect_equal(to_json(data.frame(x = c(1,2,NULL,4))), to_json(data.frame(x = c(1,2,4))))

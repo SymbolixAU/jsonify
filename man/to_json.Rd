@@ -16,9 +16,10 @@
 \alias{to_json.default}
 \title{To JSON}
 \usage{
-to_json(x, ...)
+to_json(x, auto_unbox = FALSE, ...)
 
-\method{to_json}{data.frame}(x, ..., numeric_dates = TRUE)
+\method{to_json}{data.frame}(x, auto_unbox = FALSE, ...,
+  numeric_dates = TRUE)
 
 \method{to_json}{numeric}(x, auto_unbox = FALSE, ...)
 
@@ -48,13 +49,13 @@ to_json(x, ...)
 \arguments{
 \item{x}{object to convert to JSON}
 
+\item{auto_unbox}{logical indicating if single-value arrays should be 'unboxed', 
+that is, not contained inside an array.}
+
 \item{...}{arguments passed to other methods}
 
 \item{numeric_dates}{logical indicating if dates should be treated as numerics. 
 Defaults to TRUE for speed. If FALSE, the dates will be coerced to character}
-
-\item{auto_unbox}{logical indicating if single-value arrays should be 'unboxed', 
-that is, not contained inside an array.}
 }
 \description{
 Converts R objects to JSON

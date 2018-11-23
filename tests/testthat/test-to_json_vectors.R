@@ -64,5 +64,5 @@ test_that("round trips with jsonlite work", {
 ## TODO( test list of all mixed types, inc Date, POSIXct and POSIXlt)
 
 # lst <- list(x = as.Date("2018-01-01"), y = list(as.POSIXct("2018-01-01 10:00:00")), z = NA)
-# as.character(to_json( lst, numeric_dates = T ))
+# as.character(to_json( lst, numeric_dates = F, auto_unbox = T ))
 

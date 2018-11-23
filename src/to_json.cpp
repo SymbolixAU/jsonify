@@ -2,8 +2,8 @@
 #include "jsonify/to_json.hpp"
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_df_to_json( Rcpp::DataFrame df ) {
-  return jsonify::dataframe::to_json( df );
+Rcpp::StringVector rcpp_df_to_json( Rcpp::DataFrame df, bool auto_unbox = false ) {
+  return jsonify::dataframe::to_json( df, auto_unbox );
 }
 
 // [[Rcpp::export]]
