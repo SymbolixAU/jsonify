@@ -2,13 +2,8 @@
 #define R_JSONIFY_WRITERS_H
 
 #include <Rcpp.h>
-#include "utils.hpp"
-
-// [[Rcpp::depends(rapidjsonr)]]
-
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
+#include "jsonify/utils.hpp"
+#include "jsonify/jsonify.hpp"
 
 using namespace rapidjson;
 
@@ -54,22 +49,29 @@ namespace writers {
   }
   
   template< typename Writer>
-  inline void write_value( Writer& writer, Rcpp::NumericVector& nv ) {
-    writer.StartArray();
-    for ( int i = 0; i < nv.size(); i++ ) {
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox = false ) {
+    int n = nv.size();
+    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    
+    jsonify::utils::start_array( writer, will_unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
       if( Rcpp::NumericVector::is_na( nv[i] ) ) {
         writer.Null();
       } else {
         write_value( writer, nv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::end_array( writer, will_unbox );
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv ) {
-    writer.StartArray();
-    for ( int i = 0; i < iv.size(); i++ ) {
+  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, bool unbox = false ) {
+    int n = iv.size();
+    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    jsonify::utils::start_array( writer, will_unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
       if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
         //write_value( writer, "NA" );
         writer.Null();
@@ -77,26 +79,32 @@ namespace writers {
         write_value( writer, iv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::end_array( writer, will_unbox );
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::StringVector& sv ) {
-    writer.StartArray();
-    for ( int i = 0; i < sv.size(); i++ ) {
+  inline void write_value( Writer& writer, Rcpp::StringVector& sv, bool unbox = false ) {
+    int n = sv.size();
+    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    jsonify::utils::start_array( writer, will_unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
       if (Rcpp::StringVector::is_na( sv[i] ) ) {
         writer.Null();
       } else{
         write_value( writer, sv[i] );
       }
     }
-    writer.EndArray();
+    jsonify::utils::end_array( writer, will_unbox );
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv ) {
-    writer.StartArray();
-    for ( int i = 0; i < lv.size(); i++ ) {
+  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, bool unbox = false ) {
+    int n = lv.size();
+    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    jsonify::utils::start_array( writer, will_unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
       if (Rcpp::LogicalVector::is_na( lv[i] ) ) {
         //Rcpp::Rcout << "NA logical found" << std::endl;
         // write_value( writer, "NA" );
@@ -106,20 +114,20 @@ namespace writers {
         write_value( writer, l );
       }
     }
-    writer.EndArray();
+    jsonify::utils::end_array( writer, will_unbox );
   }
   
   template <typename Writer, typename T>
-  inline void write_value( Writer& writer, T& t, int& n) {
+  inline void write_value( Writer& writer, T& t, int& n, bool unbox = false ) {
     if ( n > 0 ) {
-      write_value( writer, t );
+      write_value( writer, t, unbox );
     } else {
       write_value( writer, t[0] );
     }
   }
 
   template< typename Writer>
-  inline void write_value( Writer& writer, SEXP& list_element ) {
+  inline void write_value( Writer& writer, SEXP& list_element, bool unbox = false ) {
     
     int n_elements;
     if( Rf_isNull( list_element ) ) {
@@ -160,7 +168,7 @@ namespace writers {
           const char *s = list_names[ i ];
           write_value( writer, s );
         }
-        write_value( writer, recursive_list );
+        write_value( writer, recursive_list, unbox );
       }
       
       jsonify::utils::writer_ender( writer, has_names );
@@ -170,25 +178,25 @@ namespace writers {
     case REALSXP: {
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
       n_elements = nv.size();
-      write_value( writer, nv, n_elements);
+      write_value( writer, nv, n_elements, unbox );
       break;
     }
     case INTSXP: { 
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
       n_elements = iv.size();
-      write_value( writer, iv, n_elements);
+      write_value( writer, iv, n_elements, unbox );
       break;
     }
     case LGLSXP: {
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_element );
       n_elements = lv.size();
-      write_value( writer, lv, n_elements);
+      write_value( writer, lv, n_elements, unbox );
       break;
     }
     default: {
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_element );
       n_elements = sv.size();
-      write_value( writer, sv, n_elements);
+      write_value( writer, sv, n_elements, unbox );
       break;
     }
     }

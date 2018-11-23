@@ -1,4 +1,8 @@
 
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/jsonify)](https://CRAN.R-project.org/package=jsonify)
+![downloads](http://cranlogs.r-pkg.org/badges/grand-total/jsonify)
+[![CRAN RStudio mirror
+downloads](http://cranlogs.r-pkg.org/badges/jsonify)](https://CRAN.R-project.org/package=jsonify)
 [![Travis build
 status](https://travis-ci.org/SymbolixAU/jsonify.svg?branch=master)](https://travis-ci.org/SymbolixAU/jsonify)
 [![Coverage
@@ -8,16 +12,12 @@ status](https://codecov.io/gh/SymbolixAU/jsonify/branch/master/graph/badge.svg)]
 
 jsonify converts R objects to JSON.
 
-### Aren’t there already data.frame to JSON converters?
-
-Yep.
-
-### So why did you build this one?
+### There are already JSON converters, why did you build this one?
 
 Because I wanted it available at the source ( C++ ) level for
 integrating into other packages.
 
-### Is it fast
+### Is it fast?
 
 It does alright
 
@@ -32,6 +32,7 @@ df <- data.frame(
   , value = sample(letters, size = n, replace = T)
   , val2 = rnorm(n = n)
   , log = sample(c(T,F), size = n, replace = T)
+  , stringsAsFactors = FALSE
 )
 
 microbenchmark(
@@ -45,9 +46,9 @@ microbenchmark(
 )
 
 # Unit: seconds
-#      expr       min        lq      mean    median        uq      max neval
-#  jsonlite 13.422896 13.767812 15.178853 14.112728 16.056832 18.00094     3
-#   jsonify  7.152847  7.238169  7.294133  7.323491  7.364776  7.40606     3
+#      expr       min        lq      mean    median        uq       max neval
+#  jsonlite 11.243452 13.174676 14.721483 15.105899 16.460498 17.815098     3
+#   jsonify  4.607378  4.696038  5.419219  4.784698  5.825139  6.865581     3
 
 n <- 1e4
 x <- list(
@@ -72,18 +73,19 @@ microbenchmark(
   },
   times = 5
 )
-
+ 
 # Unit: milliseconds
 #      expr       min        lq      mean    median        uq       max neval
-#  jsonlite 21.806105 21.911735 22.143469 21.943781 22.499527 22.556196     5
-#   jsonify  8.009139  8.109407  8.540984  8.117278  8.874733  9.594362     5
+#  jsonlite 19.226906 19.488125 20.310911 19.768292 21.142979 21.928253     5
+#   jsonify  7.638329  7.715288  7.944044  7.879122  7.924961  8.562521     5
+   
 ```
 
-### There’s no ‘Date’ type in JSON, how have you handled this?
+### There’s no `Date` type in JSON, how have you handled this?
 
-At its core `Dates` in R are numeric, so they’re treated as numbers when
-converted to JSON. However, I’ve given the option to the user to coerce
-to character through the `numeric_dates` argument.
+At its core `Dates` in R are numeric, so they are treated as numbers
+when converted to JSON. However, the user can coerce to character
+through the `numeric_dates` argument.
 
 **This argument only works for data.frames and vectors, not lists**
 
@@ -143,13 +145,13 @@ jsonify::to_json( x, numeric_dates = FALSE)
 #  [1] "json"
 ```
 
-### Why doesn’t `numeric_dates` work for lists?
+### What about lists?
 
-Because the purpose of this library is speed. A lot of overhead is
-incurred iterating over a list to find and convert objects from one type
-to another.
+The purpose of this library is speed. A lot of overhead is incurred
+iterating over a list to find and convert objects from one type to
+another.
 
-### What do you mean by ‘available at the source’ ?
+### What do you mean by “available at the source” ?
 
 I want to be able to call the C++ code from another package, without
 going to & from R. Therefore, the C++ code is implemented in headers, so
@@ -158,7 +160,7 @@ you can “link to” it in your own package.
 For example, the `LinkingTo` section in DESCRIPTION will look something
 like
 
-``` r
+``` yaml
 LinkingTo: 
     Rcpp,
     jsonify
@@ -168,8 +170,8 @@ And in a c++ source file you can `#include` the header and use the
 available functions
 
 ``` cpp
-#include "jsonify.hpp"
 // [[Rcpp::depends(jsonify)]]
+#include "jsonify/to_json.hpp"
 
 Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
   return jsonify::to_json( df );
@@ -179,6 +181,27 @@ Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
 ### Can I call it from R if I want to?
 
 Yes.
+
+``` r
+df <- data.frame(
+  id = 1:3
+  , val = letters[1:3]
+  )
+jsonify::to_json( df )
+#  [1] "[{\"id\":1,\"val\":1},{\"id\":2,\"val\":2},{\"id\":3,\"val\":3}]"
+#  attr(,"class")
+#  [1] "json"
+```
+
+### Why are there numbers in stead of letters?
+
+Because `factors` are a thing in R. And `jsonify` treats them as
+factors.
+
+### Oh yeah, I forget about factors…
+
+So do a lot of people, especially when working with `tibbles`, which
+sets `stringsAsFactors = FALSE` by default (the opposite of base R)
 
 ``` r
 df <- data.frame(
@@ -194,7 +217,13 @@ jsonify::to_json( df )
 
 ### How do I install it?
 
-Install the development version from [GitHub](https://github.com/) with:
+Get the latest release version from CRAN
+
+``` r
+install.packages("jsonify")
+```
+
+Or the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")

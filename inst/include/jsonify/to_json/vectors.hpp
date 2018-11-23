@@ -2,53 +2,51 @@
 #define R_JSONIFY_VECTORS_H
 
 #include <Rcpp.h>
-#include "writers.hpp"
-
-// [[Rcpp::depends(rapidjsonr)]]
+#include "jsonify/jsonify.hpp"
 
 using namespace rapidjson;
 
 namespace jsonify {
 namespace vectors {
 
-  inline Rcpp::StringVector to_json( Rcpp::NumericVector& nv) { 
+  inline Rcpp::StringVector to_json( Rcpp::NumericVector& nv, bool unbox = false ) { 
    
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, nv );
+    jsonify::writers::write_value( writer, nv, unbox );
     return jsonify::utils::finalise_json( sb );
       
   }
 
-  inline Rcpp::StringVector to_json( Rcpp::StringVector& sv ) {
+  inline Rcpp::StringVector to_json( Rcpp::StringVector& sv, bool unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, sv );
+    jsonify::writers::write_value( writer, sv, unbox );
     return jsonify::utils::finalise_json( sb );
   }
 
-  inline Rcpp::StringVector to_json( Rcpp::IntegerVector& iv ) {
+  inline Rcpp::StringVector to_json( Rcpp::IntegerVector& iv, bool unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, iv );
+    jsonify::writers::write_value( writer, iv, unbox );
     return jsonify::utils::finalise_json( sb );
   }
 
-  inline Rcpp::StringVector to_json( Rcpp::LogicalVector& lv ) {
+  inline Rcpp::StringVector to_json( Rcpp::LogicalVector& lv, bool unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, lv );
+    jsonify::writers::write_value( writer, lv, unbox );
     return jsonify::utils::finalise_json( sb );
   }
 
-  inline Rcpp::StringVector to_json( SEXP& lst ) {
+  inline Rcpp::StringVector to_json( SEXP& lst, bool unbox = false ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, lst );
+    jsonify::writers::write_value( writer, lst, unbox );
     return jsonify::utils::finalise_json( sb );
   }
 
