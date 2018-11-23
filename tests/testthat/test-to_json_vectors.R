@@ -32,6 +32,20 @@ test_that("NAs, NULLS and Infs work", {
   expect_equal(as.character(to_json(data.frame())), "[]")
 })
 
+test_that("NAs, NULLS and Infs work and unboxed", {
+  expect_equal(as.character(to_json( NA, auto_unbox = T )), "null")
+  expect_equal(as.character(to_json( NA_character_, auto_unbox = T )), "null")
+  expect_equal(as.character(to_json( NA_complex_, auto_unbox = T )), "null")
+  expect_equal(as.character(to_json( NA_integer_, auto_unbox = T )), "null")
+  expect_equal(as.character(to_json( NA_real_, auto_unbox = T )), "null")
+  expect_equal(as.character(to_json( NaN, auto_unbox = T )), "null")
+  expect_equal(as.character(to_json( Inf, auto_unbox = T )), "\"Inf\"")
+  expect_equal(as.character(to_json( -Inf, auto_unbox = T )), "\"-Inf\"")
+  expect_equal(as.character(to_json(NULL, auto_unbox = T)), "{}")
+  expect_equal(as.character(to_json(list(a="a",b=NULL), auto_unbox = T)),"{\"a\":\"a\",\"b\":{}}")
+  expect_equal(as.character(to_json(data.frame(), auto_unbox = T)), "[]")
+})
+
 test_that("round trips with jsonlite work", {
   x <- c(1L, NA_integer_)
   expect_equal( jsonlite::fromJSON( to_json( x ) ), x)

@@ -28,63 +28,63 @@ to_json.data.frame <- function( x, ..., numeric_dates = TRUE ) {
 
 #' @rdname to_json
 #' @export
-to_json.numeric <- function( x, ... ) rcpp_numeric_to_json( x )
+to_json.numeric <- function( x, auto_unbox = FALSE, ... ) rcpp_numeric_to_json( x, auto_unbox )
 
 #' @rdname to_json
 #' @export
-to_json.character <- function( x, ... ) rcpp_character_to_json( x )
+to_json.character <- function( x, auto_unbox = FALSE, ... ) rcpp_character_to_json( x, auto_unbox )
 
 #' @rdname to_json
 #' @export
-to_json.integer <- function( x, ... ) rcpp_integer_to_json( x ) 
+to_json.integer <- function( x, auto_unbox = FALSE, ... ) rcpp_integer_to_json( x, auto_unbox ) 
 
 #' @rdname to_json
 #' @export
-to_json.logical <- function( x, ... ) rcpp_logical_to_json( x )
+to_json.logical <- function( x, auto_unbox = FALSE, ... ) rcpp_logical_to_json( x, auto_unbox )
 
 #' @rdname to_json
 #' @export
-to_json.complex <- function( x, ... ) rcpp_character_to_json( x )
+to_json.complex <- function( x, auto_unbox = FALSE, ... ) rcpp_character_to_json( x, auto_unbox )
 
-#' @rdname  to_json
+#' @rdname to_json
 #' @export
-to_json.matrix <- function( x, ... ) {
-  if( is.integer( x ) ) return( rcpp_integer_matrix_to_json( x ) ) 
-  if( is.numeric( x ) ) return( rcpp_numeric_matrix_to_json( x ) )
-  return( rcpp_character_matrix_to_json( x ) )
+to_json.matrix <- function( x, auto_unbox = FALSE, ... ) {
+  if( is.integer( x ) ) return( rcpp_integer_matrix_to_json( x, auto_unbox ) ) 
+  if( is.numeric( x ) ) return( rcpp_numeric_matrix_to_json( x, auto_unbox ) )
+  return( rcpp_character_matrix_to_json( x, auto_unbox ) )
 }
 
 #' @rdname to_json
 #' @export
 #' @inheritParams convert_to_json.data.frame
-to_json.Date <- function( x, ..., numeric_dates = TRUE ) {
-  if( numeric_dates ) return( rcpp_numeric_to_json( x ) ) 
-  return( rcpp_character_to_json( as.character( x ) ) )
+to_json.Date <- function( x, auto_unbox = FALSE, ..., numeric_dates = TRUE ) {
+  if( numeric_dates ) return( rcpp_numeric_to_json( x, auto_unbox ) ) 
+  return( rcpp_character_to_json( as.character( x ), auto_unbox ) )
 }
 
 #' @rdname to_json
 #' @export
 #' @inheritParams convert_to_json.data.frame
-to_json.POSIXct <- function( x, ..., numeric_dates = TRUE ) {
-  if( numeric_dates ) return( rcpp_numeric_to_json( x ) ) 
-  return( rcpp_character_to_json( as.character( x ) ) )
+to_json.POSIXct <- function( x, auto_unbox = FALSE, ..., numeric_dates = TRUE ) {
+  if( numeric_dates ) return( rcpp_numeric_to_json( x, auto_unbox ) ) 
+  return( rcpp_character_to_json( as.character( x ), auto_unbox ) )
 }
 
 #' @rdname to_json
 #' @export
 #' @inheritParams convert_to_json.data.frame
-to_json.POSIXlt <- function( x, ..., numeric_dates = TRUE ) {
-  if( numeric_dates ) return( rcpp_list_to_json( x ) ) 
-  return( rcpp_character_to_json( as.character( x ) ) )
+to_json.POSIXlt <- function( x, auto_unbox = FALSE, ..., numeric_dates = TRUE ) {
+  if( numeric_dates ) return( rcpp_list_to_json( x, auto_unbox ) ) 
+  return( rcpp_character_to_json( as.character( x ), auto_unbox ) )
 }
 
 #' @rdname to_json
 #' @export
-to_json.list <- function( x, ... ) rcpp_list_to_json( x )
+to_json.list <- function( x, auto_unbox = FALSE, ... ) rcpp_list_to_json( x, auto_unbox )
 
 #' @rdname to_json
 #' @export
-to_json.default <- function( x, ... ) rcpp_list_to_json( x ) # stop("this type is not supported")
+to_json.default <- function( x, auto_unbox = FALSE, ... ) rcpp_list_to_json( x, auto_unbox ) # stop("this type is not supported")
 
 date_columns <- function( df ) names(which(vapply(df , function(x) { inherits(x, "Date") || inherits(x, "POSIXct") }, T)))
 
