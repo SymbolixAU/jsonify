@@ -328,36 +328,37 @@ namespace from_json {
   // Parse rapidjson::Document object.
   inline Rcpp::List parse_document(rapidjson::Document& doc) {
     int json_len = doc.Size();
+    
     Rcpp::List out(json_len);
     Rcpp::CharacterVector names(json_len);
     
     int i = 0;
     for(rapidjson::Value::ConstMemberIterator itr = doc.MemberBegin(); itr != doc.MemberEnd(); ++itr) {
-      
+
       // Get current key
       names[i] = itr->name.GetString();
-      
+
       // Get current value
       switch(itr->value.GetType()) {
-      
+
       // bool - false
       case 1: {
         out[i] = itr->value.GetBool();
         break;
       }
-        
+
       // bool - true
       case 2: {
         out[i] = itr->value.GetBool();
         break;
       }
-        
+
       // string
       case 5: {
         out[i] = itr->value.GetString();
         break;
       }
-        
+
       // numeric
       case 6: {
         if(itr->value.IsDouble()) {
@@ -369,33 +370,33 @@ namespace from_json {
         }
         break;
       }
-      
+
       // null
       case 0: {
         out[i] = R_NA_STR;
         break;
       }
-        
+
       // array
       case 4: {
         rapidjson::Value::ConstArray curr_array = itr->value.GetArray();
         out[i] = parse_array<rapidjson::Value::ConstArray>(curr_array);
         break;
       }
-        
+
       // JSON object
       case 3: {
         const rapidjson::Value& temp_val = itr->value;
         out[i] = parse_value(temp_val);
         break;
       }
-        
+
       // some other data type not covered
       default: {
         Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, array, and json");
       }
       }
-      
+
       // Bump i
       i++;
     }
@@ -565,6 +566,18 @@ namespace from_json {
       Rcpp::stop("json parse error");
     }
     
+    if( doc.IsInt() ) {
+      Rcpp::IntegerVector x(1);
+      x[0] = doc.GetInt();
+      return x;
+    }
+    
+    if( doc.IsDouble() ) {
+      Rcpp::NumericVector x(1);
+      x[0] = doc.GetDouble();
+      return x;
+    } 
+
     // If input is not an array, pass doc through parse_document(), and return
     // the result.
     if(!doc.IsArray()) {
@@ -574,40 +587,40 @@ namespace from_json {
     // Get set of unique data types in doc.
     get_dtypes<rapidjson::Document>(doc, true);
     int dtype_len = dtypes.size();
-    
+
     // If dtype_len is greater than 2, return an R list of values.
     if(dtype_len > 2) {
       return doc_to_list(doc);
     }
-    
+
     // If dtype_len is 2 and 0 does not appear in dtypes, return an
     // R list of values.
     if(dtype_len == 2 && dtypes.find(0) == dtypes.end()) {
       return doc_to_list(doc);
     }
-    
+
     // If 3 or 4 is in dtypes, return an R list of values.
     if(dtypes.find(3) != dtypes.end() ||
        dtypes.find(4) != dtypes.end()) {
       return doc_to_list(doc);
     }
-    
+
     // Dump ints from dtypes to an std vector.
     std::vector<int> dtype_vect(dtypes.begin(), dtypes.end());
     int dt = dtype_vect[0];
-    
+
     // If dtype_len is 1, return an R vector.
     if(dtype_len == 1) {
       return doc_to_vector(doc, dt);
     }
-    
+
     // Else if dtype_len is 2 and 0 is in dtypes, return an R vector.
     if(dtype_len == 2) {
       if(dt == 0) {
         dt = dtype_vect[1];
       }
     }
-    
+
     return doc_to_vector(doc, dt);
   }
 

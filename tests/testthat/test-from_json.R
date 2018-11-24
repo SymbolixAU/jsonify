@@ -59,3 +59,53 @@ test_that("JSON missing keys handled properly", {
   json_str <- jsonify::to_json(target)
   expect_equal(from_json(json_str), target)
 })
+
+test_that("round trips work", {
+  
+  f1 <- function( x ) from_json( to_json( x ) )
+  #f2 <- function( x ) from_json( to_json( x, unbox = TRUE ) )
+  
+  x <- 1L
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  x <- 1
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  x <- 1L:5L
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  x <- 1:5
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  x <- c(1L, 2L, 3L, NA_integer_)
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  x <- list(x = 1)
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  x <- list(x = 1:5)
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  x <- list(x = 1, y = letters)
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  x <- list(1L, "cats", 3L, NA_character_)
+  expect_identical( f1(x), x )
+  #expect_identical( f2(x), x )
+  
+  
+})
+
+
+
+
+
+
