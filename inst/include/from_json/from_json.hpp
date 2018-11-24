@@ -562,10 +562,12 @@ namespace from_json {
     
     // Make sure there were no parse errors
     if(doc.HasParseError()) {
-      Rcpp::Rcerr << "parse error for json string: "<< json << std::endl;
+      Rcpp::Rcerr << "parse error for json string: " << json << std::endl;
       Rcpp::stop("json parse error");
     }
     
+    // If the input is a scalar value of type int, double, string, or bool, 
+    // return Rcpp vector with length 1.
     if( doc.IsInt() ) {
       Rcpp::IntegerVector x(1);
       x[0] = doc.GetInt();
@@ -576,8 +578,20 @@ namespace from_json {
       Rcpp::NumericVector x(1);
       x[0] = doc.GetDouble();
       return x;
-    } 
-
+    }
+    
+    if( doc.IsString() ) {
+      Rcpp::CharacterVector x(1);
+      x[0] = doc.GetString();
+      return x;
+    }
+    
+    if( doc.IsBool() ) {
+      Rcpp::LogicalVector x(1);
+      x[0] = doc.GetBool();
+      return x;
+    }
+    
     // If input is not an array, pass doc through parse_document(), and return
     // the result.
     if(!doc.IsArray()) {

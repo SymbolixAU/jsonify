@@ -8,6 +8,11 @@ test_that("scalar values handled properly", {
   
   json_str <- jsonify::to_json(target)
   expect_equal(from_json(json_str), target)
+  
+  expect_equal(from_json("1"), 1)
+  expect_equal(from_json("1.5"), 1.5)
+  expect_equal(from_json("\"a\""), "a")
+  expect_equal(from_json("true"), TRUE)
 })
 
 test_that("vector / array values handled properly", {
