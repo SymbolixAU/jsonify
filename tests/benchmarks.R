@@ -58,9 +58,9 @@ microbenchmark(
   times = 5
 )
 # Unit: milliseconds
-#     expr       min         lq       mean     median         uq        max neval
-# jsonlite 9962.3905 10075.0774 10157.5579 10076.4016 10308.3503 10365.5699     5
-#  jsonify  822.6131   831.9874   883.8569   845.1197   943.5952   975.9688     5
+#   expr       min        lq      mean    median        uq       max neval
+# jsonlite 9531.6450 9757.0702 9826.4883 9854.7296 9880.0933 10108.903     5
+#  jsonify  895.7495  908.3581  932.9345  910.2298  934.1805  1016.155     5
 
 ## numeric vector with NAs
 n <- 1e6
@@ -94,9 +94,9 @@ microbenchmark(
   times = 5
 )
 # Unit: milliseconds
-#     expr      min        lq     mean    median        uq       max neval
-# jsonlite 749.2141 754.33312 775.3778 757.38981 757.92618 858.02579     5
-#  jsonify  73.4771  74.24309  75.7850  76.84927  77.06383  77.29172     5
+#   expr      min        lq      mean    median       uq       max neval
+# jsonlite 773.2204 777.71724 800.19764 797.00264 821.4729 831.57496     5
+#  jsonify  82.7567  82.85822  85.61328  85.67881  87.7332  89.03947     5
 
 ## mixture of NAs, NULLs, Infs etc
 n <- 1e7
@@ -131,17 +131,17 @@ microbenchmark(
 js <- jsonify::to_json(df)
 microbenchmark(
   jsonlite = {
-    r_val <- jsonlite::fromJSON( js )
+    r_val <- jsonlite::fromJSON( js , simplifyVector = FALSE)
   },
   jsonify = {
-    r_val <- jsonify::from_json( js )
+    r_val <- jsonify::from_json( js , simplifyDataFrame = FALSE)
   },
   times = 5
 )
 # Unit: seconds
-#     expr       min        lq      mean    median       uq       max neval
-# jsonlite 104.84647 109.82142 120.44753 115.25022 126.4798 145.83968     5
-#  jsonify  12.13313  17.33051  25.97161  17.44538  27.2728  55.67621     5
+#   expr      min       lq     mean   median       uq      max neval
+# jsonlite 42.12359 77.00299 72.53358 78.70986 79.59812 85.23332     5
+#  jsonify 22.17143 24.22952 27.90723 25.01322 33.13034 34.99164     5
 
 
 ## forcing 

@@ -65,6 +65,16 @@ test_that("JSON missing keys handled properly", {
   expect_equal(from_json(json_str), target)
 })
 
+test_that("data frame returned properly", {
+  target <- data.frame("id" = c(1L, 2L), "val" = c("a", "b"), stringsAsFactors = FALSE)
+  
+  json_str <- '[{"id":1,"val":"a"},{"id":2,"val":"b"}]'
+  expect_equal(from_json(json_str), target)
+  
+  json_str <- jsonify::to_json(target)
+  expect_equal(from_json(json_str), target)
+})
+
 test_that("round trips work", {
   
   f1 <- function( x ) from_json( to_json( x ) )
@@ -105,6 +115,15 @@ test_that("round trips work", {
   x <- list(1L, "cats", 3L, NA_character_)
   expect_identical( f1(x), x )
   #expect_identical( f2(x), x )
+  
+  x <- data.frame(
+    "col1" = c(1, 2), 
+    "col2" = c(1L, 2L), 
+    "col3" = c(TRUE, FALSE), 
+    "col4" = c("cats", "dogs"), 
+    stringsAsFactors = FALSE
+  )
+  expect_identical( f1(x), x )
   
   
 })

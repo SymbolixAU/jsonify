@@ -4,10 +4,14 @@
 \alias{from_json}
 \title{From JSON}
 \usage{
-from_json(x)
+from_json(x, simplifyDataFrame = TRUE)
 }
 \arguments{
 \item{x}{JSON string to convert to R list}
+
+\item{simplifyDataFrame}{logical, if \code{TRUE}, coerce JSON arrays 
+containing only records (JSON objects) into a data frame. Default value is 
+\code{TRUE}.}
 }
 \description{
 Converts a JSON string to an R list
@@ -21,5 +25,8 @@ from_json("{\\"a\\":8, \\"b\\":{\\"c\\":123, \\"d\\":{\\"e\\":456}}}")
 lst <- list("a" = 5L, "b" = 1.43, "c" = "cats", "d" = FALSE)
 json_str <- jsonify::to_json(lst, unbox = TRUE)
 from_json(json_str)
+
+# Return a data frame
+from_json("[{\\"id\\":1,\\"val\\":\\"a\\"},{\\"id\\":2,\\"val\\":\\"b\\"}]")
 
 }
