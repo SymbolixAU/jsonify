@@ -66,6 +66,7 @@ test_that("JSON missing keys handled properly", {
 })
 
 test_that("data frame returned properly", {
+  # Return data frame in which the values in each name are of the same data type.
   target <- data.frame("id" = c(1L, 2L), "val" = c("a", "b"), stringsAsFactors = FALSE)
   
   json_str <- '[{"id":1,"val":"a"},{"id":2,"val":"b"}]'
@@ -73,6 +74,24 @@ test_that("data frame returned properly", {
   
   json_str <- jsonify::to_json(target)
   expect_equal(from_json(json_str), target)
+  
+  # Return data frame in which the values in each name are NOT of the same data type.
+  target <- data.frame("id" = c("cats", 2L), "val" = c("a", "b"), stringsAsFactors = FALSE)
+  
+  json_str <- '[{"id":"cats","val":"a"},{"id":2,"val":"b"}]'
+  expect_equal(from_json(json_str), target)
+  
+  json_str <- jsonify::to_json(target)
+  expect_equal(from_json(json_str), target)
+  
+  # Return data frame in which the names do not align across JSON objects.
+  target <- data.frame("id" = c(1L, 2L), "val" = c("a", NA), "blah" = c(NA, "b"), stringsAsFactors = FALSE)
+  
+  json_str <- '[{"id":1,"val":"a"},{"id":2,"blah":"b"}]'
+  expect_equal(from_json(json_str), target)
+  
+  #json_str <- jsonify::to_json(target)
+  #expect_equal(from_json(json_str), target)
 })
 
 test_that("round trips work", {

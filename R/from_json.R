@@ -22,5 +22,41 @@
 #' 
 #' @export
 from_json <- function(x, simplifyDataFrame = TRUE) {
-  rcpp_from_json(x, simplifyDataFrame)
+  res <- rcpp_from_json(x, simplifyDataFrame)
+  
+  if (!simplifyDataFrame || is.data.frame(res)) {
+    return(res)
+  }
+  
+  list_to_df(res)
+}
+
+
+list_to_df <- function(res) {
+  # Get all unique names from a list object.
+  cols <- rcpp_get_col_headers(res)
+  
+  # If column headers are NULL, return res.
+  if (is.null(cols)) {
+    return(res)
+  }
+  
+  # Convert row lists to column lists.
+  columnlist <- rcpp_transpose_list(res, cols)
+  
+  # Convert all NULL values in each nested list to NA.
+  for (i in columnlist) {
+    rcpp_null_to_na(i)
+  }
+  
+  # Unlist each element, which will naturally convert data types and NA values
+  # within each "list column" to be the same, and thus data frame friendly.
+  columnlist <- lapply(columnlist, unlist, recursive = FALSE, 
+                       use.names = FALSE)
+  
+  # Convert columnlist to a data frame, then return.
+  class(columnlist) <- "data.frame"
+  row.names(columnlist) <- seq_len(length(res))
+  colnames(columnlist) <- cols
+  columnlist
 }
