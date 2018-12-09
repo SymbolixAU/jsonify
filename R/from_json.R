@@ -24,7 +24,7 @@
 from_json <- function(x, simplifyDataFrame = TRUE) {
   res <- rcpp_from_json(x, simplifyDataFrame)
   
-  if (!simplifyDataFrame || is.data.frame(res)) {
+  if (!simplifyDataFrame || !inherits(res, "list")) {
     return(res)
   }
   
