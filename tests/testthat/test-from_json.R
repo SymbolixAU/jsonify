@@ -94,6 +94,11 @@ test_that("data frame returned properly", {
   #expect_equal(from_json(json_str), target)
 })
 
+test_that("empty inputs return NULL", {
+  expect_null(from_json("{}"))
+  expect_null(from_json("[]"))
+})
+
 test_that("round trips work", {
   
   f1 <- function( x ) from_json( to_json( x ) )

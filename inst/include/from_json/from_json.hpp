@@ -362,8 +362,13 @@ namespace from_json {
   
   
   // Parse rapidjson::Document object.
-  inline Rcpp::List parse_document(rapidjson::Document& doc) {
+  inline SEXP parse_document(rapidjson::Document& doc) {
     int json_len = doc.Size();
+    
+    // If doc has length zero, return NULL.
+    if(json_len == 0) {
+      return R_NilValue;
+    }
     
     Rcpp::List out(json_len);
     Rcpp::CharacterVector names(json_len);
@@ -715,6 +720,11 @@ namespace from_json {
     // the result.
     if(!doc.IsArray()) {
       return parse_document(doc);
+    }
+    
+    // If input is an empty array, return NULL.
+    if(doc.Size() == 0) {
+      return R_NilValue;
     }
     
     // Get set of unique data types in doc.
