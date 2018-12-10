@@ -8,7 +8,7 @@
 
 using namespace rapidjson;
 
-#define R_NA_STR Rcpp::CharacterVector(NA_STRING);
+#define R_NA_VAL Rcpp::LogicalVector::create(NA_LOGICAL);
 
 namespace jsonify {
 namespace from_json {
@@ -57,7 +57,7 @@ namespace from_json {
   
   // Tranpose a list.
   // Equivalent to the R command:
-  // cols <- unique(unlist(lapply(list_obj, names), recursive = FALSE, use.names = FALSE))
+  // cols <- unique(unlist(lapply(list_obj, names)))
   // lapply(cols, function(x) lapply(list_obj, "[[", x))
   Rcpp::List transpose_list(Rcpp::List x, Rcpp::CharacterVector names) {
     int x_len = x.size();

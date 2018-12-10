@@ -128,7 +128,7 @@ namespace from_json {
       
       // null
       case 0: {
-        out[i] = R_NA_STR;
+        out[i] = R_NA_VAL;
         break;
       }
         
@@ -252,7 +252,7 @@ namespace from_json {
       
     // null
     case 0: {
-      Rcpp::CharacterVector out(array_len, NA_STRING);
+      Rcpp::LogicalVector out(array_len, NA_LOGICAL);
       return out;
     }
     
@@ -328,7 +328,7 @@ namespace from_json {
       
       // null
       case 0: {
-        out[i] = R_NA_STR;
+        out[i] = R_NA_VAL;
         break;
       }
         
@@ -414,7 +414,7 @@ namespace from_json {
 
       // null
       case 0: {
-        out[i] = R_NA_STR;
+        out[i] = R_NA_VAL;
         break;
       }
 
@@ -509,7 +509,7 @@ namespace from_json {
       
     // null
     case 0: {
-      Rcpp::CharacterVector out(doc_len, NA_STRING);
+      Rcpp::LogicalVector out(doc_len, NA_LOGICAL);
       return out;
     }
     }
@@ -568,7 +568,7 @@ namespace from_json {
       
       // null
       case 0: {
-        out[i] = R_NA_STR;
+        out[i] = R_NA_VAL;
         df_out = false;
         break;
       }
