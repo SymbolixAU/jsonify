@@ -16,12 +16,12 @@
 \alias{to_json.default}
 \title{To JSON}
 \usage{
-to_json(x, unbox = FALSE, ...)
+to_json(x, unbox = FALSE, digits = NULL, ...)
 
-\method{to_json}{data.frame}(x, unbox = FALSE, ...,
+\method{to_json}{data.frame}(x, unbox = FALSE, digits = NULL, ...,
   numeric_dates = TRUE)
 
-\method{to_json}{numeric}(x, unbox = FALSE, ...)
+\method{to_json}{numeric}(x, unbox = FALSE, digits = NULL, ...)
 
 \method{to_json}{character}(x, unbox = FALSE, ...)
 
@@ -31,7 +31,7 @@ to_json(x, unbox = FALSE, ...)
 
 \method{to_json}{complex}(x, unbox = FALSE, ...)
 
-\method{to_json}{matrix}(x, unbox = FALSE, ...)
+\method{to_json}{matrix}(x, unbox = FALSE, digits = NULL, ...)
 
 \method{to_json}{Date}(x, unbox = FALSE, ..., numeric_dates = TRUE)
 
@@ -39,15 +39,17 @@ to_json(x, unbox = FALSE, ...)
 
 \method{to_json}{POSIXlt}(x, unbox = FALSE, ..., numeric_dates = TRUE)
 
-\method{to_json}{list}(x, unbox = FALSE, ...)
+\method{to_json}{list}(x, unbox = FALSE, digits = NULL, ...)
 
-\method{to_json}{default}(x, unbox = FALSE, ...)
+\method{to_json}{default}(x, unbox = FALSE, digits = NULL, ...)
 }
 \arguments{
 \item{x}{object to convert to JSON}
 
 \item{unbox}{logical indicating if single-value arrays should be 'unboxed', 
 that is, not contained inside an array.}
+
+\item{digits}{integer specifying the number of decimal places to round numerics.}
 
 \item{...}{arguments passed to other methods}
 
