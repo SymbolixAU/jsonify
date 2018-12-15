@@ -73,4 +73,9 @@ to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5), numer
 to_json(list(x = 1), unbox = TRUE)
 to_json(list(x = 1, y = c("a"), z = list(x = 2, y = c("b"))), unbox = TRUE)
 
+## rounding numbers using the digits argument
+to_json(1.23456789, digits = 2)
+to_json(data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3], stringsAsFactors = FALSE), digits = 0 )
+
+
 }

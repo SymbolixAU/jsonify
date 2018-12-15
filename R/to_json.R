@@ -22,6 +22,11 @@
 #' to_json(list(x = 1), unbox = TRUE)
 #' to_json(list(x = 1, y = c("a"), z = list(x = 2, y = c("b"))), unbox = TRUE)
 #' 
+#' ## rounding numbers using the digits argument
+#' to_json(1.23456789, digits = 2)
+#' to_json(data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3], stringsAsFactors = FALSE), digits = 0 )
+#' 
+#' 
 #' @export
 to_json <- function( x, unbox = FALSE, digits = NULL, ... ) {
   UseMethod("to_json")

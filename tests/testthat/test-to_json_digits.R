@@ -6,7 +6,7 @@ test_that("digits argument in R handled", {
   expect_equal( jsonify:::handle_digits( 1 ), 1 )
   expect_equal( jsonify:::handle_digits( 1L ), 1 )
   expect_equal( jsonify:::handle_digits( 1.001 ), 1 )
-  expect_equal( jsonify:::handle_digits( 1.99 ), 2 )
+  expect_equal( jsonify:::handle_digits( 1.99 ), 1 )
   
 })
 
