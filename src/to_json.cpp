@@ -32,6 +32,10 @@ Rcpp::StringVector rcpp_logical_to_json( Rcpp::LogicalVector iv, bool unbox = fa
 
 // [[Rcpp::export]]
 Rcpp::StringVector rcpp_list_to_json( SEXP lst, bool unbox = false, int digits = -1 ) {
+  if ( digits >= 0 ) {
+    SEXP lst2 = Rcpp::clone( lst );
+    return jsonify::vectors::to_json( lst2, unbox, digits );
+  }
   return jsonify::vectors::to_json( lst, unbox, digits );
 }
 
@@ -42,6 +46,10 @@ Rcpp::StringVector rcpp_integer_matrix_to_json( Rcpp::IntegerMatrix m, bool unbo
 
 // [[Rcpp::export]]
 Rcpp::StringVector rcpp_numeric_matrix_to_json( Rcpp::NumericMatrix m, bool unbox = false, int digits = -1 ) {
+  if ( digits >= 0 ) {
+    Rcpp::NumericMatrix m2 = Rcpp::clone( m );
+    return jsonify::matrix::to_json( m2, unbox, digits );
+  }
   return jsonify::matrix::to_json( m, unbox, digits );
 }
 
