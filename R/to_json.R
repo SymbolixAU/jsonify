@@ -5,7 +5,8 @@
 #' @param x object to convert to JSON
 #' @param unbox logical indicating if single-value arrays should be 'unboxed', 
 #' that is, not contained inside an array.
-#' @param digits integer specifying the number of decimal places to round numerics.
+#' @param digits integer specifying the number of decimal places to round numerics. 
+#' numeric values are coorced using \code{as.integer}, which may round-down a value you supply
 #' @param ... arguments passed to other methods
 #' 
 #' @examples 
@@ -38,7 +39,7 @@ to_json.data.frame <- function( x, unbox = FALSE, digits = NULL, ..., numeric_da
 #' @rdname to_json
 #' @export
 to_json.numeric <- function( x, unbox = FALSE, digits = NULL, ... ) {
-  if(is.null(digits)) digits <- -1
+  digits <- handle_digits( digits )
   rcpp_numeric_to_json( x, unbox, digits )
 }
 
@@ -62,7 +63,7 @@ to_json.complex <- function( x, unbox = FALSE, ... ) rcpp_character_to_json( x, 
 #' @export
 to_json.matrix <- function( x, unbox = FALSE, digits = NULL, ... ) {
   if( is.integer( x ) ) return( rcpp_integer_matrix_to_json( x, unbox ) ) 
-  if(is.null(digits)) digits <- -1
+  digits <- handle_digits( digits )
   if( is.numeric( x ) ) return( rcpp_numeric_matrix_to_json( x, unbox, digits ) )
   return( rcpp_character_matrix_to_json( x, unbox ) )
 }
@@ -91,14 +92,14 @@ to_json.POSIXlt <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
 #' @rdname to_json
 #' @export
 to_json.list <- function( x, unbox = FALSE, digits = NULL, ... ) {
-  if(is.null(digits)) digits <- -1
+  digits <- handle_digits( digits )
   rcpp_list_to_json( x, unbox, digits )
 }
 
 #' @rdname to_json
 #' @export
 to_json.default <- function( x, unbox = FALSE, digits = NULL, ... ) {
-  if(is.null(digits)) digits <- -1
+  digits <- handle_digits( digits )
   rcpp_list_to_json( x, unbox, digits ) # stop("this type is not supported")
 }
 
@@ -110,7 +111,10 @@ handle_dates <- function( x ) {
   return( x )
 }
 
-
+handle_digits <- function( digits ) {
+  if( is.null( digits )) return(-1)
+  return( as.integer( digits ) )
+}
 
 
 

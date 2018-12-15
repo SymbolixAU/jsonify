@@ -49,7 +49,8 @@ to_json(x, unbox = FALSE, digits = NULL, ...)
 \item{unbox}{logical indicating if single-value arrays should be 'unboxed', 
 that is, not contained inside an array.}
 
-\item{digits}{integer specifying the number of decimal places to round numerics.}
+\item{digits}{integer specifying the number of decimal places to round numerics. 
+numeric values are coorced using \code{as.integer}, which may round-down a value you supply}
 
 \item{...}{arguments passed to other methods}
 
