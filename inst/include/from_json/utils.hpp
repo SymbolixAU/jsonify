@@ -19,23 +19,21 @@ namespace from_json {
   std::unordered_map<std::string, int> names_map;
   int pv_len;
   std::string temp_name;
-  
   std::vector<bool> df_out_lgl;
   std::vector<int> df_out_int;
   std::vector<double> df_out_dbl;
   std::vector<std::string> df_out_str;
-  
   Rcpp::CharacterVector names;
   Rcpp::List pv_list;
   
   // Get all unique names from a list object.
   // Equivalent to the R command:
   // unique(unlist(lapply(list_obj, names), recursive = FALSE, use.names = FALSE))
-  SEXP get_col_headers(Rcpp::List list_obj) {
+  SEXP get_col_headers(Rcpp::List& list_obj) {
     Rcpp::List curr_list;
     Rcpp::CharacterVector curr_names;
     std::string curr_str;
-    std::set<std::string> names_set;
+    std::unordered_set<std::string> names_set;
     std::vector<std::string> names;
     for(unsigned int i = 0; i < list_obj.size(); ++i) {
       if(TYPEOF(list_obj[i]) != VECSXP) {
@@ -59,7 +57,7 @@ namespace from_json {
   // Equivalent to the R command:
   // cols <- unique(unlist(lapply(list_obj, names)))
   // lapply(cols, function(x) lapply(list_obj, "[[", x))
-  Rcpp::List transpose_list(Rcpp::List x, Rcpp::CharacterVector names) {
+  Rcpp::List transpose_list(Rcpp::List& x, Rcpp::CharacterVector& names) {
     int x_len = x.size();
     int names_len = names.size();
     Rcpp::List out(names_len);
@@ -88,7 +86,7 @@ namespace from_json {
   }
   
   // Convert all NULL elements in a list to NA.
-  void null_to_na(Rcpp::List x) {
+  void null_to_na(Rcpp::List& x) {
     for(unsigned int i = 0; i < x.size(); ++i) {
       if(Rf_isNull(x[i])) {
         x[i] = NA_LOGICAL;
