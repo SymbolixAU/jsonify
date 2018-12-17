@@ -37,7 +37,7 @@ to_json <- function( x, unbox = FALSE, digits = NULL, ... ) {
 #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character
 to_json.data.frame <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
   if(!numeric_dates) x <- handle_dates( x ) 
-  if(is.null(digits)) digits <- -1
+  digits <- handle_digits( digits )
   rcpp_df_to_json( x, unbox, digits )
 }
 

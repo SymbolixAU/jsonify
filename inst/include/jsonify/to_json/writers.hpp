@@ -40,7 +40,7 @@ namespace writers {
       }
       writer.String( str.c_str() );
     } else {
-      // round to 3 dp
+      
       if ( digits >= 0 ) {
         double e = std::pow( 10.0, digits );
         value = round( value * e ) / e;
