@@ -5,6 +5,17 @@
 
 using namespace Rcpp;
 
+// rcpp_pretty_json
+Rcpp::StringVector rcpp_pretty_json(const char* json);
+RcppExport SEXP _jsonify_rcpp_pretty_json(SEXP jsonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char* >::type json(jsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_pretty_json(json));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_df_to_json
 Rcpp::StringVector rcpp_df_to_json(Rcpp::DataFrame df, bool unbox, int digits);
 RcppExport SEXP _jsonify_rcpp_df_to_json(SEXP dfSEXP, SEXP unboxSEXP, SEXP digitsSEXP) {
@@ -118,18 +129,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_validate_json
-Rcpp::LogicalVector rcpp_validate_json(Rcpp::StringVector geojson);
-RcppExport SEXP _jsonify_rcpp_validate_json(SEXP geojsonSEXP) {
+Rcpp::LogicalVector rcpp_validate_json(Rcpp::StringVector json);
+RcppExport SEXP _jsonify_rcpp_validate_json(SEXP jsonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::StringVector >::type geojson(geojsonSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_validate_json(geojson));
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type json(jsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_validate_json(json));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
     {"_jsonify_rcpp_df_to_json", (DL_FUNC) &_jsonify_rcpp_df_to_json, 3},
     {"_jsonify_rcpp_numeric_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_to_json, 3},
     {"_jsonify_rcpp_character_to_json", (DL_FUNC) &_jsonify_rcpp_character_to_json, 2},
