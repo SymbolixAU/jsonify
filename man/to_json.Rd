@@ -50,7 +50,8 @@ to_json(x, unbox = FALSE, digits = NULL, ...)
 that is, not contained inside an array.}
 
 \item{digits}{integer specifying the number of decimal places to round numerics. 
-numeric values are coorced using \code{as.integer}, which may round-down a value you supply}
+numeric values are coorced using \code{as.integer}, which may round-down the value you supply.
+Default is \code{NULL} - no rounding}
 
 \item{...}{arguments passed to other methods}
 

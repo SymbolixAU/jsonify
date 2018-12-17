@@ -6,7 +6,8 @@
 #' @param unbox logical indicating if single-value arrays should be 'unboxed', 
 #' that is, not contained inside an array.
 #' @param digits integer specifying the number of decimal places to round numerics. 
-#' numeric values are coorced using \code{as.integer}, which may round-down a value you supply
+#' numeric values are coorced using \code{as.integer}, which may round-down the value you supply.
+#' Default is \code{NULL} - no rounding
 #' @param ... arguments passed to other methods
 #' 
 #' @examples 
