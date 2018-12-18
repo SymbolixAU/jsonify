@@ -31,7 +31,7 @@ from_json <- function(x, simplifyDataFrame = TRUE) {
   list_to_df(res)
 }
 
-
+# Helper function to convert a "from_json()" list to a data frame.
 list_to_df <- function(res) {
   # Get all unique names from a list object.
   cols <- rcpp_get_col_headers(res)
@@ -49,11 +49,28 @@ list_to_df <- function(res) {
     rcpp_null_to_na(i)
   }
   
-  # Unlist each element, which will naturally convert data types and NA values
-  # within each "list column" to be the same, and thus data frame friendly.
-  columnlist <- lapply(columnlist, unlist, recursive = FALSE, 
-                       use.names = FALSE)
+  # If the value of each inner list is length one, unlist each element, which 
+  # will naturally convert data types and NA values within each "list column" 
+  # to be the same, and thus data frame friendly.
+  unlist_values <- TRUE
+  for (i in columnlist) {
+    for (j in i) {
+      if (length(j) > 1) {
+        unlist_values <- FALSE
+        break
+      }
+      if (!unlist_values) {
+        break
+      }
+    }
+  }
   
+  if (unlist_values) {
+    # Unlist each element.
+    columnlist <- lapply(columnlist, unlist, recursive = FALSE, 
+                         use.names = FALSE)
+  }
+
   # Convert columnlist to a data frame, then return.
   class(columnlist) <- "data.frame"
   row.names(columnlist) <- seq_len(length(res))

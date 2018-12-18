@@ -89,7 +89,7 @@ namespace from_json {
   void null_to_na(Rcpp::List& x) {
     for(unsigned int i = 0; i < x.size(); ++i) {
       if(Rf_isNull(x[i])) {
-        x[i] = NA_LOGICAL;
+        x[i] = R_NA_VAL;
       }
     }
   }

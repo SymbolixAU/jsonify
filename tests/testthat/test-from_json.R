@@ -92,6 +92,18 @@ test_that("data frame returned properly", {
   
   json_str <- jsonify::to_json(target)
   expect_equal(from_json(json_str), target)
+  
+  # Return data frame in which the lengths of the input values are different.
+  target <- data.frame(matrix(nrow = 2, ncol = 2), stringsAsFactors = FALSE)
+  colnames(target) <- c("id", "val")
+  target[["id"]] <- list("a", NA)
+  target[["val"]] <- list(NA, c(1L, 2L, 3L, 4L))
+
+  json_str <- '[{"id":"a"},{"val":[1,2,3,4]}]'
+  expect_equal(from_json(json_str), target)
+  
+  json_str <- jsonify::to_json(target)
+  expect_equal(from_json(json_str), target)
 })
 
 test_that("empty inputs return NULL", {
