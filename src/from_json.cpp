@@ -8,19 +8,20 @@ SEXP rcpp_from_json( const char * json, bool& simplifyDataFrame ) {
 }
 
 // [[Rcpp::export]]
-SEXP rcpp_get_col_headers( Rcpp::List x) {
+SEXP rcpp_get_col_headers( Rcpp::List& x) {
   return jsonify::from_json::get_col_headers( x );
 }
 
 // [[Rcpp::export]]
-Rcpp::List rcpp_transpose_list( Rcpp::List x, Rcpp::CharacterVector names ) {
+Rcpp::List rcpp_transpose_list( Rcpp::List& x, Rcpp::CharacterVector& names ) {
   return jsonify::from_json::transpose_list( x, names );
 }
 
 // [[Rcpp::export]]
-void rcpp_null_to_na( Rcpp::List x ) {
+void rcpp_null_to_na( Rcpp::List& x ) {
   return jsonify::from_json::null_to_na( x );
 }
+
 
 /*
  
