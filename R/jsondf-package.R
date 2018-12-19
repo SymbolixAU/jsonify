@@ -4,4 +4,4 @@ NULL
 
 
 #' @export
-print.json <- function( js, ... ) cat( js )
+print.json <- function( x, ... ) cat( x )
