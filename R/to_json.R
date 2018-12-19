@@ -25,7 +25,8 @@
 #' 
 #' ## rounding numbers using the digits argument
 #' to_json(1.23456789, digits = 2)
-#' to_json(data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3], stringsAsFactors = FALSE), digits = 0 )
+#' to_json(data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3], 
+#'   stringsAsFactors = FALSE), digits = 0 )
 #' 
 #' 
 #' @export

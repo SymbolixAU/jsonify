@@ -13,6 +13,7 @@ minify_json(json)
 Removes indentiation from a JSON string
 }
 \examples{
+
 df <- data.frame(id = 1:10, val = rnorm(10))
 js <- to_json( df )
 jsp <- pretty_json(js)
