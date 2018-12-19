@@ -5,6 +5,14 @@ rcpp_pretty_json <- function(json) {
     .Call(`_jsonify_rcpp_pretty_json`, json)
 }
 
+rcpp_minify_json <- function(json) {
+    .Call(`_jsonify_rcpp_minify_json`, json)
+}
+
+rcpp_pretty_print <- function(json) {
+    invisible(.Call(`_jsonify_rcpp_pretty_print`, json))
+}
+
 rcpp_df_to_json <- function(df, unbox = FALSE, digits = -1L) {
     .Call(`_jsonify_rcpp_df_to_json`, df, unbox, digits)
 }

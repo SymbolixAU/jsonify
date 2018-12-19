@@ -16,6 +16,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_minify_json
+Rcpp::StringVector rcpp_minify_json(const char* json);
+RcppExport SEXP _jsonify_rcpp_minify_json(SEXP jsonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char* >::type json(jsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_minify_json(json));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_pretty_print
+void rcpp_pretty_print(const char* json);
+RcppExport SEXP _jsonify_rcpp_pretty_print(SEXP jsonSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char* >::type json(jsonSEXP);
+    rcpp_pretty_print(json);
+    return R_NilValue;
+END_RCPP
+}
 // rcpp_df_to_json
 Rcpp::StringVector rcpp_df_to_json(Rcpp::DataFrame df, bool unbox, int digits);
 RcppExport SEXP _jsonify_rcpp_df_to_json(SEXP dfSEXP, SEXP unboxSEXP, SEXP digitsSEXP) {
@@ -142,6 +163,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
+    {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
+    {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},
     {"_jsonify_rcpp_df_to_json", (DL_FUNC) &_jsonify_rcpp_df_to_json, 3},
     {"_jsonify_rcpp_numeric_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_to_json, 3},
     {"_jsonify_rcpp_character_to_json", (DL_FUNC) &_jsonify_rcpp_character_to_json, 2},
