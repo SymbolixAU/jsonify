@@ -7,18 +7,18 @@
 namespace jsonify {
 namespace validate {
 
-  inline bool validate_json( rapidjson::Document& d, const char* geojson ) {
-    d.Parse( geojson );
+  inline bool validate_json( rapidjson::Document& d, const char* json ) {
+    d.Parse( json );
     bool res = true;
-    if( d.Parse( geojson ).HasParseError() ) {
+    if( d.Parse( json ).HasParseError() ) {
       res = false;
     }
     return res;
   }
 
-  inline bool validate_json( const char* geojson ) {
+  inline bool validate_json( const char* json ) {
     rapidjson::Document doc;
-    return validate_json( doc, geojson );
+    return validate_json( doc, json );
   }
 
 } // namespace validate
