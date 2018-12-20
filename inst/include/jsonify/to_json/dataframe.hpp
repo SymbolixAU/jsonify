@@ -12,7 +12,7 @@ namespace dataframe {
 
   template <typename Writer>
   inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row, 
-                              bool unbox = false, int digits = -1 ) {
+                              bool unbox, int digits ) {
     
     switch( TYPEOF( this_vec ) ) {
     case VECSXP: {
@@ -66,8 +66,8 @@ namespace dataframe {
   
   // overload for when you dont' specify 'unbox'
   template <typename Writer>
-  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row, int digits = -1 ) {
-    dataframe_cell( writer, this_vec, row, false, digits );
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row ) {
+    dataframe_cell( writer, this_vec, row, false, -1 );
   }
 
   inline Rcpp::StringVector to_json( Rcpp::DataFrame& df, bool unbox = false, int digits = -1 ) {
