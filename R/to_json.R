@@ -72,6 +72,7 @@ to_json.matrix <- function( x, unbox = FALSE, digits = NULL, ... ) {
   if( is.integer( x ) ) return( rcpp_integer_matrix_to_json( x, unbox ) ) 
   digits <- handle_digits( digits )
   if( is.numeric( x ) ) return( rcpp_numeric_matrix_to_json( x, unbox, digits ) )
+  if( is.logical( x ) ) return( rcpp_logical_matrix_to_json( x, unbox, digits ) )
   return( rcpp_character_matrix_to_json( x, unbox ) )
 }
 

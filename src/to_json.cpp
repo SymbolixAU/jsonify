@@ -54,6 +54,11 @@ Rcpp::StringVector rcpp_numeric_matrix_to_json( Rcpp::NumericMatrix m, bool unbo
 }
 
 // [[Rcpp::export]]
+Rcpp::StringVector rcpp_logical_matrix_to_json( Rcpp::LogicalMatrix m, bool unbox = false, int digits = -1 ) {
+  return jsonify::matrix::to_json( m, unbox );
+}
+
+// [[Rcpp::export]]
 Rcpp::StringVector rcpp_character_matrix_to_json( Rcpp::CharacterMatrix m, bool unbox = false ) {
   return jsonify::matrix::to_json( m, unbox );
 }

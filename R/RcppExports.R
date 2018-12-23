@@ -45,6 +45,10 @@ rcpp_numeric_matrix_to_json <- function(m, unbox = FALSE, digits = -1L) {
     .Call(`_jsonify_rcpp_numeric_matrix_to_json`, m, unbox, digits)
 }
 
+rcpp_logical_matrix_to_json <- function(m, unbox = FALSE, digits = -1L) {
+    .Call(`_jsonify_rcpp_logical_matrix_to_json`, m, unbox, digits)
+}
+
 rcpp_character_matrix_to_json <- function(m, unbox = FALSE) {
     .Call(`_jsonify_rcpp_character_matrix_to_json`, m, unbox)
 }

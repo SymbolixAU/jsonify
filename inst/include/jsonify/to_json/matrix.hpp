@@ -16,7 +16,7 @@ namespace matrix {
     int i;
     for ( i = 0; i < n; i++ ) {
       Rcpp::NumericVector this_row = nm(i, Rcpp::_);
-      writers::write_value( writer, this_row, unbox, digits );
+      jsonify::writers::write_value( writer, this_row, unbox, digits );
     }
     writer.EndArray();
     return jsonify::utils::finalise_json( sb );
@@ -31,7 +31,7 @@ namespace matrix {
     int i;
     for ( i = 0; i < n; i++ ) {
       Rcpp::IntegerVector this_row = im(i, Rcpp::_);
-      writers::write_value( writer, this_row, unbox );
+      jsonify::writers::write_value( writer, this_row, unbox );
     }
     writer.EndArray();
     return jsonify::utils::finalise_json( sb );
@@ -46,12 +46,26 @@ namespace matrix {
     int i;
     for ( i = 0; i < n; i++ ) {
       Rcpp::StringVector this_row = cm(i, Rcpp::_);
-      writers::write_value( writer, this_row, unbox );
+      jsonify::writers::write_value( writer, this_row, unbox );
     }
     writer.EndArray();
     return jsonify::utils::finalise_json( sb );
   }
 
+  inline Rcpp::StringVector to_json( Rcpp::LogicalMatrix& lm, bool unbox = false ) {
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
+    writer.StartArray();
+    
+    int n = lm.nrow();
+    int i;
+    for ( i = 0; i < n; i++ ) {
+      Rcpp::LogicalVector this_row = lm(i, Rcpp::_);
+      jsonify::writers::write_value( writer, this_row, unbox );
+    }
+    writer.EndArray();
+    return jsonify::utils::finalise_json( sb );
+  }
 
 } // namespace matrix
 } // namespace jsonify

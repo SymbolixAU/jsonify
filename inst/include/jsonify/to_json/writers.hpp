@@ -124,6 +124,36 @@ namespace writers {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
+  template < typename Writer >
+  inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, bool unbox = false, int digits = -1 ) {
+    int n = mat.nrow();
+    int i;
+    for ( i = 0; i < n; i++ ) {
+      Rcpp::IntegerVector this_row = mat(i, Rcpp::_);
+      write_value( writer, this_row, unbox, digits );
+    }
+  }
+  
+  template < typename Writer >
+  inline void write_value( Writer& writer, Rcpp::NumericMatrix& mat, bool unbox = false, int digits = -1 ) {
+    int n = mat.nrow();
+    int i;
+    for ( i = 0; i < n; i++ ) {
+      Rcpp::NumericVector this_row = mat(i, Rcpp::_);
+      write_value( writer, this_row, unbox, digits );
+    }
+  }
+  
+  template < typename Writer >
+  inline void write_value( Writer& writer, Rcpp::CharacterMatrix& mat, bool unbox = false, int digits = -1 ) {
+    int n = mat.nrow();
+    int i;
+    for ( i = 0; i < n; i++ ) {
+      Rcpp::StringVector this_row = mat(i, Rcpp::_);
+      write_value( writer, this_row, unbox, digits );
+    }
+  }
+  
   template <typename Writer, typename T>
   inline void write_value( Writer& writer, T& t, int& n, bool unbox = false, int digits = -1 ) {
     if ( n > 0 ) {
@@ -142,6 +172,31 @@ namespace writers {
       writer.EndObject();
       return;
     } 
+    
+    if( Rf_isMatrix( list_element ) ) {
+      
+      switch( TYPEOF( list_element ) ) {
+      case REALSXP: {
+        Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( list_element );
+        return write_value( writer, nm, unbox, digits );
+        break;
+      }
+      case INTSXP: {
+        Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( list_element );
+        return write_value( writer, im, unbox, digits );
+        break;
+      }
+      default :{
+        Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( list_element );
+        return write_value( writer, sm, unbox, digits );
+        break;
+      }
+      }
+      
+    } else if ( Rf_inherits( list_element, "data.frame" ) ) {
+      Rcpp::Rcout << "data.frame element " << std::endl;
+    }
+    
     
     switch( TYPEOF( list_element ) ) {
     case VECSXP: {
