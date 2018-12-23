@@ -50,27 +50,61 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// rcpp_pretty_json
+Rcpp::StringVector rcpp_pretty_json(const char* json);
+RcppExport SEXP _jsonify_rcpp_pretty_json(SEXP jsonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char* >::type json(jsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_pretty_json(json));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_minify_json
+Rcpp::StringVector rcpp_minify_json(const char* json);
+RcppExport SEXP _jsonify_rcpp_minify_json(SEXP jsonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char* >::type json(jsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_minify_json(json));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_pretty_print
+void rcpp_pretty_print(const char* json);
+RcppExport SEXP _jsonify_rcpp_pretty_print(SEXP jsonSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char* >::type json(jsonSEXP);
+    rcpp_pretty_print(json);
+    return R_NilValue;
+END_RCPP
+}
 // rcpp_df_to_json
-Rcpp::StringVector rcpp_df_to_json(Rcpp::DataFrame df, bool unbox);
-RcppExport SEXP _jsonify_rcpp_df_to_json(SEXP dfSEXP, SEXP unboxSEXP) {
+Rcpp::StringVector rcpp_df_to_json(Rcpp::DataFrame df, bool unbox, int digits);
+RcppExport SEXP _jsonify_rcpp_df_to_json(SEXP dfSEXP, SEXP unboxSEXP, SEXP digitsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame >::type df(dfSEXP);
     Rcpp::traits::input_parameter< bool >::type unbox(unboxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_df_to_json(df, unbox));
+    Rcpp::traits::input_parameter< int >::type digits(digitsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_df_to_json(df, unbox, digits));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_numeric_to_json
-Rcpp::StringVector rcpp_numeric_to_json(Rcpp::NumericVector nv, bool unbox);
-RcppExport SEXP _jsonify_rcpp_numeric_to_json(SEXP nvSEXP, SEXP unboxSEXP) {
+Rcpp::StringVector rcpp_numeric_to_json(Rcpp::NumericVector nv, bool unbox, int digits);
+RcppExport SEXP _jsonify_rcpp_numeric_to_json(SEXP nvSEXP, SEXP unboxSEXP, SEXP digitsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type nv(nvSEXP);
     Rcpp::traits::input_parameter< bool >::type unbox(unboxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_numeric_to_json(nv, unbox));
+    Rcpp::traits::input_parameter< int >::type digits(digitsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_numeric_to_json(nv, unbox, digits));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -111,14 +145,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_list_to_json
-Rcpp::StringVector rcpp_list_to_json(SEXP lst, bool unbox);
-RcppExport SEXP _jsonify_rcpp_list_to_json(SEXP lstSEXP, SEXP unboxSEXP) {
+Rcpp::StringVector rcpp_list_to_json(SEXP lst, bool unbox, int digits);
+RcppExport SEXP _jsonify_rcpp_list_to_json(SEXP lstSEXP, SEXP unboxSEXP, SEXP digitsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type lst(lstSEXP);
     Rcpp::traits::input_parameter< bool >::type unbox(unboxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_list_to_json(lst, unbox));
+    Rcpp::traits::input_parameter< int >::type digits(digitsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_list_to_json(lst, unbox, digits));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -135,14 +170,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_numeric_matrix_to_json
-Rcpp::StringVector rcpp_numeric_matrix_to_json(Rcpp::NumericMatrix m, bool unbox);
-RcppExport SEXP _jsonify_rcpp_numeric_matrix_to_json(SEXP mSEXP, SEXP unboxSEXP) {
+Rcpp::StringVector rcpp_numeric_matrix_to_json(Rcpp::NumericMatrix m, bool unbox, int digits);
+RcppExport SEXP _jsonify_rcpp_numeric_matrix_to_json(SEXP mSEXP, SEXP unboxSEXP, SEXP digitsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type m(mSEXP);
     Rcpp::traits::input_parameter< bool >::type unbox(unboxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_numeric_matrix_to_json(m, unbox));
+    Rcpp::traits::input_parameter< int >::type digits(digitsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_numeric_matrix_to_json(m, unbox, digits));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -159,13 +195,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_validate_json
-Rcpp::LogicalVector rcpp_validate_json(Rcpp::StringVector geojson);
-RcppExport SEXP _jsonify_rcpp_validate_json(SEXP geojsonSEXP) {
+Rcpp::LogicalVector rcpp_validate_json(Rcpp::StringVector json);
+RcppExport SEXP _jsonify_rcpp_validate_json(SEXP jsonSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::StringVector >::type geojson(geojsonSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_validate_json(geojson));
+    Rcpp::traits::input_parameter< Rcpp::StringVector >::type json(jsonSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_validate_json(json));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -175,14 +211,17 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_get_col_headers", (DL_FUNC) &_jsonify_rcpp_get_col_headers, 1},
     {"_jsonify_rcpp_transpose_list", (DL_FUNC) &_jsonify_rcpp_transpose_list, 2},
     {"_jsonify_rcpp_null_to_na", (DL_FUNC) &_jsonify_rcpp_null_to_na, 1},
-    {"_jsonify_rcpp_df_to_json", (DL_FUNC) &_jsonify_rcpp_df_to_json, 2},
-    {"_jsonify_rcpp_numeric_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_to_json, 2},
+    {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
+    {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
+    {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},
+    {"_jsonify_rcpp_df_to_json", (DL_FUNC) &_jsonify_rcpp_df_to_json, 3},
+    {"_jsonify_rcpp_numeric_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_to_json, 3},
     {"_jsonify_rcpp_character_to_json", (DL_FUNC) &_jsonify_rcpp_character_to_json, 2},
     {"_jsonify_rcpp_integer_to_json", (DL_FUNC) &_jsonify_rcpp_integer_to_json, 2},
     {"_jsonify_rcpp_logical_to_json", (DL_FUNC) &_jsonify_rcpp_logical_to_json, 2},
-    {"_jsonify_rcpp_list_to_json", (DL_FUNC) &_jsonify_rcpp_list_to_json, 2},
+    {"_jsonify_rcpp_list_to_json", (DL_FUNC) &_jsonify_rcpp_list_to_json, 3},
     {"_jsonify_rcpp_integer_matrix_to_json", (DL_FUNC) &_jsonify_rcpp_integer_matrix_to_json, 2},
-    {"_jsonify_rcpp_numeric_matrix_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_matrix_to_json, 2},
+    {"_jsonify_rcpp_numeric_matrix_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_matrix_to_json, 3},
     {"_jsonify_rcpp_character_matrix_to_json", (DL_FUNC) &_jsonify_rcpp_character_matrix_to_json, 2},
     {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
     {NULL, NULL, 0}

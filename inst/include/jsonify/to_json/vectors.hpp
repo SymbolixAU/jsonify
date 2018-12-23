@@ -9,11 +9,11 @@ using namespace rapidjson;
 namespace jsonify {
 namespace vectors {
 
-  inline Rcpp::StringVector to_json( Rcpp::NumericVector& nv, bool unbox = false ) { 
+  inline Rcpp::StringVector to_json( Rcpp::NumericVector& nv, bool unbox = false, int digits = -1 ) { 
    
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, nv, unbox );
+    jsonify::writers::write_value( writer, nv, unbox, digits );
     return jsonify::utils::finalise_json( sb );
       
   }
@@ -42,11 +42,11 @@ namespace vectors {
     return jsonify::utils::finalise_json( sb );
   }
 
-  inline Rcpp::StringVector to_json( SEXP& lst, bool unbox = false ) {
+  inline Rcpp::StringVector to_json( SEXP& lst, bool unbox = false, int digits = -1 ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, lst, unbox );
+    jsonify::writers::write_value( writer, lst, unbox, digits );
     return jsonify::utils::finalise_json( sb );
   }
 

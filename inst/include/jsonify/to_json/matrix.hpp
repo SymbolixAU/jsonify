@@ -7,7 +7,7 @@
 namespace jsonify {
 namespace matrix {
 
-  inline Rcpp::StringVector to_json( Rcpp::NumericMatrix& nm, bool unbox = false ) {
+  inline Rcpp::StringVector to_json( Rcpp::NumericMatrix& nm, bool unbox = false, int digits = -1 ) {
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
     writer.StartArray();
@@ -16,7 +16,7 @@ namespace matrix {
     int i;
     for ( i = 0; i < n; i++ ) {
       Rcpp::NumericVector this_row = nm(i, Rcpp::_);
-      writers::write_value( writer, this_row, unbox );
+      writers::write_value( writer, this_row, unbox, digits );
     }
     writer.EndArray();
     return jsonify::utils::finalise_json( sb );

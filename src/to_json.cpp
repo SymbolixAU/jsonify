@@ -2,13 +2,17 @@
 #include "jsonify/to_json.hpp"
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_df_to_json( Rcpp::DataFrame df, bool unbox = false ) {
-  return jsonify::dataframe::to_json( df, unbox );
+Rcpp::StringVector rcpp_df_to_json( Rcpp::DataFrame df, bool unbox = false, int digits = -1 ) {
+  return jsonify::dataframe::to_json( df, unbox, digits );
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_numeric_to_json( Rcpp::NumericVector nv, bool unbox = false ) {
-  return jsonify::vectors::to_json( nv, unbox );
+Rcpp::StringVector rcpp_numeric_to_json( Rcpp::NumericVector nv, bool unbox = false, int digits = -1 ) {
+  if( digits >= 0 ) {
+    Rcpp::NumericVector nv2 = Rcpp::clone( nv );
+    return jsonify::vectors::to_json( nv2, unbox, digits );
+  }
+  return jsonify::vectors::to_json( nv, unbox, digits );
 }
 
 // [[Rcpp::export]]
@@ -27,8 +31,12 @@ Rcpp::StringVector rcpp_logical_to_json( Rcpp::LogicalVector iv, bool unbox = fa
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_list_to_json( SEXP lst, bool unbox = false ) {
-  return jsonify::vectors::to_json( lst, unbox );
+Rcpp::StringVector rcpp_list_to_json( SEXP lst, bool unbox = false, int digits = -1 ) {
+  if ( digits >= 0 ) {
+    SEXP lst2 = Rcpp::clone( lst );
+    return jsonify::vectors::to_json( lst2, unbox, digits );
+  }
+  return jsonify::vectors::to_json( lst, unbox, digits );
 }
 
 // [[Rcpp::export]]
@@ -37,8 +45,12 @@ Rcpp::StringVector rcpp_integer_matrix_to_json( Rcpp::IntegerMatrix m, bool unbo
 }
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_numeric_matrix_to_json( Rcpp::NumericMatrix m, bool unbox = false ) {
-  return jsonify::matrix::to_json( m, unbox );
+Rcpp::StringVector rcpp_numeric_matrix_to_json( Rcpp::NumericMatrix m, bool unbox = false, int digits = -1 ) {
+  if ( digits >= 0 ) {
+    Rcpp::NumericMatrix m2 = Rcpp::clone( m );
+    return jsonify::matrix::to_json( m2, unbox, digits );
+  }
+  return jsonify::matrix::to_json( m, unbox, digits );
 }
 
 // [[Rcpp::export]]

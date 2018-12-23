@@ -11,13 +11,14 @@ namespace jsonify {
 namespace dataframe {
 
   template <typename Writer>
-  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row, bool unbox = false ) {
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row, 
+                              bool unbox, int digits ) {
     
     switch( TYPEOF( this_vec ) ) {
     case VECSXP: {
       Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
       SEXP s = lst[ row ];
-      jsonify::writers::write_value( writer, s, unbox );
+      jsonify::writers::write_value( writer, s, unbox, digits );
       break;
     }
     case REALSXP: {
@@ -26,7 +27,7 @@ namespace dataframe {
         writer.Null();
       } else {
         double n = nv[ row ];
-        jsonify::writers::write_value( writer, n );
+        jsonify::writers::write_value( writer, n, digits );
       }
       break;
     }
@@ -62,8 +63,14 @@ namespace dataframe {
     }
     }
   }
+  
+  // overload for when you dont' specify 'unbox'
+  template <typename Writer>
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row ) {
+    dataframe_cell( writer, this_vec, row, false, -1 );
+  }
 
-  inline Rcpp::StringVector to_json( Rcpp::DataFrame& df, bool unbox = false ) {
+  inline Rcpp::StringVector to_json( Rcpp::DataFrame& df, bool unbox = false, int digits = -1 ) {
     
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
@@ -83,7 +90,7 @@ namespace dataframe {
         jsonify::writers::write_value( writer, h );
         
         SEXP this_vec = df[ h ];
-        dataframe_cell( writer, this_vec, i, unbox );
+        dataframe_cell( writer, this_vec, i, unbox, digits );
         
       }
       writer.EndObject();
