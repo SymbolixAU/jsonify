@@ -240,7 +240,6 @@ namespace writers {
   template< typename Writer>
   inline void write_value( Writer& writer, SEXP& list_element, bool unbox = false, int digits = -1 ) {
     
-    int n_elements;
     if( Rf_isNull( list_element ) ) {
       writer.StartObject();
       writer.EndObject();
@@ -326,8 +325,8 @@ namespace writers {
       
     } else {
     
-    
       switch( TYPEOF( list_element ) ) {
+      
       case VECSXP: {
         Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
         int n = lst.size();
@@ -363,31 +362,26 @@ namespace writers {
         }
         
         jsonify::utils::writer_ender( writer, has_names );
-  
         break;
       }
       case REALSXP: {
         Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
-        n_elements = nv.size();
-        write_value( writer, nv, n_elements, unbox, digits );
+        write_value( writer, nv, unbox, digits );
         break;
       }
       case INTSXP: { 
         Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
-        n_elements = iv.size();
-        write_value( writer, iv, n_elements, unbox );
+        write_value( writer, iv, unbox );
         break;
       }
       case LGLSXP: {
         Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_element );
-        n_elements = lv.size();
-        write_value( writer, lv, n_elements, unbox );
+        write_value( writer, lv, unbox );
         break;
       }
       default: {
         Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_element );
-        n_elements = sv.size();
-        write_value( writer, sv, n_elements, unbox );
+        write_value( writer, sv, unbox );
         break;
       }
       }

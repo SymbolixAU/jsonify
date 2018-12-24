@@ -10,6 +10,8 @@ using namespace rapidjson;
 namespace jsonify {
 namespace dataframe {
 
+  // keeping these dataframe_cell functions so they can be called directly by other libraries
+  //, e.g., geojsonsf
   template <typename Writer>
   inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row,
                               bool unbox, int digits ) {
@@ -70,9 +72,15 @@ namespace dataframe {
     dataframe_cell( writer, this_vec, row, false, -1 );
   }
 
-  inline Rcpp::StringVector to_json( Rcpp::DataFrame& df, bool unbox = false, int digits = -1 ) {
-    Rcpp::warning("namespace jsonify::dataframe is deprecated. Use jsonify::api instead"); 
-    return jsonify::api::to_json( df, unbox, digits );
+  inline Rcpp::StringVector to_json( SEXP& df, bool unbox = false, int digits = -1 ) {
+    Rcpp::Rcout << "namespace jsonify::dataframe is deprecated. Use jsonify::api instead" << std::endl;
+    
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
+    jsonify::writers::write_value( writer, df, unbox, digits );
+    return jsonify::utils::finalise_json( sb );
+    
+    //return jsonify::api::to_json( df, unbox, digits );
   }
 
 } // namespace dataframe
