@@ -10,6 +10,9 @@ using namespace rapidjson;
 namespace jsonify {
 namespace writers {
 
+  // ---------------------------------------------------------------------------
+  // scalar values
+  // ---------------------------------------------------------------------------
   template <typename Writer>
   inline void write_value( Writer& writer, const char* value, int digits = -1 ) {
     writer.String( value );
@@ -52,6 +55,10 @@ namespace writers {
   inline void write_value( Writer& writer, bool& value, int digits = -1 ) {
     writer.Bool( value );
   }
+  
+  // ---------------------------------------------------------------------------
+  // vectors
+  // ---------------------------------------------------------------------------
   
   template< typename Writer>
   inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox = false, int digits = -1 ) {
@@ -168,6 +175,10 @@ namespace writers {
     }
   }
   
+  // ---------------------------------------------------------------------------
+  // matrix values
+  // ---------------------------------------------------------------------------
+  
   template < typename Writer >
   inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, bool unbox = false, int digits = -1 ) {
     
@@ -227,6 +238,9 @@ namespace writers {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
+  // ---------------------------------------------------------------------------
+  // Template definition
+  // ---------------------------------------------------------------------------
   template <typename Writer, typename T>
   inline void write_value( Writer& writer, T& t, int& n, bool unbox = false, int digits = -1 ) {
     if ( n > 0 ) {
@@ -236,7 +250,9 @@ namespace writers {
     }
   }
 
-  
+  // ---------------------------------------------------------------------------
+  // List
+  // ---------------------------------------------------------------------------
   template< typename Writer>
   inline void write_value( Writer& writer, SEXP& list_element, bool unbox = false, int digits = -1 ) {
     
