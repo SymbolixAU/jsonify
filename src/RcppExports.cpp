@@ -37,31 +37,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// rcpp_numeric_to_json
-Rcpp::StringVector rcpp_numeric_to_json(Rcpp::NumericVector nv, bool unbox, int digits);
-RcppExport SEXP _jsonify_rcpp_numeric_to_json(SEXP nvSEXP, SEXP unboxSEXP, SEXP digitsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type nv(nvSEXP);
-    Rcpp::traits::input_parameter< bool >::type unbox(unboxSEXP);
-    Rcpp::traits::input_parameter< int >::type digits(digitsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_numeric_to_json(nv, unbox, digits));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_character_to_json
-Rcpp::StringVector rcpp_character_to_json(Rcpp::StringVector sv, bool unbox);
-RcppExport SEXP _jsonify_rcpp_character_to_json(SEXP svSEXP, SEXP unboxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::StringVector >::type sv(svSEXP);
-    Rcpp::traits::input_parameter< bool >::type unbox(unboxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_character_to_json(sv, unbox));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rcpp_list_to_json
 Rcpp::StringVector rcpp_list_to_json(SEXP lst, bool unbox, int digits);
 RcppExport SEXP _jsonify_rcpp_list_to_json(SEXP lstSEXP, SEXP unboxSEXP, SEXP digitsSEXP) {
@@ -91,8 +66,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
     {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
     {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},
-    {"_jsonify_rcpp_numeric_to_json", (DL_FUNC) &_jsonify_rcpp_numeric_to_json, 3},
-    {"_jsonify_rcpp_character_to_json", (DL_FUNC) &_jsonify_rcpp_character_to_json, 2},
     {"_jsonify_rcpp_list_to_json", (DL_FUNC) &_jsonify_rcpp_list_to_json, 3},
     {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
     {NULL, NULL, 0}

@@ -33,6 +33,7 @@
 to_json <- function( x, unbox = FALSE, digits = NULL, ... ) {
   UseMethod("to_json")
 }
+
 #' @rdname to_json
 #' @export
 #' @param numeric_dates logical indicating if dates should be treated as numerics. 
@@ -47,22 +48,20 @@ to_json.data.frame <- function( x, unbox = FALSE, digits = NULL, ..., numeric_da
 #' @rdname to_json
 #' @export
 to_json.Date <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
-  if( numeric_dates ) return( rcpp_numeric_to_json( x, unbox ) ) 
-  return( rcpp_character_to_json( as.character( x ), unbox ) )
+  if( numeric_dates ) return( rcpp_list_to_json( x, unbox ) ) 
+  return( rcpp_list_to_json( as.character( x ), unbox ) )
 }
 
 #' @rdname to_json
 #' @export
 to_json.POSIXct <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
-  if( numeric_dates ) return( rcpp_numeric_to_json( x, unbox ) ) 
-  return( rcpp_character_to_json( as.character( x ), unbox ) )
+  to_json.Date( x = x, unbox = unbox, ..., numeric_dates = numeric_dates )
 }
 
 #' @rdname to_json
 #' @export
-to_json.POSIXlt <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
-  if( numeric_dates ) return( rcpp_list_to_json( x, unbox ) ) 
-  return( rcpp_character_to_json( as.character( x ), unbox ) )
+to_json.POSIXlt <- function( x, unbox = FALSE, ..., numeric_dates = TRUE )  {
+  to_json.Date( x = x, unbox = unbox, ..., numeric_dates = numeric_dates )
 }
 
 

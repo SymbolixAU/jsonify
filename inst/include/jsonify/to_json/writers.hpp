@@ -3,8 +3,6 @@
 
 #include <Rcpp.h>
 #include "jsonify/utils.hpp"
-//#include "jsonify/jsonify.hpp"
-//#include "jsonify/to_json/dataframe.hpp"
 #include <math.h>
 
 using namespace rapidjson;
@@ -56,8 +54,7 @@ namespace writers {
   }
   
   template< typename Writer>
-  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, 
-                           bool unbox = false, int digits = -1 ) {
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox = false, int digits = -1 ) {
     int n = nv.size();
     bool will_unbox = jsonify::utils::should_unbox( n, unbox );
     
@@ -73,6 +70,19 @@ namespace writers {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
+  /*
+   * For writing a single value of a vector
+   */
+  template< typename Writer >
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, size_t row, bool unbox = false, int digits = -1 ) {
+    if ( Rcpp::NumericVector::is_na( nv[ row ] ) ) {
+      writer.Null();
+    } else {
+      double n = nv[ row ];
+      write_value( writer, n, digits );
+    }
+  }
+  
   template <typename Writer>
   inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, bool unbox = false, int digits = -1 ) {
     int n = iv.size();
@@ -81,13 +91,25 @@ namespace writers {
     
     for ( int i = 0; i < n; i++ ) {
       if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
-        //write_value( writer, "NA" );
         writer.Null();
       } else {
         write_value( writer, iv[i] );
       }
     }
     jsonify::utils::end_array( writer, will_unbox );
+  }
+  
+  /*
+   * For writing a single value of a vector
+   */
+  template< typename Writer >
+  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, size_t row, bool unbox = false ) {
+    if ( Rcpp::IntegerVector::is_na( iv[ row ] ) ) {
+      writer.Null();
+    } else {
+      int i = iv[ row ];
+      write_value( writer, i );
+    }
   }
   
   template <typename Writer>
@@ -106,6 +128,19 @@ namespace writers {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
+  /*
+   * for writing a single value of a vector
+   */
+  template <typename Writer >
+  inline void write_value( Writer& writer, Rcpp::StringVector& sv, size_t row, bool unbox = false ) {
+    if ( Rcpp::StringVector::is_na( sv[ row ] ) ) {
+      writer.Null();
+    } else {
+      const char *s = sv[ row ];
+      write_value( writer, s );
+    }
+  }
+  
   template <typename Writer>
   inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, bool unbox = false, int digits = -1 ) {
     int n = lv.size();
@@ -121,6 +156,16 @@ namespace writers {
       }
     }
     jsonify::utils::end_array( writer, will_unbox );
+  }
+  
+  template < typename Writer >
+  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, size_t row, bool unbox = false, int digits = -1) {
+    if ( Rcpp::LogicalVector::is_na( lv[ row ] ) ) { 
+      writer.Null();
+    } else {
+      bool l = lv[ row ];
+      write_value( writer, l );
+    }
   }
   
   template < typename Writer >
@@ -228,6 +273,7 @@ namespace writers {
       }
       
     } else if ( Rf_inherits( list_element, "data.frame" ) ) {
+      
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
       size_t n_cols = df.ncol();
       size_t n_rows = df.nrows();
@@ -242,9 +288,7 @@ namespace writers {
           const char *h = column_names[ j ];
           
           write_value( writer, h );
-          
           SEXP this_vec = df[ h ];
-          
           
           switch( TYPEOF( this_vec ) ) {
           case VECSXP: {
@@ -255,42 +299,22 @@ namespace writers {
           }
           case REALSXP: {
             Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-            if ( Rcpp::NumericVector::is_na( nv[ i ] ) ) { 
-              writer.Null();
-            } else {
-              double n = nv[ i ];
-              write_value( writer, n, digits );
-            }
+            write_value( writer, nv, i, unbox, digits );
             break;
           }
           case INTSXP: { 
             Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-            if ( Rcpp::IntegerVector::is_na( iv[ i ] ) ) {
-              writer.Null();
-            } else {
-              int ii = iv[ i ];
-              write_value( writer, ii );
-            }
+            write_value( writer, iv, i, unbox );
             break;
           }
           case LGLSXP: {
             Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-            if ( Rcpp::LogicalVector::is_na( lv[ i ] ) ) { 
-              writer.Null();
-            } else {
-              bool l = lv[ i ];
-              write_value( writer, l );
-            }
+            write_value( writer, lv, i, unbox );
             break;
           }
           default: {
             Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-            if ( Rcpp::StringVector::is_na( sv[ i ] ) ) {
-              writer.Null();
-            } else {
-              const char *s = sv[ i ];
-              write_value( writer, s );
-            }
+            write_value( writer, sv, i, unbox );
             break;
           }
           }
@@ -299,8 +323,6 @@ namespace writers {
         writer.EndObject();
       }
       writer.EndArray();
-      
-      
       
     } else {
     
