@@ -41,15 +41,15 @@ to_json <- function( x, unbox = FALSE, digits = NULL, ... ) {
 to_json.data.frame <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
   if(!numeric_dates) x <- handle_dates( x ) 
   digits <- handle_digits( digits )
-  rcpp_list_to_json( x, unbox, digits )
+  rcpp_to_json( x, unbox, digits )
 }
 
 
 #' @rdname to_json
 #' @export
 to_json.Date <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
-  if( numeric_dates ) return( rcpp_list_to_json( x, unbox ) ) 
-  return( rcpp_list_to_json( as.character( x ), unbox ) )
+  if( numeric_dates ) return( rcpp_to_json( x, unbox ) ) 
+  return( rcpp_to_json( as.character( x ), unbox ) )
 }
 
 #' @rdname to_json
@@ -69,7 +69,7 @@ to_json.POSIXlt <- function( x, unbox = FALSE, ..., numeric_dates = TRUE )  {
 #' @export
 to_json.default <- function( x, unbox = FALSE, digits = NULL, ... ) {
   digits <- handle_digits( digits )
-  rcpp_list_to_json( x, unbox, digits ) # stop("this type is not supported")
+  rcpp_to_json( x, unbox, digits ) # stop("this type is not supported")
 }
 
 date_columns <- function( df ) names(which(vapply(df , function(x) { inherits(x, "Date") || inherits(x, "POSIXct") }, T)))

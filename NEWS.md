@@ -1,5 +1,6 @@
 ## v0.1.3
 
+* c++ API restructured and simplified
 * `print.json()` method to print json class objects
 * `minify_json()` functino to remove indentation
 * `pretty_json()` function to add indentation

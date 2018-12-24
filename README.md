@@ -92,27 +92,19 @@ through the `numeric_dates` argument.
 ``` r
 df <- data.frame(dte = as.Date("2018-01-01"))
 jsonify::to_json( df )
-#  [1] "[{\"dte\":17532.0}]"
-#  attr(,"class")
-#  [1] "json"
+#  [{"dte":17532.0}]
 
 df <- data.frame(dte = as.Date("2018-01-01"))
 jsonify::to_json( df, numeric_dates = FALSE )
-#  [1] "[{\"dte\":\"2018-01-01\"}]"
-#  attr(,"class")
-#  [1] "json"
+#  [{"dte":"2018-01-01"}]
 
 df <- data.frame(dte = as.POSIXct("2018-01-01 01:01:01"))
 jsonify::to_json( df )
-#  [1] "[{\"dte\":1514728861.0}]"
-#  attr(,"class")
-#  [1] "json"
+#  [{"dte":1514728861.0}]
 
 df <- data.frame(dte = as.POSIXct("2018-01-01 01:01:01"))
 jsonify::to_json( df, numeric_dates = FALSE )
-#  [1] "[{\"dte\":\"2018-01-01 01:01:01\"}]"
-#  attr(,"class")
-#  [1] "json"
+#  [{"dte":"2018-01-01 01:01:01"}]
 ```
 
 ### And `POSIXct` and `POSIXlt`?
@@ -122,13 +114,9 @@ jsonify::to_json( df, numeric_dates = FALSE )
 ``` r
 df <- data.frame(dte = as.POSIXct("2018-01-01 10:00:00"))
 jsonify::to_json( df )
-#  [1] "[{\"dte\":1514761200.0}]"
-#  attr(,"class")
-#  [1] "json"
+#  [{"dte":1514761200.0}]
 jsonify::to_json( df, numeric_dates = FALSE)
-#  [1] "[{\"dte\":\"2018-01-01 10:00:00\"}]"
-#  attr(,"class")
-#  [1] "json"
+#  [{"dte":"2018-01-01 10:00:00"}]
 ```
 
 `POSIXlt` will return each component of the date-time
@@ -136,13 +124,9 @@ jsonify::to_json( df, numeric_dates = FALSE)
 ``` r
 x <- as.POSIXlt("2018-01-01 01:00:00", tz = "GMT")
 jsonify::to_json( x )
-#  [1] "{\"sec\":[0.0],\"min\":[0],\"hour\":[1],\"mday\":[1],\"mon\":[0],\"year\":[118],\"wday\":[1],\"yday\":[0],\"isdst\":[0]}"
-#  attr(,"class")
-#  [1] "json"
+#  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}
 jsonify::to_json( x, numeric_dates = FALSE)
-#  [1] "[\"2018-01-01 01:00:00\"]"
-#  attr(,"class")
-#  [1] "json"
+#  ["2018-01-01 01:00:00"]
 ```
 
 ### What about lists?
@@ -171,10 +155,10 @@ available functions
 
 ``` cpp
 // [[Rcpp::depends(jsonify)]]
-#include "jsonify/to_json.hpp"
+#include "jsonify/jsonify.hpp"
 
 Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
-  return jsonify::to_json( df );
+  return jsonify::api::to_json( df );
 }
 ```
 
@@ -188,9 +172,7 @@ df <- data.frame(
   , val = letters[1:3]
   )
 jsonify::to_json( df )
-#  [1] "[{\"id\":1,\"val\":1},{\"id\":2,\"val\":2},{\"id\":3,\"val\":3}]"
-#  attr(,"class")
-#  [1] "json"
+#  [{"id":1,"val":1},{"id":2,"val":2},{"id":3,"val":3}]
 ```
 
 ### Why are there numbers in stead of letters?
@@ -210,9 +192,7 @@ df <- data.frame(
   , stringsAsFactors = FALSE 
   )
 jsonify::to_json( df )
-#  [1] "[{\"id\":1,\"val\":\"a\"},{\"id\":2,\"val\":\"b\"},{\"id\":3,\"val\":\"c\"}]"
-#  attr(,"class")
-#  [1] "json"
+#  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]
 ```
 
 ### How do I install it?

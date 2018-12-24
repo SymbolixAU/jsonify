@@ -79,8 +79,6 @@ namespace dataframe {
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
     jsonify::writers::write_value( writer, df, unbox, digits );
     return jsonify::utils::finalise_json( sb );
-    
-    //return jsonify::api::to_json( df, unbox, digits );
   }
 
 } // namespace dataframe
