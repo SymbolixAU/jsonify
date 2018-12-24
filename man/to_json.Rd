@@ -3,16 +3,9 @@
 \name{to_json}
 \alias{to_json}
 \alias{to_json.data.frame}
-\alias{to_json.numeric}
-\alias{to_json.character}
-\alias{to_json.integer}
-\alias{to_json.logical}
-\alias{to_json.complex}
-\alias{to_json.matrix}
 \alias{to_json.Date}
 \alias{to_json.POSIXct}
 \alias{to_json.POSIXlt}
-\alias{to_json.list}
 \alias{to_json.default}
 \title{To JSON}
 \usage{
@@ -21,25 +14,11 @@ to_json(x, unbox = FALSE, digits = NULL, ...)
 \method{to_json}{data.frame}(x, unbox = FALSE, digits = NULL, ...,
   numeric_dates = TRUE)
 
-\method{to_json}{numeric}(x, unbox = FALSE, digits = NULL, ...)
-
-\method{to_json}{character}(x, unbox = FALSE, ...)
-
-\method{to_json}{integer}(x, unbox = FALSE, ...)
-
-\method{to_json}{logical}(x, unbox = FALSE, ...)
-
-\method{to_json}{complex}(x, unbox = FALSE, ...)
-
-\method{to_json}{matrix}(x, unbox = FALSE, digits = NULL, ...)
-
 \method{to_json}{Date}(x, unbox = FALSE, ..., numeric_dates = TRUE)
 
 \method{to_json}{POSIXct}(x, unbox = FALSE, ..., numeric_dates = TRUE)
 
 \method{to_json}{POSIXlt}(x, unbox = FALSE, ..., numeric_dates = TRUE)
-
-\method{to_json}{list}(x, unbox = FALSE, digits = NULL, ...)
 
 \method{to_json}{default}(x, unbox = FALSE, digits = NULL, ...)
 }

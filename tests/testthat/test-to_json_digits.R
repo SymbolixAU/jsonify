@@ -48,12 +48,12 @@ test_that("results rounded",{
     , i = 1L
     )
   js <- to_json( lst, unbox = TRUE, digits = 0)
-  expect_equal( as.character( js ), '{"x":[1.0,2.0],"y":{"x":1.0,"z":[10.0,1000.0]},"m":1000.0,"i":1}')
+  expect_equal( as.character( js ), '{"x":[1.0,2.0],"y":{"x":1.0,"z":[10.0,1000.0]},"m":[1000.0],"i":1}')
   
   js <- to_json( lst, unbox = TRUE, digits = 1)
-  expect_equal( as.character( js ), '{"x":[1.2,2.0],"y":{"x":1.2,"z":[9.9,1000.1]},"m":1000.1,"i":1}')
+  expect_equal( as.character( js ), '{"x":[1.2,2.0],"y":{"x":1.2,"z":[9.9,1000.1]},"m":[1000.1],"i":1}')
   
   js <- to_json( lst, unbox = TRUE, digits = 4)
-  expect_equal( as.character( js ), '{"x":[1.2346,1.9877],"y":{"x":1.2346,"z":[9.8765,1000.1]},"m":1000.1235,"i":1}')
+  expect_equal( as.character( js ), '{"x":[1.2346,1.9877],"y":{"x":1.2346,"z":[9.8765,1000.1]},"m":[1000.1235],"i":1}')
   
 })
