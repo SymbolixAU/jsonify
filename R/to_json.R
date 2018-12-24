@@ -39,7 +39,7 @@ to_json <- function( x, unbox = FALSE, digits = NULL, ... ) {
 #' @param numeric_dates logical indicating if dates should be treated as numerics. 
 #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character
 to_json.data.frame <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
-  if(!numeric_dates) x <- handle_dates( x ) 
+  if(!numeric_dates) x <- handle_dates2( x ) 
   digits <- handle_digits( digits )
   rcpp_to_json( x, unbox, digits )
 }
@@ -67,8 +67,9 @@ to_json.POSIXlt <- function( x, unbox = FALSE, ..., numeric_dates = TRUE )  {
 
 #' @rdname to_json
 #' @export
-to_json.default <- function( x, unbox = FALSE, digits = NULL, ... ) {
+to_json.default <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
   digits <- handle_digits( digits )
+  if(!numeric_dates) x <- handle_dates2( x ) 
   rcpp_to_json( x, unbox, digits ) # stop("this type is not supported")
 }
 
@@ -86,4 +87,28 @@ handle_digits <- function( digits ) {
 }
 
 
+# 
+# is_date <- rapply( l, function(x) {
+#   any( grepl("Date|POSIX*", class(x)) )
+# })
+# 
+# 
+# df <- data.frame(id = 1, dte = as.POSIXct("2018-01-01"))
+# 
+# rapply( df, function(x) {
+#   any( grepl("Date|POSIX*", class(x)) )
+# })
+# 
+# rapply( l, function(x) as.character(x) )
 
+# l <- list(x = 1L:5L, y = 1:5, z = data.frame(i = letters[1:5]), aa = list( bb = list( cc = as.Date("2018-01-01")) ), d = as.POSIXlt("2018-01-01") )
+
+handle_dates2 <- function(x) {
+  rapply( x, how = "replace", function(y) {
+    if(inherits(y, "Date") | inherits(y,"POSIXct") | inherits (y, "POSIXlt")) {
+      as.character( y )
+    } else { 
+      y
+    }
+  })
+}

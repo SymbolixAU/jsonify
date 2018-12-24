@@ -256,6 +256,8 @@ namespace writers {
   template< typename Writer>
   inline void write_value( Writer& writer, SEXP& list_element, bool unbox = false, int digits = -1 ) {
     
+    size_t i, j;
+    
     if( Rf_isNull( list_element ) ) {
       writer.StartObject();
       writer.EndObject();
@@ -292,7 +294,6 @@ namespace writers {
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
       size_t n_cols = df.ncol();
       size_t n_rows = df.nrows();
-      size_t i, j;
       Rcpp::StringVector column_names = df.names();
       
       writer.StartArray();
@@ -345,7 +346,7 @@ namespace writers {
       
       case VECSXP: {
         Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
-        int n = lst.size();
+        size_t n = lst.size();
         
         if ( n == 0 ) {
           writer.StartArray();
@@ -360,7 +361,7 @@ namespace writers {
         
         if ( has_names ) {
           Rcpp::CharacterVector temp_names = lst.names();
-          for( int i = 0; i < n; i++ ) {
+          for( i = 0; i < n; i++ ) {
             list_names[i] = temp_names[i] == "" ? list_names[i] : temp_names[i];
           }
         }
@@ -368,7 +369,7 @@ namespace writers {
   
         jsonify::utils::writer_starter( writer, has_names );
         
-        for ( int i = 0; i < n; i++ ) {
+        for ( i = 0; i < n; i++ ) {
           SEXP recursive_list = lst[ i ];
           if ( has_names ) {
             const char *s = list_names[ i ];

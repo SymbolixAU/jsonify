@@ -20,7 +20,8 @@ to_json(x, unbox = FALSE, digits = NULL, ...)
 
 \method{to_json}{POSIXlt}(x, unbox = FALSE, ..., numeric_dates = TRUE)
 
-\method{to_json}{default}(x, unbox = FALSE, digits = NULL, ...)
+\method{to_json}{default}(x, unbox = FALSE, digits = NULL, ...,
+  numeric_dates = TRUE)
 }
 \arguments{
 \item{x}{object to convert to JSON}
