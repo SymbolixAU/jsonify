@@ -238,52 +238,70 @@ namespace writers {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
-  // ---------------------------------------------------------------------------
-  // Template definition
-  // ---------------------------------------------------------------------------
-  template <typename Writer, typename T>
-  inline void write_value( Writer& writer, T& t, int& n, bool unbox = false, int digits = -1 ) {
-    if ( n > 0 ) {
-      write_value( writer, t, unbox, digits );
-    } else {
-      write_value( writer, t[0], digits );
-    }
-  }
+  // // ---------------------------------------------------------------------------
+  // // Template definition
+  // // ---------------------------------------------------------------------------
+  // template <typename Writer, typename T>
+  // inline void write_value( Writer& writer, T& t, int& n, bool unbox = false, int digits = -1 ) {
+  //   if ( n > 0 ) {
+  //     write_value( writer, t, unbox, digits );
+  //   } else {
+  //     write_value( writer, t[0], digits );
+  //   }
+  // }
 
+  void increment_counter( int& counter ) {
+    counter++;
+    Rcpp::Rcout << "counter: " << counter << std::endl;
+  }
+  
   // ---------------------------------------------------------------------------
   // List
   // ---------------------------------------------------------------------------
   template< typename Writer>
-  inline void write_value( Writer& writer, SEXP& list_element, bool unbox = false, int digits = -1 ) {
-    
+  inline void write_value( Writer& writer, SEXP& list_element, Rcpp::List r_types, int& counter, bool unbox = false, int digits = -1 ) {
+    //int counter = 0;
+    //increment_counter( counter );  // only increment counter when it writes a value, not recurses into a list
+    // becaues the rapply doesn't record the class for nested list elements
+    //counter++;
+    //Rcpp::Rcout << "incremented? : " << counter << std::endl;
     size_t i, j;
+    Rcpp::StringVector r_type_names = r_types.names();
+    
+    const char* this_elem = r_type_names[counter];
+    Rcpp::Rcout << "this_element : " << this_elem << std::endl;
+    
     
     if( Rf_isNull( list_element ) ) {
+      //increment_counter( counter );  // no class recorded for NULL values
       writer.StartObject();
       writer.EndObject();
       return;
     } 
     
     if( Rf_isMatrix( list_element ) ) {
-      
       switch( TYPEOF( list_element ) ) {
       case REALSXP: {
         Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( list_element );
+        increment_counter( counter );
         return write_value( writer, nm, unbox, digits );
         break;
       }
       case INTSXP: {
         Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( list_element );
+        increment_counter( counter );
         return write_value( writer, im, unbox, digits );
         break;
       }
       case LGLSXP: {
         Rcpp::LogicalMatrix lm = Rcpp::as< Rcpp::LogicalMatrix >( list_element );
+        increment_counter( counter );
         return write_value( writer, lm, unbox, digits );
         break;
       }
       default :{
         Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( list_element );
+        increment_counter( counter );
         return write_value( writer, sm, unbox, digits );
         break;
       }
@@ -303,6 +321,7 @@ namespace writers {
         for( j = 0; j < n_cols; j++ ) {
           const char *h = column_names[ j ];
           
+          Rcpp::Rcout << "column: " << h << std::endl;
           write_value( writer, h );
           SEXP this_vec = df[ h ];
           
@@ -310,32 +329,37 @@ namespace writers {
           case VECSXP: {
             Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
             SEXP s = lst[ i ];
-            write_value( writer, s, unbox, digits );
+            write_value( writer, s, r_types, counter, unbox, digits );
+            increment_counter( counter );
             break;
           }
           case REALSXP: {
             Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
             write_value( writer, nv, i, unbox, digits );
+            increment_counter( counter );
             break;
           }
           case INTSXP: { 
             Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
             write_value( writer, iv, i, unbox );
+            increment_counter( counter );
             break;
           }
           case LGLSXP: {
             Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
             write_value( writer, lv, i, unbox );
+            increment_counter( counter );
             break;
           }
           default: {
             Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
             write_value( writer, sv, i, unbox );
+            increment_counter( counter );
             break;
           }
           }
-          
         }
+        counter = counter - n_cols; // reset back to the start of data.frame's columns
         writer.EndObject();
       }
       writer.EndArray();
@@ -351,6 +375,7 @@ namespace writers {
         if ( n == 0 ) {
           writer.StartArray();
           writer.EndArray();
+          increment_counter( counter );
           break;
         }
         
@@ -366,7 +391,7 @@ namespace writers {
           }
         }
         // END LIST NAMES
-  
+        
         jsonify::utils::writer_starter( writer, has_names );
         
         for ( i = 0; i < n; i++ ) {
@@ -375,7 +400,9 @@ namespace writers {
             const char *s = list_names[ i ];
             write_value( writer, s );
           }
-          write_value( writer, recursive_list, unbox, digits );
+          //Rcpp::Rcout << "recurssing " << std::endl;
+          //Rcpp::Rcout << "counter: " << counter << std::endl;
+          write_value( writer, recursive_list, r_types, counter, unbox, digits );
         }
         
         jsonify::utils::writer_ender( writer, has_names );
@@ -384,21 +411,25 @@ namespace writers {
       case REALSXP: {
         Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
         write_value( writer, nv, unbox, digits );
+        increment_counter( counter );
         break;
       }
       case INTSXP: { 
         Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
         write_value( writer, iv, unbox );
+        increment_counter( counter );
         break;
       }
       case LGLSXP: {
         Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_element );
         write_value( writer, lv, unbox );
+        increment_counter( counter );
         break;
       }
       default: {
         Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_element );
         write_value( writer, sv, unbox );
+        increment_counter( counter );
         break;
       }
       }

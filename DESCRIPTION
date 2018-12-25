@@ -12,6 +12,7 @@ License: GPL (>= 2)
 Imports: 
   Rcpp (>= 0.12.18)
 LinkingTo: 
+  BH,
   rapidjsonr,
   Rcpp
 RoxygenNote: 6.1.0
