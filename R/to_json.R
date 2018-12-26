@@ -34,44 +34,44 @@ to_json <- function( x, unbox = FALSE, digits = NULL, ... ) {
   UseMethod("to_json")
 }
 
-#' @rdname to_json
-#' @export
-#' @param numeric_dates logical indicating if dates should be treated as numerics. 
-#' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character
-to_json.data.frame <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
-  if(!numeric_dates) x <- handle_dates( x ) 
-  digits <- handle_digits( digits )
-  rcpp_to_json( x, unbox, digits )
-}
-
-
-#' @rdname to_json
-#' @export
-to_json.Date <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
-  if( numeric_dates ) return( rcpp_to_json( x, unbox ) ) 
-  return( rcpp_to_json( as.character( x ), unbox ) )
-}
-
-#' @rdname to_json
-#' @export
-to_json.POSIXct <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
-  to_json.Date( x = x, unbox = unbox, ..., numeric_dates = numeric_dates )
-}
-
-#' @rdname to_json
-#' @export
-to_json.POSIXlt <- function( x, unbox = FALSE, ..., numeric_dates = TRUE )  {
-  to_json.Date( x = x, unbox = unbox, ..., numeric_dates = numeric_dates )
-}
+#' #' @rdname to_json
+#' #' @export
+#' #' @param numeric_dates logical indicating if dates should be treated as numerics. 
+#' #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character
+#' to_json.data.frame <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
+#'   if(!numeric_dates) x <- handle_dates( x ) 
+#'   digits <- handle_digits( digits )
+#'   rcpp_to_json( x, unbox, digits )
+#' }
+#' 
+#' 
+#' #' @rdname to_json
+#' #' @export
+#' to_json.Date <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
+#'   if( numeric_dates ) return( rcpp_to_json( x, unbox ) ) 
+#'   return( rcpp_to_json( as.character( x ), unbox ) )
+#' }
+#' 
+#' #' @rdname to_json
+#' #' @export
+#' to_json.POSIXct <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
+#'   to_json.Date( x = x, unbox = unbox, ..., numeric_dates = numeric_dates )
+#' }
+#' 
+#' #' @rdname to_json
+#' #' @export
+#' to_json.POSIXlt <- function( x, unbox = FALSE, ..., numeric_dates = TRUE )  {
+#'   to_json.Date( x = x, unbox = unbox, ..., numeric_dates = numeric_dates )
+#' }
 
 
 #' @rdname to_json
 #' @export
 to_json.default <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
   digits <- handle_digits( digits )
-  cls <- get_classes( x )
+  #cls <- get_classes( x )
   #if(!numeric_dates) x <- handle_dates( x ) 
-  rcpp_to_json( x, cls, unbox, digits ) # stop("this type is not supported")
+  rcpp_to_json( x, unbox, digits, numeric_dates ) # stop("this type is not supported")
 }
 
 date_columns <- function( df ) names(which(vapply(df , function(x) { inherits(x, "Date") || inherits(x, "POSIXct") }, T)))
@@ -89,24 +89,24 @@ handle_digits <- function( digits ) {
 
 
 
-handle_dates2 <- function( lst ) {
-  rapply( lst, function(x) {
-    any( grepl("Date|POSIX*", class(x)) )
-  })
-}
+# handle_dates2 <- function( lst ) {
+#   rapply( lst, function(x) {
+#     any( grepl("Date|POSIX*", class(x)) )
+#   })
+# }
 
-get_classes <- function( obj ) {
-  rapply( obj, how = "list", function(x) {
-    cls <- class(x)
-    if("Date" %in% cls){
-      "Date"
-    } else if ("POSIXct" %in% cls ) {
-      "POSIXct"
-    } else {
-      "other"
-    }
-    })
-}
+# get_classes <- function( obj ) {
+#   rapply( obj, how = "list", function(x) {
+#     cls <- class(x)
+#     if("Date" %in% cls){
+#       "Date"
+#     } else if ("POSIXct" %in% cls ) {
+#       "POSIXct"
+#     } else {
+#       "other"
+#     }
+#     })
+# }
 
 
 # sf <- mapdeck::roads[1:2, ]
@@ -182,6 +182,16 @@ get_classes <- function( obj ) {
 #   times = 3
 # )
 
-
-
+# df <- data.frame(
+#   x = as.Date("2018-01-01")
+#   , y = as.POSIXct("2018-01-01 00:30:00")
+#   , z = 1L
+#   , a = 1
+#   , b = as.POSIXlt("2018-01-01 00:30:00")
+#   )
+# 
+# l <- list(
+#   x = df
+# )
+# to_json( l, numeric_dates = FALSE )
 
