@@ -20,6 +20,14 @@
 #' to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5))
 #' to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5), numeric_dates = FALSE)
 #' 
+#' psx <- seq(
+#'   as.POSIXct("2018-01-01", tz = "Australia/Melbourne"), 
+#'   as.POSIXct("2018-02-01", tz = "Australia/Melbourne"), 
+#'   length.out = 5
+#'   )
+#' to_json(psx)
+#' to_json(psx, numeric_dates = FALSE)
+#' 
 #' ## unbox single-value arrays
 #' to_json(list(x = 1), unbox = TRUE)
 #' to_json(list(x = 1, y = c("a"), z = list(x = 2, y = c("b"))), unbox = TRUE)
@@ -40,111 +48,3 @@ handle_digits <- function( digits ) {
   if( is.null( digits )) return(-1)
   return( as.integer( digits ) )
 }
-
-
-
-# handle_dates2 <- function( lst ) {
-#   rapply( lst, function(x) {
-#     any( grepl("Date|POSIX*", class(x)) )
-#   })
-# }
-
-# get_classes <- function( obj ) {
-#   rapply( obj, how = "list", function(x) {
-#     cls <- class(x)
-#     if("Date" %in% cls){
-#       "Date"
-#     } else if ("POSIXct" %in% cls ) {
-#       "POSIXct"
-#     } else {
-#       "other"
-#     }
-#     })
-# }
-
-
-# sf <- mapdeck::roads[1:2, ]
-# 
-# l <- list(
-#   n = NULL
-#   , x = 1L:5L
-#   , y = 1:5
-#   , z = data.frame(i = letters[1:5], v = 21:25, l = list(lst = 1:5))
-#   , aa = list(
-#     bb = list(
-#       cc = as.Date("2018-01-01")
-#       )
-#     )
-#   # , d = as.POSIXlt("2018-01-01")
-#   # , p = as.POSIXct("2018-01-01 00:00:01")
-#    , sf = sf
-#   )
-# 
-# v <- jsonify:::get_classes( l )
-# length( v )
-# v
-# 
-# to_json( l )
-
-# handle_dates2 <- function(x) {
-#   rapply( x, how = "replace", function(y) {
-#     if(inherits(y, "Date") | inherits(y,"POSIXct") | inherits (y, "POSIXlt")) {
-#       as.character( y )
-#     } else { 
-#       y
-#     }
-#   })
-# }
-
-# 
-# library(data.table)
-# library(sf)
-# 
-# dtes <- seq(as.Date("2018-01-01"), as.Date("2019-01-01"), length.out = 365)
-# psx <- seq(as.POSIXct("2018-01-01"), as.POSIXct("2019-01-01"), length.out = 365)
-# n <- 1e5
-# 
-# sf <- mapdeck::roads
-# 
-# lst <- list(
-#   x = sample(dtes, size = n, replace = T)
-#   , y = list(
-#     ya = sample(dtes, size = n, replace = TRUE)
-#     , yb = rnorm(n = n)
-#     , yx = list( sample(dtes, size = n, replace = T ) )
-#   )
-#   , p = psx
-#   #, sf = sf
-# )
-# 
-# library( microbenchmark )
-# 
-# 
-# res <- jsonify::to_json( lst, numeric_dates = FALSE )
-# 
-# microbenchmark(
-#   jsonify1 = {
-#     jsonify::to_json( lst, numeric_dates = TRUE )
-#   },
-#   jsonify2 = {
-#     jsonify::to_json( lst, numeric_dates = FALSE )
-#   },
-#   jsonlite = {
-#     jsonlite::toJSON( lst )
-#   },
-#   times = 3
-# )
-
-# df <- data.frame(
-#   x = as.Date("2018-01-01")
-#   , y = as.POSIXct("2018-01-01 00:30:00")
-#   , z = 1L
-#   , a = 1
-#   , b = as.POSIXlt("2018-01-01 00:30:00")
-#   )
-# 
-# l <- list(
-#   x = df
-# )
-# to_json( l, numeric_dates = FALSE )
-# # {"x":[{"x":"2018-01-01","y":"2017-12-31T13:30:00","z":1,"a":1.0,"b":"2017-12-31T13:30:00"}]}
