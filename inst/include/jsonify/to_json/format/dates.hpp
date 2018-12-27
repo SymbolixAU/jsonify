@@ -1,13 +1,14 @@
-#ifndef JSONIFY_FORMAT_DATES_H
-#define JSONIFY_FORMAT_DATES_H
+#ifndef JSONIFY_DATES_H
+#define JSONIFY_DATES_H
 
 #include <Rcpp.h>
 #include <boost/date_time.hpp>
+#include "jsonify/utils.hpp"
 
 // [[Rcpp::depends(BH)]]
 
 namespace jsonify {
-namespace format {
+namespace dates {
 
   inline bool is_in( const char* x, Rcpp::CharacterVector v ) {
     int n = v.size();
@@ -117,7 +118,7 @@ namespace format {
     }
     return sv;
   }
-  
+
 
 } // namespace format
 } // namespace jsonify

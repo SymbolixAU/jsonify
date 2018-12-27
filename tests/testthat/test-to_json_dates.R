@@ -85,5 +85,6 @@ test_that("Different R objects with dates are handled", {
   js <- to_json( df, numeric_dates = FALSE )
   expect_equal( as.character( js ), '[{"dte":"2017-12-31T13:00:01"},{"dte":"2018-01-01T13:00:01"},{"dte":"2018-01-02T13:00:01"},{"dte":"2018-01-03T13:00:01"},{"dte":"2018-01-04T13:00:01"},{"dte":"2018-01-05T13:00:01"}]')
   
-  
 })
+
+
