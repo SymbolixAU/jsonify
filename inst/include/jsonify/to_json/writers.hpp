@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include "jsonify/utils.hpp"
+#include "jsonify/to_json/format/dates.hpp"
 #include <math.h>
 
 using namespace rapidjson;
@@ -14,12 +15,12 @@ namespace writers {
   // scalar values
   // ---------------------------------------------------------------------------
   template <typename Writer>
-  inline void write_value( Writer& writer, const char* value, int digits = -1 ) {
+  inline void write_value( Writer& writer, const char* value ) {
     writer.String( value );
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, int& value, int digits = -1 ) {
+  inline void write_value( Writer& writer, int& value ) {
      if( std::isnan( value ) ) {
       writer.Null();
     } else {
@@ -29,6 +30,7 @@ namespace writers {
   
   template <typename Writer>
   inline void write_value( Writer& writer, double& value, int digits = -1 ) {
+    
     if(std::isnan( value ) ) {
       writer.Null();
     } else if ( std::isinf( value ) ) {
@@ -59,68 +61,8 @@ namespace writers {
   // ---------------------------------------------------------------------------
   // vectors
   // ---------------------------------------------------------------------------
-  
-  template< typename Writer>
-  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox = false, int digits = -1 ) {
-    int n = nv.size();
-    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
-    
-    jsonify::utils::start_array( writer, will_unbox );
-    
-    for ( int i = 0; i < n; i++ ) {
-      if( Rcpp::NumericVector::is_na( nv[i] ) ) {
-        writer.Null();
-      } else {
-        write_value( writer, nv[i], digits );
-      }
-    }
-    jsonify::utils::end_array( writer, will_unbox );
-  }
-  
-  /*
-   * For writing a single value of a vector
-   */
-  template< typename Writer >
-  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, size_t row, bool unbox = false, int digits = -1 ) {
-    if ( Rcpp::NumericVector::is_na( nv[ row ] ) ) {
-      writer.Null();
-    } else {
-      double n = nv[ row ];
-      write_value( writer, n, digits );
-    }
-  }
-  
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, bool unbox = false, int digits = -1 ) {
-    int n = iv.size();
-    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
-    jsonify::utils::start_array( writer, will_unbox );
-    
-    for ( int i = 0; i < n; i++ ) {
-      if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
-        writer.Null();
-      } else {
-        write_value( writer, iv[i] );
-      }
-    }
-    jsonify::utils::end_array( writer, will_unbox );
-  }
-  
-  /*
-   * For writing a single value of a vector
-   */
-  template< typename Writer >
-  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, size_t row, bool unbox = false ) {
-    if ( Rcpp::IntegerVector::is_na( iv[ row ] ) ) {
-      writer.Null();
-    } else {
-      int i = iv[ row ];
-      write_value( writer, i );
-    }
-  }
-  
-  template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::StringVector& sv, bool unbox = false, int digits = -1) {
+  inline void write_value( Writer& writer, Rcpp::StringVector& sv, bool unbox = false ) {
     int n = sv.size();
     bool will_unbox = jsonify::utils::should_unbox( n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
@@ -148,8 +90,130 @@ namespace writers {
     }
   }
   
+  template< typename Writer>
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
+
+    Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv );
+    
+    if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
+      
+      Rcpp::StringVector sv = jsonify::dates::date_to_string( nv );
+      write_value( writer, sv, unbox );
+      
+    } else if ( !numeric_dates && jsonify::dates::is_in( "POSIXt", cls ) ) {
+      
+      Rcpp::StringVector sv = jsonify::dates::posixct_to_string( nv );
+      write_value( writer, sv, unbox );
+      
+    } else {
+    
+      int n = nv.size();
+      bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+      
+      jsonify::utils::start_array( writer, will_unbox );
+    
+      for ( int i = 0; i < n; i++ ) {
+        if( Rcpp::NumericVector::is_na( nv[i] ) ) {
+          writer.Null();
+        } else {
+          write_value( writer, nv[i], digits );
+        }
+      }
+    jsonify::utils::end_array( writer, will_unbox );
+    }
+  }
+  
+  /*
+   * For writing a single value of a vector
+   */
+  template< typename Writer >
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, size_t row, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
+
+    Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv );
+    
+    if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
+
+      Rcpp::StringVector sv = jsonify::dates::date_to_string( nv );
+      write_value( writer, sv, row, unbox );
+      
+    } else if ( !numeric_dates && jsonify::dates::is_in( "POSIXt", cls ) ) {
+      
+      Rcpp::StringVector sv = jsonify::dates::posixct_to_string( nv );
+      write_value( writer, sv, row, unbox );
+      
+    } else {
+      if ( Rcpp::NumericVector::is_na( nv[ row ] ) ) {
+        writer.Null();
+      } else {
+        double n = nv[ row ];
+        write_value( writer, n, digits );
+      }
+    }
+  }
+  
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, bool unbox = false, int digits = -1 ) {
+  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, bool unbox = false, bool numeric_dates = true ) {
+    
+    Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
+
+    if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
+
+      Rcpp::StringVector sv = jsonify::dates::date_to_string( iv );
+      write_value( writer, sv, unbox );
+      
+    } else if ( !numeric_dates && jsonify::dates::is_in( "POSIXt", cls ) ) {
+      
+      Rcpp::StringVector sv = jsonify::dates::posixct_to_string( iv );
+      write_value( writer, sv, unbox );
+      
+    } else {
+    
+      int n = iv.size();
+      bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+      jsonify::utils::start_array( writer, will_unbox );
+      
+      for ( int i = 0; i < n; i++ ) {
+        if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
+          writer.Null();
+        } else {
+          write_value( writer, iv[i] );
+        }
+      }
+      jsonify::utils::end_array( writer, will_unbox );
+    }
+  }
+  
+  /*
+   * For writing a single value of a vector
+   */
+  template< typename Writer >
+  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, size_t row, bool unbox = false, bool numeric_dates = false ) {
+    
+    Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
+    
+    
+    if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
+      
+      Rcpp::StringVector sv = jsonify::dates::date_to_string( iv );
+      write_value( writer, sv, row, unbox );
+    } else if ( !numeric_dates && jsonify::dates::is_in( "POSIXt", cls ) ) {
+      
+      Rcpp::StringVector sv = jsonify::dates::posixct_to_string( iv );
+      write_value( writer, sv, row, unbox );
+      
+    } else {
+    
+      if ( Rcpp::IntegerVector::is_na( iv[ row ] ) ) {
+        writer.Null();
+      } else {
+        int i = iv[ row ];
+        write_value( writer, i );
+      }
+    }
+  }
+  
+  template <typename Writer>
+  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, bool unbox = false ) {
     int n = lv.size();
     bool will_unbox = jsonify::utils::should_unbox( n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
@@ -166,7 +230,7 @@ namespace writers {
   }
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, size_t row, bool unbox = false, int digits = -1) {
+  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, size_t row, bool unbox = false ) {
     if ( Rcpp::LogicalVector::is_na( lv[ row ] ) ) { 
       writer.Null();
     } else {
@@ -180,7 +244,7 @@ namespace writers {
   // ---------------------------------------------------------------------------
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, bool unbox = false, int digits = -1 ) {
+  inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, bool unbox = false ) {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
@@ -188,7 +252,7 @@ namespace writers {
     int i;
     for ( i = 0; i < n; i++ ) {
       Rcpp::IntegerVector this_row = mat(i, Rcpp::_);
-      write_value( writer, this_row, unbox, digits );
+      write_value( writer, this_row, unbox );
     }
     jsonify::utils::end_array( writer, will_unbox );
   }
@@ -209,7 +273,7 @@ namespace writers {
   }
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::CharacterMatrix& mat, bool unbox = false, int digits = -1 ) {
+  inline void write_value( Writer& writer, Rcpp::CharacterMatrix& mat, bool unbox = false ) {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
@@ -217,14 +281,14 @@ namespace writers {
     int i;
     for ( i = 0; i < n; i++ ) {
       Rcpp::StringVector this_row = mat(i, Rcpp::_);
-      write_value( writer, this_row, unbox, digits );
+      write_value( writer, this_row, unbox );
     }
     jsonify::utils::end_array( writer, will_unbox );
   }
   
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::LogicalMatrix& mat, bool unbox = false, int digits = -1 ) {
+  inline void write_value( Writer& writer, Rcpp::LogicalMatrix& mat, bool unbox = false ) {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
@@ -233,28 +297,18 @@ namespace writers {
     int i;
     for ( i = 0; i < n; i++ ) {
       Rcpp::LogicalVector this_row = mat(i, Rcpp::_);
-      write_value( writer, this_row, unbox, digits );
+      write_value( writer, this_row, unbox );
     }
     jsonify::utils::end_array( writer, will_unbox );
-  }
-  
-  // ---------------------------------------------------------------------------
-  // Template definition
-  // ---------------------------------------------------------------------------
-  template <typename Writer, typename T>
-  inline void write_value( Writer& writer, T& t, int& n, bool unbox = false, int digits = -1 ) {
-    if ( n > 0 ) {
-      write_value( writer, t, unbox, digits );
-    } else {
-      write_value( writer, t[0], digits );
-    }
   }
 
   // ---------------------------------------------------------------------------
   // List
   // ---------------------------------------------------------------------------
   template< typename Writer>
-  inline void write_value( Writer& writer, SEXP& list_element, bool unbox = false, int digits = -1 ) {
+  inline void write_value( Writer& writer, SEXP& list_element, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
+    size_t i, j;
+    
     
     if( Rf_isNull( list_element ) ) {
       writer.StartObject();
@@ -263,7 +317,6 @@ namespace writers {
     } 
     
     if( Rf_isMatrix( list_element ) ) {
-      
       switch( TYPEOF( list_element ) ) {
       case REALSXP: {
         Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( list_element );
@@ -272,27 +325,25 @@ namespace writers {
       }
       case INTSXP: {
         Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( list_element );
-        return write_value( writer, im, unbox, digits );
+        return write_value( writer, im, unbox );
         break;
       }
       case LGLSXP: {
         Rcpp::LogicalMatrix lm = Rcpp::as< Rcpp::LogicalMatrix >( list_element );
-        return write_value( writer, lm, unbox, digits );
+        return write_value( writer, lm, unbox );
         break;
       }
       default :{
         Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( list_element );
-        return write_value( writer, sm, unbox, digits );
+        return write_value( writer, sm, unbox );
         break;
       }
       }
-      
     } else if ( Rf_inherits( list_element, "data.frame" ) ) {
-      
+
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
       size_t n_cols = df.ncol();
       size_t n_rows = df.nrows();
-      size_t i, j;
       Rcpp::StringVector column_names = df.names();
       
       writer.StartArray();
@@ -301,7 +352,6 @@ namespace writers {
         writer.StartObject();
         for( j = 0; j < n_cols; j++ ) {
           const char *h = column_names[ j ];
-          
           write_value( writer, h );
           SEXP this_vec = df[ h ];
           
@@ -309,17 +359,17 @@ namespace writers {
           case VECSXP: {
             Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
             SEXP s = lst[ i ];
-            write_value( writer, s, unbox, digits );
+            write_value( writer, s, unbox, digits, numeric_dates );
             break;
           }
           case REALSXP: {
             Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-            write_value( writer, nv, i, unbox, digits );
+            write_value( writer, nv, i, unbox, digits, numeric_dates );
             break;
           }
-          case INTSXP: { 
+          case INTSXP: {
             Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-            write_value( writer, iv, i, unbox );
+            write_value( writer, iv, i, unbox, numeric_dates );
             break;
           }
           case LGLSXP: {
@@ -333,7 +383,6 @@ namespace writers {
             break;
           }
           }
-          
         }
         writer.EndObject();
       }
@@ -345,7 +394,7 @@ namespace writers {
       
       case VECSXP: {
         Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
-        int n = lst.size();
+        size_t n = lst.size();
         
         if ( n == 0 ) {
           writer.StartArray();
@@ -360,34 +409,33 @@ namespace writers {
         
         if ( has_names ) {
           Rcpp::CharacterVector temp_names = lst.names();
-          for( int i = 0; i < n; i++ ) {
+          for( i = 0; i < n; i++ ) {
             list_names[i] = temp_names[i] == "" ? list_names[i] : temp_names[i];
           }
         }
         // END LIST NAMES
-  
+        
         jsonify::utils::writer_starter( writer, has_names );
         
-        for ( int i = 0; i < n; i++ ) {
+        for ( i = 0; i < n; i++ ) {
           SEXP recursive_list = lst[ i ];
           if ( has_names ) {
             const char *s = list_names[ i ];
             write_value( writer, s );
           }
-          write_value( writer, recursive_list, unbox, digits );
+          write_value( writer, recursive_list, unbox, digits, numeric_dates );
         }
-        
         jsonify::utils::writer_ender( writer, has_names );
         break;
       }
       case REALSXP: {
         Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
-        write_value( writer, nv, unbox, digits );
+        write_value( writer, nv, unbox, digits, numeric_dates );
         break;
       }
       case INTSXP: { 
         Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
-        write_value( writer, iv, unbox );
+        write_value( writer, iv, unbox, numeric_dates );
         break;
       }
       case LGLSXP: {

@@ -87,8 +87,6 @@ At its core `Dates` in R are numeric, so they are treated as numbers
 when converted to JSON. However, the user can coerce to character
 through the `numeric_dates` argument.
 
-**This argument only works for data.frames and vectors, not lists**
-
 ``` r
 df <- data.frame(dte = as.Date("2018-01-01"))
 jsonify::to_json( df )
@@ -97,43 +95,133 @@ jsonify::to_json( df )
 df <- data.frame(dte = as.Date("2018-01-01"))
 jsonify::to_json( df, numeric_dates = FALSE )
 #  [{"dte":"2018-01-01"}]
-
-df <- data.frame(dte = as.POSIXct("2018-01-01 01:01:01"))
-jsonify::to_json( df )
-#  [{"dte":1514728861.0}]
-
-df <- data.frame(dte = as.POSIXct("2018-01-01 01:01:01"))
-jsonify::to_json( df, numeric_dates = FALSE )
-#  [{"dte":"2018-01-01 01:01:01"}]
 ```
 
 ### And `POSIXct` and `POSIXlt`?
 
-`POSIXct` work the same as `Date`
-
 ``` r
-df <- data.frame(dte = as.POSIXct("2018-01-01 10:00:00"))
-jsonify::to_json( df )
-#  [{"dte":1514761200.0}]
-jsonify::to_json( df, numeric_dates = FALSE)
-#  [{"dte":"2018-01-01 10:00:00"}]
+
+jsonify::to_json( as.POSIXct("2018-01-01 10:00:00") )
+#  [1514761200.0]
+jsonify::to_json( as.POSIXct("2018-01-01 10:00:00"), numeric_dates = FALSE)
+#  ["2017-12-31T23:00:00"]
 ```
 
-`POSIXlt` will return each component of the date-time
+Note here that **POSIXct** values are returned in UTC timezone.
+
+**POSIXlt** will return each component of the date-time
 
 ``` r
 x <- as.POSIXlt("2018-01-01 01:00:00", tz = "GMT")
 jsonify::to_json( x )
 #  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}
+
 jsonify::to_json( x, numeric_dates = FALSE)
-#  ["2018-01-01 01:00:00"]
+#  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}
 ```
 
 ### What about lists?
 
-The purpose of this library is speed. A lot of overhead is incurred
+~~The purpose of this library is speed. A lot of overhead is incurred
 iterating over a list to find and convert objects from one type to
-another.
+another.~~
+
+For v0.2.0 I’ve managed to get the date handling at the c++ level, so
+there’s no penalty for recursing through the list to coerce to
+character.
+
+Therefore, lists will work too
+
+``` r
+l <- list(
+  dte = as.Date("2018-01-01")
+  , psx = seq(as.POSIXct("2018-01-01 13:00:00"), as.POSIXct("2018-01-05 13:00:00"), length.out = 5)
+  , df = data.frame(psx = seq(as.POSIXct("2018-01-01 13:00:00"), as.POSIXct("2018-01-05 13:00:00"), length.out = 5))
+)
+jsonify::to_json( l )
+#  {"dte":[17532.0],"psx":[1514772000,1514858400,1514944800,1515031200,1515117600],"df":[{"psx":1514772000},{"psx":1514858400},{"psx":1514944800},{"psx":1515031200},{"psx":1515117600}]}
+```
+
+``` r
+js <- jsonify::to_json( l, numeric_dates = FALSE )
+jsonify::pretty_json( js )
+#  {
+#      "dte": [
+#          "2018-01-01"
+#      ],
+#      "psx": [
+#          "2018-01-01T02:00:00",
+#          "2018-01-02T02:00:00",
+#          "2018-01-03T02:00:00",
+#          "2018-01-04T02:00:00",
+#          "2018-01-05T02:00:00"
+#      ],
+#      "df": [
+#          {
+#              "psx": "2018-01-01T02:00:00"
+#          },
+#          {
+#              "psx": "2018-01-02T02:00:00"
+#          },
+#          {
+#              "psx": "2018-01-03T02:00:00"
+#          },
+#          {
+#              "psx": "2018-01-04T02:00:00"
+#          },
+#          {
+#              "psx": "2018-01-05T02:00:00"
+#          }
+#      ]
+#  }
+```
+
+And it’s still
+fast
+
+``` r
+dtes <- seq(as.Date("2018-01-01"), as.Date("2019-01-01"), length.out = 365)
+psx <- seq(as.POSIXct("2018-01-01"), as.POSIXct("2019-01-01"), length.out = 365)
+n <- 1e5
+
+lst <- list(
+  x = sample(dtes, size = n, replace = T)
+  , y = list(
+    ya = sample(dtes, size = n, replace = TRUE)
+    , yb = rnorm(n = n)
+    , yx = list( sample(dtes, size = n, replace = T ) )
+  )
+  , p = psx
+)
+
+library( microbenchmark )
+
+microbenchmark(
+  jsonify1 = {
+    jsonify::to_json( lst, numeric_dates = TRUE )
+  },
+  jsonify2 = {
+    jsonify::to_json( lst, numeric_dates = FALSE )
+  },
+  jsonlite = {
+    jsonlite::toJSON( lst )
+  },
+  times = 3
+)
+#  Unit: milliseconds
+#       expr       min        lq      mean    median        uq       max
+#   jsonify1  130.4760  136.5254  176.1251  142.5748  198.9496  255.3243
+#   jsonify2  678.8992  730.5589  928.0832  782.2186 1052.6752 1323.1318
+#   jsonlite 1849.3437 1897.8639 2028.3890 1946.3841 2117.9116 2289.4391
+#   neval
+#       3
+#       3
+#       3
+```
+
+### That output looks nice, is that `pretty_json()` function new?
+
+Yep, it’s a new feature in v0.2.0
 
 ### What do you mean by “available at the source” ?
 
@@ -141,8 +229,8 @@ I want to be able to call the C++ code from another package, without
 going to & from R. Therefore, the C++ code is implemented in headers, so
 you can “link to” it in your own package.
 
-For example, the `LinkingTo` section in DESCRIPTION will look something
-like
+For example, the `LinkingTo` section in **DESCRIPTION** will look
+something like
 
 ``` yaml
 LinkingTo: 
@@ -164,7 +252,7 @@ Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
 
 ### Can I call it from R if I want to?
 
-Yes.
+Yes. Just like the examples in this readme use `to_json()`
 
 ``` r
 df <- data.frame(
@@ -175,7 +263,7 @@ jsonify::to_json( df )
 #  [{"id":1,"val":1},{"id":2,"val":2},{"id":3,"val":3}]
 ```
 
-### Why are there numbers in stead of letters?
+### Why are there numbers instead of letters?
 
 Because `factors` are a thing in R. And `jsonify` treats them as
 factors.

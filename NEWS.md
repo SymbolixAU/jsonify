@@ -1,5 +1,6 @@
-## v0.1.3
+## v0.2.0
 
+* Dates are handled in c++, and now supports nested lists
 * c++ API restructured and simplified
 * `print.json()` method to print json class objects
 * `minify_json()` functino to remove indentation

@@ -24,7 +24,7 @@ test_that("single-vectors unboxed", {
   expect_true( validate_json( js ) )
   x <- as.POSIXct("2018-01-01 00:00:01")
   js <- to_json(x, unbox = T, numeric_dates = F )
-  expect_equal( as.character( js ), "\"2018-01-01 00:00:01\"")
+  expect_equal( as.character( js ), "\"2017-12-31T13:00:01\"")
   expect_true( validate_json( js ) )
   x <- as.POSIXlt("2018-01-01 01:00:00", tz = "GMT")
   js <- to_json(x, unbox = T)

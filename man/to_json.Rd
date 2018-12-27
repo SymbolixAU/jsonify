@@ -2,25 +2,9 @@
 % Please edit documentation in R/to_json.R
 \name{to_json}
 \alias{to_json}
-\alias{to_json.data.frame}
-\alias{to_json.Date}
-\alias{to_json.POSIXct}
-\alias{to_json.POSIXlt}
-\alias{to_json.default}
 \title{To JSON}
 \usage{
-to_json(x, unbox = FALSE, digits = NULL, ...)
-
-\method{to_json}{data.frame}(x, unbox = FALSE, digits = NULL, ...,
-  numeric_dates = TRUE)
-
-\method{to_json}{Date}(x, unbox = FALSE, ..., numeric_dates = TRUE)
-
-\method{to_json}{POSIXct}(x, unbox = FALSE, ..., numeric_dates = TRUE)
-
-\method{to_json}{POSIXlt}(x, unbox = FALSE, ..., numeric_dates = TRUE)
-
-\method{to_json}{default}(x, unbox = FALSE, digits = NULL, ...)
+to_json(x, unbox = FALSE, digits = NULL, numeric_dates = TRUE)
 }
 \arguments{
 \item{x}{object to convert to JSON}
@@ -32,10 +16,8 @@ that is, not contained inside an array.}
 numeric values are coorced using \code{as.integer}, which may round-down the value you supply.
 Default is \code{NULL} - no rounding}
 
-\item{...}{arguments passed to other methods}
-
 \item{numeric_dates}{logical indicating if dates should be treated as numerics. 
-Defaults to TRUE for speed. If FALSE, the dates will be coerced to character}
+Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone}
 }
 \description{
 Converts R objects to JSON
