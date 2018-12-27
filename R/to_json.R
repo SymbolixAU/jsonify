@@ -8,7 +8,8 @@
 #' @param digits integer specifying the number of decimal places to round numerics. 
 #' numeric values are coorced using \code{as.integer}, which may round-down the value you supply.
 #' Default is \code{NULL} - no rounding
-#' @param ... arguments passed to other methods
+#' @param numeric_dates logical indicating if dates should be treated as numerics. 
+#' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone
 #' 
 #' @examples 
 #' 
@@ -30,56 +31,9 @@
 #' 
 #' 
 #' @export
-to_json <- function( x, unbox = FALSE, digits = NULL, ... ) {
-  UseMethod("to_json")
-}
-
-#' #' @rdname to_json
-#' #' @export
-#' #' @param numeric_dates logical indicating if dates should be treated as numerics. 
-#' #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character
-#' to_json.data.frame <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
-#'   if(!numeric_dates) x <- handle_dates( x ) 
-#'   digits <- handle_digits( digits )
-#'   rcpp_to_json( x, unbox, digits )
-#' }
-#' 
-#' 
-#' #' @rdname to_json
-#' #' @export
-#' to_json.Date <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
-#'   if( numeric_dates ) return( rcpp_to_json( x, unbox ) ) 
-#'   return( rcpp_to_json( as.character( x ), unbox ) )
-#' }
-#' 
-#' #' @rdname to_json
-#' #' @export
-#' to_json.POSIXct <- function( x, unbox = FALSE, ..., numeric_dates = TRUE ) {
-#'   to_json.Date( x = x, unbox = unbox, ..., numeric_dates = numeric_dates )
-#' }
-#' 
-#' #' @rdname to_json
-#' #' @export
-#' to_json.POSIXlt <- function( x, unbox = FALSE, ..., numeric_dates = TRUE )  {
-#'   to_json.Date( x = x, unbox = unbox, ..., numeric_dates = numeric_dates )
-#' }
-
-
-#' @rdname to_json
-#' @export
-to_json.default <- function( x, unbox = FALSE, digits = NULL, ..., numeric_dates = TRUE ) {
+to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE ) {
   digits <- handle_digits( digits )
-  #cls <- get_classes( x )
-  #if(!numeric_dates) x <- handle_dates( x ) 
-  rcpp_to_json( x, unbox, digits, numeric_dates ) # stop("this type is not supported")
-}
-
-date_columns <- function( df ) names(which(vapply(df , function(x) { inherits(x, "Date") || inherits(x, "POSIXct") }, T)))
-
-handle_dates <- function( x ) {
-  dte <- date_columns( x )
-  for ( i in dte ) x[[i]] <- as.character( x[[i]] )
-  return( x )
+  rcpp_to_json( x, unbox, digits, numeric_dates )
 }
 
 handle_digits <- function( digits ) {
@@ -142,7 +96,7 @@ handle_digits <- function( digits ) {
 #   })
 # }
 
-
+# 
 # library(data.table)
 # library(sf)
 # 
@@ -165,16 +119,15 @@ handle_digits <- function( digits ) {
 # 
 # library( microbenchmark )
 # 
-# get_classes( lst )
-# 
-# 
 # 
 # res <- jsonify::to_json( lst, numeric_dates = FALSE )
 # 
 # microbenchmark(
-#   jsonify = {
-#     v <- jsonify:::handle_dates2( lst )
+#   jsonify1 = {
 #     jsonify::to_json( lst, numeric_dates = TRUE )
+#   },
+#   jsonify2 = {
+#     jsonify::to_json( lst, numeric_dates = FALSE )
 #   },
 #   jsonlite = {
 #     jsonlite::toJSON( lst )
@@ -194,4 +147,4 @@ handle_digits <- function( digits ) {
 #   x = df
 # )
 # to_json( l, numeric_dates = FALSE )
-
+# # {"x":[{"x":"2018-01-01","y":"2017-12-31T13:30:00","z":1,"a":1.0,"b":"2017-12-31T13:30:00"}]}

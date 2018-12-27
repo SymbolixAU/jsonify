@@ -20,6 +20,21 @@ namespace format {
     return false;
   }
 
+  inline Rcpp::StringVector date_to_string( Rcpp::IntegerVector& iv ) {
+    
+    int i;
+    int n = iv.size();
+    Rcpp::StringVector sv( n );
+    
+    for ( i = 0; i < n; i++ ) {
+      Rcpp::Date d = iv[i];
+      boost::gregorian::date gd = boost::gregorian::date(d.getYear(), d.getMonth(), d.getDay());
+      std::string s = boost::gregorian::to_iso_extended_string( gd );
+      sv[i] = s.c_str();
+    }
+    return sv;
+  }
+
   inline Rcpp::StringVector date_to_string( Rcpp::NumericVector& nv ) {
     
     int i;
@@ -30,6 +45,29 @@ namespace format {
       Rcpp::Date d = nv[i];
       boost::gregorian::date gd = boost::gregorian::date(d.getYear(), d.getMonth(), d.getDay());
       std::string s = boost::gregorian::to_iso_extended_string( gd );
+      sv[i] = s.c_str();
+    }
+    return sv;
+  }
+
+  inline Rcpp::StringVector posixct_to_string( Rcpp::IntegerVector& iv ) {
+    
+    int i;
+    int n = iv.size();
+
+    Rcpp::StringVector sv( n );
+    
+    for ( i = 0; i < n; i++ ) {
+      Rcpp::Datetime d = iv[i];
+      boost::gregorian::date dt( d.getYear(), d.getMonth(), d.getDay() );
+      boost::posix_time::hours h( d.getHours() );
+      boost::posix_time::minutes mins( d.getMinutes() );
+      boost::posix_time::seconds sec( d.getSeconds() );
+      boost::posix_time::time_duration td = h + mins + sec;
+      
+      boost::posix_time::ptime pt = boost::posix_time::ptime( dt, td );
+      
+      std::string s = boost::posix_time::to_iso_extended_string( pt );
       sv[i] = s.c_str();
     }
     return sv;
