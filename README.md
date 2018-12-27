@@ -176,6 +176,49 @@ jsonify::pretty_json( js )
 #  }
 ```
 
+And it’s still
+fast
+
+``` r
+dtes <- seq(as.Date("2018-01-01"), as.Date("2019-01-01"), length.out = 365)
+psx <- seq(as.POSIXct("2018-01-01"), as.POSIXct("2019-01-01"), length.out = 365)
+n <- 1e5
+
+lst <- list(
+  x = sample(dtes, size = n, replace = T)
+  , y = list(
+    ya = sample(dtes, size = n, replace = TRUE)
+    , yb = rnorm(n = n)
+    , yx = list( sample(dtes, size = n, replace = T ) )
+  )
+  , p = psx
+)
+
+library( microbenchmark )
+
+microbenchmark(
+  jsonify1 = {
+    jsonify::to_json( lst, numeric_dates = TRUE )
+  },
+  jsonify2 = {
+    jsonify::to_json( lst, numeric_dates = FALSE )
+  },
+  jsonlite = {
+    jsonlite::toJSON( lst )
+  },
+  times = 3
+)
+#  Unit: milliseconds
+#       expr       min        lq      mean    median        uq       max
+#   jsonify1  130.4760  136.5254  176.1251  142.5748  198.9496  255.3243
+#   jsonify2  678.8992  730.5589  928.0832  782.2186 1052.6752 1323.1318
+#   jsonlite 1849.3437 1897.8639 2028.3890 1946.3841 2117.9116 2289.4391
+#   neval
+#       3
+#       3
+#       3
+```
+
 ### That output looks nice, is that `pretty_json()` function new?
 
 Yep, it’s a new feature in v0.2.0
