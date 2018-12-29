@@ -3,9 +3,7 @@
 
 #include <Rcpp.h>
 
-#include "from_json/utils.hpp"
-
-using namespace rapidjson;
+#include "from_json_utils.hpp"
 
 namespace jsonify {
 namespace from_json {
