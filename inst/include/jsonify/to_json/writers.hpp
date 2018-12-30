@@ -307,8 +307,8 @@ namespace writers {
   // ---------------------------------------------------------------------------
   template< typename Writer>
   inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
-    size_t i, j;
     
+    size_t i, j;
     
     if( Rf_isNull( list_element ) ) {
       writer.StartObject();
@@ -441,6 +441,11 @@ namespace writers {
       case LGLSXP: {
         Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( list_element );
         write_value( writer, lv, unbox );
+        break;
+      }
+      case LANGSXP: {
+        Rcpp::Pairlist s;
+        write_value( writer, s, unbox, digits, numeric_dates );
         break;
       }
       default: {
