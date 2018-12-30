@@ -9,24 +9,24 @@ using namespace rapidjson;
 namespace jsonify {
 namespace vectors {
 
-  inline Rcpp::StringVector to_json( Rcpp::NumericVector& nv, bool unbox = false, int digits = -1 ) { 
-    Rcpp::warning("namespace jsonify::vectors is deprecated. Use jsonify::api instead"); 
+  inline Rcpp::StringVector to_json( Rcpp::NumericVector& nv, bool unbox = false, int digits = -1 ) {
+    Rcpp::warning("namespace jsonify::vectors is deprecated. Use jsonify::api instead");
     return jsonify::api::to_json( nv, unbox, digits );
   }
 
   inline Rcpp::StringVector to_json( Rcpp::StringVector& sv, bool unbox = false ) {
     Rcpp::warning("namespace jsonify::vectors is deprecated. Use jsonify::api instead");
-    return jsonify::api::to_json( sv, unbox, digits );
+    return jsonify::api::to_json( sv, unbox );
   }
 
   inline Rcpp::StringVector to_json( Rcpp::IntegerVector& iv, bool unbox = false ) {
     Rcpp::warning("namespace jsonify::vectors is deprecated. Use jsonify::api instead");
-    return jsonify::api::to_json( iv, unbox, digits );
+    return jsonify::api::to_json( iv, unbox );
   }
 
   inline Rcpp::StringVector to_json( Rcpp::LogicalVector& lv, bool unbox = false ) {
     Rcpp::warning("namespace jsonify::vectors is deprecated. Use jsonify::api instead");
-    return jsonify::api::to_json( lv, unbox, digits );
+    return jsonify::api::to_json( lv, unbox );
   }
 
   inline Rcpp::StringVector to_json( SEXP& lst, bool unbox = false, int digits = -1 ) {

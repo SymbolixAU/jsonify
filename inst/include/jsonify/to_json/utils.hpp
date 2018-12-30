@@ -6,8 +6,6 @@
 // [[Rcpp::depends(rapidjsonr)]]
 
 #include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
 
 namespace jsonify {
 namespace utils {

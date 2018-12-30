@@ -72,9 +72,9 @@ namespace dataframe {
     dataframe_cell( writer, this_vec, row, false, -1 );
   }
 
-  inline Rcpp::StringVector to_json( SEXP& df, bool unbox = false, int digits = -1 ) {
-    Rcpp::Rcout << "namespace jsonify::dataframe is deprecated. Use jsonify::api instead" << std::endl;
-    
+  inline Rcpp::StringVector to_json( Rcpp::DataFrame& df, bool unbox = false, int digits = -1 ) {
+    Rcpp::warning("namespace jsonify::dataframe is deprecated. Use jsonify::api instead");
+    //SEXP s = df;
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
     jsonify::writers::write_value( writer, df, unbox, digits );

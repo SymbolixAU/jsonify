@@ -2,8 +2,8 @@
 #define R_JSONIFY_WRITERS_H
 
 #include <Rcpp.h>
-#include "jsonify/utils.hpp"
-#include "jsonify/to_json/format/dates.hpp"
+#include "jsonify/to_json/utils.hpp"
+#include "jsonify/to_json/dates/dates.hpp"
 #include <math.h>
 
 using namespace rapidjson;
@@ -306,7 +306,7 @@ namespace writers {
   // List
   // ---------------------------------------------------------------------------
   template< typename Writer>
-  inline void write_value( Writer& writer, SEXP& list_element, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
+  inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
     size_t i, j;
     
     
