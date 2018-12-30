@@ -1,9 +1,10 @@
 ## v0.2.0
 
+* Support for LANGSXP objects
 * Dates are handled in c++, and now supports nested lists
 * c++ API restructured and simplified
 * `print.json()` method to print json class objects
-* `minify_json()` functino to remove indentation
+* `minify_json()` function to remove indentation
 * `pretty_json()` function to add indentation
 * `digits` argument to specify the number of digits to which numeric values will be rounded
 
