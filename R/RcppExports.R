@@ -29,40 +29,8 @@ rcpp_pretty_print <- function(json) {
     invisible(.Call(`_jsonify_rcpp_pretty_print`, json))
 }
 
-rcpp_df_to_json <- function(df, unbox = FALSE, digits = -1L) {
-    .Call(`_jsonify_rcpp_df_to_json`, df, unbox, digits)
-}
-
-rcpp_numeric_to_json <- function(nv, unbox = FALSE, digits = -1L) {
-    .Call(`_jsonify_rcpp_numeric_to_json`, nv, unbox, digits)
-}
-
-rcpp_character_to_json <- function(sv, unbox = FALSE) {
-    .Call(`_jsonify_rcpp_character_to_json`, sv, unbox)
-}
-
-rcpp_integer_to_json <- function(iv, unbox = FALSE) {
-    .Call(`_jsonify_rcpp_integer_to_json`, iv, unbox)
-}
-
-rcpp_logical_to_json <- function(iv, unbox = FALSE) {
-    .Call(`_jsonify_rcpp_logical_to_json`, iv, unbox)
-}
-
-rcpp_list_to_json <- function(lst, unbox = FALSE, digits = -1L) {
-    .Call(`_jsonify_rcpp_list_to_json`, lst, unbox, digits)
-}
-
-rcpp_integer_matrix_to_json <- function(m, unbox = FALSE) {
-    .Call(`_jsonify_rcpp_integer_matrix_to_json`, m, unbox)
-}
-
-rcpp_numeric_matrix_to_json <- function(m, unbox = FALSE, digits = -1L) {
-    .Call(`_jsonify_rcpp_numeric_matrix_to_json`, m, unbox, digits)
-}
-
-rcpp_character_matrix_to_json <- function(m, unbox = FALSE) {
-    .Call(`_jsonify_rcpp_character_matrix_to_json`, m, unbox)
+rcpp_to_json <- function(lst, unbox = FALSE, digits = -1L, numeric_dates = TRUE) {
+    .Call(`_jsonify_rcpp_to_json`, lst, unbox, digits, numeric_dates)
 }
 
 rcpp_validate_json <- function(json) {

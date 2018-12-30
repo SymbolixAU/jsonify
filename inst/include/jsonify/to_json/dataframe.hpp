@@ -3,17 +3,19 @@
 
 #include <Rcpp.h>
 
-#include "jsonify/jsonify.hpp"
+#include "jsonify/to_json/writers.hpp"
 
 using namespace rapidjson;
 
 namespace jsonify {
 namespace dataframe {
 
+  // keeping these dataframe_cell functions so they can be called directly by other libraries
+  //, e.g., geojsonsf
   template <typename Writer>
-  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row, 
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row,
                               bool unbox, int digits ) {
-    
+
     switch( TYPEOF( this_vec ) ) {
     case VECSXP: {
       Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
@@ -23,7 +25,7 @@ namespace dataframe {
     }
     case REALSXP: {
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-      if ( Rcpp::NumericVector::is_na( nv[ row ] ) ) { 
+      if ( Rcpp::NumericVector::is_na( nv[ row ] ) ) {
         writer.Null();
       } else {
         double n = nv[ row ];
@@ -31,7 +33,7 @@ namespace dataframe {
       }
       break;
     }
-    case INTSXP: { 
+    case INTSXP: {
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
       if ( Rcpp::IntegerVector::is_na( iv[ row ] ) ) {
         writer.Null();
@@ -43,7 +45,7 @@ namespace dataframe {
     }
     case LGLSXP: {
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-      if ( Rcpp::LogicalVector::is_na( lv[ row ] ) ) { 
+      if ( Rcpp::LogicalVector::is_na( lv[ row ] ) ) {
         writer.Null();
       } else {
         bool l = lv[ row ];
@@ -63,7 +65,7 @@ namespace dataframe {
     }
     }
   }
-  
+
   // overload for when you dont' specify 'unbox'
   template <typename Writer>
   inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row ) {
@@ -71,32 +73,11 @@ namespace dataframe {
   }
 
   inline Rcpp::StringVector to_json( Rcpp::DataFrame& df, bool unbox = false, int digits = -1 ) {
-    
+    Rcpp::warning("namespace jsonify::dataframe is deprecated. Use jsonify::api instead");
+    //SEXP s = df;
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    
-    size_t n_cols = df.ncol();
-    size_t n_rows = df.nrows();
-    size_t i, j;
-    Rcpp::StringVector column_names = df.names();
-    
-    writer.StartArray();
-    
-    for( i = 0; i < n_rows; i++ ) {
-      writer.StartObject();
-      for( j = 0; j < n_cols; j++ ) {
-        const char *h = column_names[ j ];
-        
-        jsonify::writers::write_value( writer, h );
-        
-        SEXP this_vec = df[ h ];
-        dataframe_cell( writer, this_vec, i, unbox, digits );
-        
-      }
-      writer.EndObject();
-    }
-    writer.EndArray();
-    
+    jsonify::writers::write_value( writer, df, unbox, digits );
     return jsonify::utils::finalise_json( sb );
   }
 

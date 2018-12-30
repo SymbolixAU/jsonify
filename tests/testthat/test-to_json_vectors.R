@@ -9,12 +9,11 @@ test_that("different vector types work", {
   expect_equal(as.character(to_json(as.Date("2018-01-01"))), "[17532.0]")
   expect_equal(as.character(to_json(as.Date("2018-01-01"), numeric_dates = F)), "[\"2018-01-01\"]")
   expect_equal(as.character(to_json(as.POSIXct("2018-01-01 01:00:00", tz = "GMT"))), "[1514768400.0]")
-  expect_equal(as.character(to_json(as.POSIXct("2018-01-01 01:00:00", tz = "GMT"), numeric_dates = F)), "[\"2018-01-01 01:00:00\"]")
+  expect_equal(as.character(to_json(as.POSIXct("2018-01-01 01:00:00", tz = "GMT"), numeric_dates = F)), "[\"2018-01-01T01:00:00\"]")
   expect_equal(as.character(to_json(as.POSIXlt("2018-01-01 01:00:00", tz = "GMT"))), "{\"sec\":[0.0],\"min\":[0],\"hour\":[1],\"mday\":[1],\"mon\":[0],\"year\":[118],\"wday\":[1],\"yday\":[0],\"isdst\":[0]}")
-  expect_equal(as.character(to_json(as.POSIXlt("2018-01-01 01:00:00", tz = "GMT"), numeric_dates = F)), "[\"2018-01-01 01:00:00\"]")
+  expect_equal(as.character(to_json(as.POSIXlt("2018-01-01 01:00:00", tz = "GMT"), numeric_dates = F)), '{"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}')
   expect_equal(as.character(to_json(complex(1))),"[\"0+0i\"]")
-  ## Numeric dates not implemented for lists
-  expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = F)), '{"x":[17532.0]}')
+  expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = F)), '{"x":[\"2018-01-01\"]}')
   expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = T)), '{"x":[17532.0]}')
 })
 

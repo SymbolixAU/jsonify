@@ -6,11 +6,30 @@
 // [[Rcpp::depends(rapidjsonr)]]
 
 #include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
 
 namespace jsonify {
 namespace utils {
+
+  template < int RTYPE >
+  inline Rcpp::CharacterVector rClass( Rcpp::Vector< RTYPE > v ) {
+    if( Rf_isNull( v.attr("class")) ) {
+      return "";
+    }
+    return v.attr("class");
+  }
+  
+  inline Rcpp::CharacterVector getRClass( SEXP obj ) {
+    switch( TYPEOF( obj ) ) {
+    case REALSXP:
+      return rClass< REALSXP >( obj );
+    case VECSXP:
+      return rClass< VECSXP >( obj );
+    case INTSXP:
+      return rClass< INTSXP >( obj );
+    }
+    return "";
+  }
+
 
   inline Rcpp::StringVector finalise_json( rapidjson::StringBuffer& sb ) {
     Rcpp::StringVector js = sb.GetString();

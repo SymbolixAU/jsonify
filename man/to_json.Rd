@@ -2,46 +2,9 @@
 % Please edit documentation in R/to_json.R
 \name{to_json}
 \alias{to_json}
-\alias{to_json.data.frame}
-\alias{to_json.numeric}
-\alias{to_json.character}
-\alias{to_json.integer}
-\alias{to_json.logical}
-\alias{to_json.complex}
-\alias{to_json.matrix}
-\alias{to_json.Date}
-\alias{to_json.POSIXct}
-\alias{to_json.POSIXlt}
-\alias{to_json.list}
-\alias{to_json.default}
 \title{To JSON}
 \usage{
-to_json(x, unbox = FALSE, digits = NULL, ...)
-
-\method{to_json}{data.frame}(x, unbox = FALSE, digits = NULL, ...,
-  numeric_dates = TRUE)
-
-\method{to_json}{numeric}(x, unbox = FALSE, digits = NULL, ...)
-
-\method{to_json}{character}(x, unbox = FALSE, ...)
-
-\method{to_json}{integer}(x, unbox = FALSE, ...)
-
-\method{to_json}{logical}(x, unbox = FALSE, ...)
-
-\method{to_json}{complex}(x, unbox = FALSE, ...)
-
-\method{to_json}{matrix}(x, unbox = FALSE, digits = NULL, ...)
-
-\method{to_json}{Date}(x, unbox = FALSE, ..., numeric_dates = TRUE)
-
-\method{to_json}{POSIXct}(x, unbox = FALSE, ..., numeric_dates = TRUE)
-
-\method{to_json}{POSIXlt}(x, unbox = FALSE, ..., numeric_dates = TRUE)
-
-\method{to_json}{list}(x, unbox = FALSE, digits = NULL, ...)
-
-\method{to_json}{default}(x, unbox = FALSE, digits = NULL, ...)
+to_json(x, unbox = FALSE, digits = NULL, numeric_dates = TRUE)
 }
 \arguments{
 \item{x}{object to convert to JSON}
@@ -53,10 +16,8 @@ that is, not contained inside an array.}
 numeric values are coorced using \code{as.integer}, which may round-down the value you supply.
 Default is \code{NULL} - no rounding}
 
-\item{...}{arguments passed to other methods}
-
 \item{numeric_dates}{logical indicating if dates should be treated as numerics. 
-Defaults to TRUE for speed. If FALSE, the dates will be coerced to character}
+Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone}
 }
 \description{
 Converts R objects to JSON
@@ -69,6 +30,14 @@ to_json(data.frame(x = 1:3, y = letters[1:3]))
 to_json(list(x = 1:3, y = list(z = letters[1:3])))
 to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5))
 to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5), numeric_dates = FALSE)
+
+psx <- seq(
+  as.POSIXct("2018-01-01", tz = "Australia/Melbourne"), 
+  as.POSIXct("2018-02-01", tz = "Australia/Melbourne"), 
+  length.out = 5
+  )
+to_json(psx)
+to_json(psx, numeric_dates = FALSE)
 
 ## unbox single-value arrays
 to_json(list(x = 1), unbox = TRUE)

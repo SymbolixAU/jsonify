@@ -1,59 +1,33 @@
-#ifndef R_JSONIFY_MATRIX_H
-#define R_JSONIFY_MATRIX_H
-
-#include <Rcpp.h>
-#include "jsonify/jsonify.hpp"
-
-namespace jsonify {
-namespace matrix {
-
-  inline Rcpp::StringVector to_json( Rcpp::NumericMatrix& nm, bool unbox = false, int digits = -1 ) {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    writer.StartArray();
-    
-    int n = nm.nrow();
-    int i;
-    for ( i = 0; i < n; i++ ) {
-      Rcpp::NumericVector this_row = nm(i, Rcpp::_);
-      writers::write_value( writer, this_row, unbox, digits );
-    }
-    writer.EndArray();
-    return jsonify::utils::finalise_json( sb );
-  }
-
-  inline Rcpp::StringVector to_json( Rcpp::IntegerMatrix& im, bool unbox = false ) {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    writer.StartArray();
-    
-    int n = im.nrow();
-    int i;
-    for ( i = 0; i < n; i++ ) {
-      Rcpp::IntegerVector this_row = im(i, Rcpp::_);
-      writers::write_value( writer, this_row, unbox );
-    }
-    writer.EndArray();
-    return jsonify::utils::finalise_json( sb );
-  }
-
-  inline Rcpp::StringVector to_json( Rcpp::CharacterMatrix& cm, bool unbox = false ) {
-    rapidjson::StringBuffer sb;
-    rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    writer.StartArray();
-    
-    int n = cm.nrow();
-    int i;
-    for ( i = 0; i < n; i++ ) {
-      Rcpp::StringVector this_row = cm(i, Rcpp::_);
-      writers::write_value( writer, this_row, unbox );
-    }
-    writer.EndArray();
-    return jsonify::utils::finalise_json( sb );
-  }
-
-
-} // namespace matrix
-} // namespace jsonify
-
-#endif
+// #ifndef R_JSONIFY_MATRIX_H
+// #define R_JSONIFY_MATRIX_H
+// 
+// #include <Rcpp.h>
+// #include "jsonify/jsonify.hpp"
+// 
+// namespace jsonify {
+// namespace matrix {
+// 
+//   inline Rcpp::StringVector to_json( Rcpp::NumericMatrix& nm, bool unbox = false, int digits = -1 ) {
+//     Rcpp::Rcout << "namespace jsonify::matrix is deprecated. Use jsonify::api instead" << std::endl; 
+//     return jsonify::api::to_json( nm, unbox, digits );
+//   }
+// 
+//   inline Rcpp::StringVector to_json( Rcpp::IntegerMatrix& im, bool unbox = false ) {
+//     Rcpp::Rcout << "namespace jsonify::matrix is deprecated. Use jsonify::api instead" << std::endl;
+//     return jsonify::api::to_json( im, unbox, digits );
+//   }
+// 
+//   inline Rcpp::StringVector to_json( Rcpp::CharacterMatrix& cm, bool unbox = false ) {
+//     Rcpp::Rcout << "namespace jsonify::matrix is deprecated. Use jsonify::api instead" << std::endl;
+//     return jsonify::api::to_json( cm, unbox, digits );
+//   }
+// 
+//   inline Rcpp::StringVector to_json( Rcpp::LogicalMatrix& lm, bool unbox = false ) {
+//     Rcpp::Rcout << "namespace jsonify::matrix is deprecated. Use jsonify::api instead" << std::endl;
+//     return jsonify::api::to_json( lm, unbox, digits );
+//   }
+// 
+// } // namespace matrix
+// } // namespace jsonify
+// 
+// #endif

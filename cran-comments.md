@@ -1,7 +1,8 @@
 ## Cran submission updates
 
-* Updates v0.1.1 to v0.1.2
-* New argument to `to_json` function
+* Updates v0.1.2 to v0.2.0
+* better handling of dates
+* restructured R and c++ APIs
 
 ## R CMD check results
 
