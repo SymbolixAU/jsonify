@@ -1,5 +1,5 @@
 #include "Rcpp.h"
-#include "from_json/from_json.hpp"
+#include "jsonify/from_json/from_json.hpp"
 
 
 // [[Rcpp::export]]

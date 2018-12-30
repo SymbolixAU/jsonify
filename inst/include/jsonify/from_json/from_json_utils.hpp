@@ -6,8 +6,6 @@
 // [[Rcpp::depends(rapidjsonr)]]
 #include "rapidjson/document.h"
 
-using namespace rapidjson;
-
 #define R_NA_VAL Rcpp::LogicalVector::create(NA_LOGICAL);
 
 namespace jsonify {
