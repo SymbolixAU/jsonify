@@ -444,8 +444,9 @@ namespace writers {
         break;
       }
       case LANGSXP: {
-        Rcpp::Pairlist s;
-        write_value( writer, s, unbox, digits, numeric_dates );
+        Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
+        Rcpp::List l = Rcpp::as< Rcpp::List >( s );
+        write_value( writer, l, unbox, digits, numeric_dates );
         break;
       }
       default: {
