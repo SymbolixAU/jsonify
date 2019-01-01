@@ -443,13 +443,54 @@ namespace writers {
         write_value( writer, lv, unbox );
         break;
       }
-      case LANGSXP: {
+      case LISTSXP: {
+        Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
+        Rcpp::List l = Rcpp::as< Rcpp::List >( s );
+        write_value( writer, l, unbox, digits, numeric_dates );
+        break;
+      }  // lists of dotted paires
+      case LANGSXP: {   // language constructs (special lists)
         Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
         Rcpp::List l = Rcpp::as< Rcpp::List >( s );
         write_value( writer, l, unbox, digits, numeric_dates );
         break;
       }
+      case CLOSXP: {   // closures
+        // Rcpp::Rcout << "closxp" << std::endl;
+        // int tp = TYPEOF( list_element );
+        // Rcpp::Rcout << "tp: " << tp << std::endl;
+        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
+        write_value( writer, l, unbox, digits, numeric_dates );
+        break;
+      }
+      case BUILTINSXP: {
+        // Rcpp::Rcout << "builtinsxp" << std::endl;
+        // int tp = TYPEOF( list_element );
+        // Rcpp::Rcout << "tp: " << tp << std::endl;
+        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
+        write_value( writer, l, unbox, digits, numeric_dates );
+        break;
+      }
+      // case SYMSXP: {
+      //   Rcpp::Rcout << "symbol" << std::endl;
+      //   int tp = TYPEOF( list_element );
+      //   Rcpp::Rcout << "tp: " << tp << std::endl;
+      //   Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
+      //   write_value( writer, l, unbox, digits, numeric_dates );
+      //   break;
+      // }
+      case FUNSXP: {
+        // Rcpp::Rcout << "funsxp" << std::endl;
+        // int tp = TYPEOF( list_element );
+        // Rcpp::Rcout << "tp: " << tp << std::endl;
+        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
+        write_value( writer, l, unbox, digits, numeric_dates );
+        break;
+      }
       default: {
+        // Rcpp::Rcout << "default" << std::endl;
+        // int tp = TYPEOF( list_element );
+        // Rcpp::Rcout << "tp: " << tp << std::endl;
         Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( list_element );
         write_value( writer, sv, unbox );
         break;
