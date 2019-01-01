@@ -444,12 +444,14 @@ namespace writers {
         break;
       }
       case LISTSXP: {
+        // Rcpp::Rcout << "listsxp" << std::endl;
         Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
         Rcpp::List l = Rcpp::as< Rcpp::List >( s );
         write_value( writer, l, unbox, digits, numeric_dates );
         break;
       }  // lists of dotted paires
       case LANGSXP: {   // language constructs (special lists)
+        // Rcpp::Rcout << "langsxp" << std::endl;
         Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
         Rcpp::List l = Rcpp::as< Rcpp::List >( s );
         write_value( writer, l, unbox, digits, numeric_dates );
@@ -465,6 +467,22 @@ namespace writers {
       }
       case BUILTINSXP: {
         // Rcpp::Rcout << "builtinsxp" << std::endl;
+        // int tp = TYPEOF( list_element );
+        // Rcpp::Rcout << "tp: " << tp << std::endl;
+        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
+        write_value( writer, l, unbox, digits, numeric_dates );
+        break;
+      }
+      case SPECIALSXP: {
+        // Rcpp::Rcout << "specialsxp" << std::endl;
+        // int tp = TYPEOF( list_element );
+        // Rcpp::Rcout << "tp: " << tp << std::endl;
+        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
+        write_value( writer, l, unbox, digits, numeric_dates );
+        break;
+      }
+      case ENVSXP: {
+        // Rcpp::Rcout << "envsxp" << std::endl;
         // int tp = TYPEOF( list_element );
         // Rcpp::Rcout << "tp: " << tp << std::endl;
         Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );

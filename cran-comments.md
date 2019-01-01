@@ -1,6 +1,7 @@
 ## Cran submission updates
 
 * Updates v0.1.2 to v0.2.0
+* Support for other SEXPTYPE objects
 * better handling of dates
 * restructured R and c++ APIs
 * digits argument to control 'size' of JSON
