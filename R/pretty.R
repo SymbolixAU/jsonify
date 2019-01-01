@@ -4,7 +4,7 @@
 #' Adds indentiation to a JSON string
 #' 
 #' @param json string of JSON
-#' @param ... other argments passed to \link{\code{to_json}}
+#' @param ... other argments passed to \link{to_json}
 #' 
 #' @examples
 #' 
@@ -33,7 +33,7 @@ pretty_json.default <- function( json, ... ) {
 #' Removes indentiation from a JSON string
 #' 
 #' @param json string of JSON
-#' @param ... other argments passed to \link{\code{to_json}}
+#' @param ... other argments passed to \link{to_json}
 #' 
 #' @examples 
 #' 

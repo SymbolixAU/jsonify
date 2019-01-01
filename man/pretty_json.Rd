@@ -9,7 +9,7 @@ pretty_json(json, ...)
 \arguments{
 \item{json}{string of JSON}
 
-\item{...}{other argments passed to \link{\code{to_json}}}
+\item{...}{other argments passed to \link{to_json}}
 }
 \description{
 Adds indentiation to a JSON string
