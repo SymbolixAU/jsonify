@@ -265,9 +265,9 @@ microbenchmark(
 )
 #  Unit: milliseconds
 #       expr       min        lq      mean    median        uq       max
-#   jsonify1  113.9115  118.6428  134.2629  123.3740  144.4385  165.5031
-#   jsonify2  738.8370  744.0664  763.5628  749.2958  775.9256  802.5555
-#   jsonlite 1553.8366 1601.3454 1622.4471 1648.8542 1656.7523 1664.6504
+#   jsonify1  61.01419  61.60092  65.06496  62.18765  67.09035  71.99305
+#   jsonify2 308.45733 312.74926 316.87192 317.04118 321.07921 325.11724
+#   jsonlite 701.39867 713.23648 724.02332 725.07428 735.33564 745.59700
 #   neval
 #       3
 #       3
@@ -329,11 +329,11 @@ strings.
 Yes. And it’s to keep the data more inline with modern concepts and
 design patterns.
 
-If you want factors, use `stringsAsFactors = TRUE` in the `to_json()`
+If you want factors, use `factors_as_string = FALSE` in the `to_json()`
 call
 
 ``` r
-jsonify::to_json( df, stringsAsFactors = TRUE )
+jsonify::to_json( df, factors_as_string = FALSE )
 #  [{"id":1,"val":1},{"id":2,"val":2},{"id":3,"val":3}]
 ```
 
