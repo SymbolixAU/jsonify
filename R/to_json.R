@@ -10,6 +10,7 @@
 #' Default is \code{NULL} - no rounding
 #' @param numeric_dates logical indicating if dates should be treated as numerics. 
 #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone
+#' @param factors_as_strings 
 #' 
 #' @examples 
 #' 
@@ -39,9 +40,9 @@
 #' 
 #' 
 #' @export
-to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE ) {
+to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE, factors_as_strings = FALSE ) {
   digits <- handle_digits( digits )
-  rcpp_to_json( x, unbox, digits, numeric_dates )
+  rcpp_to_json( x, unbox, digits, numeric_dates, factors_as_strings )
 }
 
 handle_digits <- function( digits ) {

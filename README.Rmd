@@ -40,7 +40,7 @@ df <- data.frame(
   , value = sample(letters, size = n, replace = T)
   , val2 = rnorm(n = n)
   , log = sample(c(T,F), size = n, replace = T)
-  , stringsAsFactors = FALSE
+  #, stringsAsFactors = FALSE
 )
 
 microbenchmark(

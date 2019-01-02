@@ -306,7 +306,9 @@ namespace writers {
   // List
   // ---------------------------------------------------------------------------
   template< typename Writer>
-  inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
+  inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, 
+                           int digits = -1, bool numeric_dates = true,
+                           bool factors_as_strings = false) {
     
     size_t i, j;
     
@@ -371,8 +373,8 @@ namespace writers {
             Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
             //Rcpp::Rcout << "iv: " << iv << std::endl;
             //bool isFactor = Rf_isFactor( this_vec );
-            bool stringsAsFactors = false;
-            if( Rf_isFactor( this_vec ) && !stringsAsFactors ) {
+            //bool factors_as_strings = false;
+            if( Rf_isFactor( this_vec ) && factors_as_strings ) {
               //Rcpp::Rcout << "isFactor: " << isFactor << std::endl;
               //Rcpp::IntegerVector this_int_vec = Rcpp::as< Rcpp::IntegerVector >( this_vec );
               Rcpp::CharacterVector lvls = iv.attr("levels");
@@ -437,7 +439,7 @@ namespace writers {
             const char *s = list_names[ i ];
             write_value( writer, s );
           }
-          write_value( writer, recursive_list, unbox, digits, numeric_dates );
+          write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_strings );
         }
         jsonify::utils::writer_ender( writer, has_names );
         break;
