@@ -280,12 +280,12 @@ Yep. Even though I constructed a `data.frame()` without setting `stringsAsFactro
 
 Yes. And it's to keep the data more inline with modern concepts and design patterns.
 
-If you want factors, use `stringsAsFactors = TRUE` in the `to_json()` call
+If you want factors, use `factors_as_string = FALSE` in the `to_json()` call
 
 
 
 ```{r}
-jsonify::to_json( df, stringsAsFactors = TRUE )
+jsonify::to_json( df, factors_as_string = FALSE )
 ```
 
 

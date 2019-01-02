@@ -6,7 +6,7 @@ test_that("data.frame - all R data types are converted", {
   df <- data.frame(id = 1L:2L, stringsAsFactors = F)      ## integer
   expect_equal('[{"id":1},{"id":2}]', as.character(to_json(df)))
   df <- data.frame(id = c("a","b"), stringsAsFactors = T) ## factor
-  expect_equal('[{"id":1},{"id":2}]', as.character(to_json(df)))
+  expect_equal('[{"id":1},{"id":2}]', as.character(to_json(df, factors_as_string = FALSE)))
   df <- data.frame(id = c("a","b"), stringsAsFactors = F) ## character
   expect_equal('[{"id":"a"},{"id":"b"}]', as.character(to_json(df)))
   df <- data.frame(id = c(T,FALSE))                       ## logical

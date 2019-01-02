@@ -1,7 +1,7 @@
 ## v0.2.0
 
 * by column | row option
-* stringsAsFactors argument
+* factors_as_string argument
 * Support for LANGSXP objects
 * Dates are handled in c++, and now supports nested lists
 * c++ API restructured and simplified

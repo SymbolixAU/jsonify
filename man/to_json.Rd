@@ -5,7 +5,7 @@
 \title{To JSON}
 \usage{
 to_json(x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
-  stringsAsFactors = FALSE, by = "row")
+  factors_as_string = TRUE, by = "row")
 }
 \arguments{
 \item{x}{object to convert to JSON}
@@ -20,7 +20,7 @@ Default is \code{NULL} - no rounding}
 \item{numeric_dates}{logical indicating if dates should be treated as numerics. 
 Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone}
 
-\item{stringsAsFactors}{}
+\item{factors_as_string}{}
 
 \item{by}{}
 }

@@ -360,7 +360,7 @@ namespace writers {
   template< typename Writer>
   inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, 
                            int digits = -1, bool numeric_dates = true,
-                           bool stringsAsFactors = false, std::string by = "row") {
+                           bool factors_as_string = true, std::string by = "row") {
     
     size_t i, j;
     
@@ -411,7 +411,7 @@ namespace writers {
           switch( TYPEOF( this_col ) ) {
           case VECSXP: {
             //Rcpp::List lst = Rcpp::as< Rcpp::List >( this_col );
-            write_value( writer, this_col, unbox, digits, numeric_dates, stringsAsFactors, by );
+            write_value( writer, this_col, unbox, digits, numeric_dates, factors_as_string, by );
             break;
           }
           case REALSXP: {
@@ -450,7 +450,7 @@ namespace writers {
             case VECSXP: {
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
               SEXP s = lst[ i ];
-              write_value( writer, s, unbox, digits, numeric_dates, stringsAsFactors, by );
+              write_value( writer, s, unbox, digits, numeric_dates, factors_as_string, by );
               break;
             }
             case REALSXP: {
@@ -460,11 +460,19 @@ namespace writers {
             }
             case INTSXP: {
               Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-              if( !stringsAsFactors && Rf_isFactor( this_vec ) ) {
+              if( factors_as_string && Rf_isFactor( this_vec ) ) {
                 Rcpp::CharacterVector lvls = iv.attr("levels");
-                int this_int = iv[i];
-                const char * this_char = lvls[ this_int -1 ];
-                write_value( writer, this_char );
+                if ( lvls.length() == 0 ) {
+                  // no levls - from NA_character_ vector
+                  
+                  Rcpp::StringVector s(1);
+                  s[0] = NA_STRING;
+                  write_value( writer, s, 0, unbox );
+                } else {
+                  int this_int = iv[i];
+                  const char * this_char = lvls[ this_int -1 ];
+                  write_value( writer, this_char );
+                }
 
               } else {
                 write_value( writer, iv, i, unbox, numeric_dates );
@@ -523,7 +531,7 @@ namespace writers {
             const char *s = list_names[ i ];
             write_value( writer, s );
           }
-          write_value( writer, recursive_list, unbox, digits, numeric_dates, stringsAsFactors, by );
+          write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by );
         }
         jsonify::utils::writer_ender( writer, has_names );
         break;
