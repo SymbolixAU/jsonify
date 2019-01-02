@@ -265,9 +265,9 @@ microbenchmark(
 )
 #  Unit: milliseconds
 #       expr       min        lq      mean    median        uq       max
-#   jsonify1  104.8780  110.8610  123.6041  116.8440  132.9671  149.0903
-#   jsonify2  704.8197  728.4839  751.5097  752.1482  774.8546  797.5611
-#   jsonlite 1628.5961 1686.8710 1723.8135 1745.1460 1771.4222 1797.6984
+#   jsonify1  113.9115  118.6428  134.2629  123.3740  144.4385  165.5031
+#   jsonify2  738.8370  744.0664  763.5628  749.2958  775.9256  802.5555
+#   jsonlite 1553.8366 1601.3454 1622.4471 1648.8542 1656.7523 1664.6504
 #   neval
 #       3
 #       3
@@ -318,24 +318,23 @@ jsonify::to_json( df )
 #  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]
 ```
 
-### Why are there numbers instead of letters?
+### I see factors are converted to strings
 
-Because `factors` are a thing in R. And `jsonify` treats them as
-factors.
+Yep. Even though I constructed a `data.frame()` without setting
+`stringsAsFactros = FALSE`, jsonify automatically treats factors as
+strings.
 
-### Oh yeah, I forget about factors…
+### Has this changed from v0.1?
 
-So do a lot of people, especially when working with `tibbles`, which
-sets `stringsAsFactors = FALSE` by default (the opposite of base R)
+Yes. And it’s to keep the data more inline with modern concepts and
+design patterns.
+
+If you want factors, use `stringsAsFactors = TRUE` in the `to_json()`
+call
 
 ``` r
-df <- data.frame(
-  id = 1:3
-  , val = letters[1:3]
-  , stringsAsFactors = FALSE 
-  )
-jsonify::to_json( df )
-#  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]
+jsonify::to_json( df, stringsAsFactors = TRUE )
+#  [{"id":1,"val":1},{"id":2,"val":2},{"id":3,"val":3}]
 ```
 
 ### How do I install it?
