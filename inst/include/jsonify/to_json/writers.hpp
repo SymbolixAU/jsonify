@@ -369,7 +369,21 @@ namespace writers {
           }
           case INTSXP: {
             Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-            write_value( writer, iv, i, unbox, numeric_dates );
+            //Rcpp::Rcout << "iv: " << iv << std::endl;
+            //bool isFactor = Rf_isFactor( this_vec );
+            bool stringsAsFactors = false;
+            if( Rf_isFactor( this_vec ) && !stringsAsFactors ) {
+              //Rcpp::Rcout << "isFactor: " << isFactor << std::endl;
+              //Rcpp::IntegerVector this_int_vec = Rcpp::as< Rcpp::IntegerVector >( this_vec );
+              Rcpp::CharacterVector lvls = iv.attr("levels");
+              int this_int = iv[i];
+              //Rcpp::Rcout << "this_int: " << this_int << std::endl;
+              const char * this_char = lvls[ this_int -1 ];
+              write_value( writer, this_char );
+              //Rcpp::Rcout << "lvls: " << lvls << std::endl;
+            } else {
+              write_value( writer, iv, i, unbox, numeric_dates );
+            }
             break;
           }
           case LGLSXP: {
