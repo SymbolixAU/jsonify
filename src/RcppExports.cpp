@@ -38,8 +38,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_to_json
-Rcpp::StringVector rcpp_to_json(SEXP lst, bool unbox, int digits, bool numeric_dates, bool factors_as_strings);
-RcppExport SEXP _jsonify_rcpp_to_json(SEXP lstSEXP, SEXP unboxSEXP, SEXP digitsSEXP, SEXP numeric_datesSEXP, SEXP factors_as_stringsSEXP) {
+Rcpp::StringVector rcpp_to_json(SEXP lst, bool unbox, int digits, bool numeric_dates, bool stringsAsFactors, std::string by);
+RcppExport SEXP _jsonify_rcpp_to_json(SEXP lstSEXP, SEXP unboxSEXP, SEXP digitsSEXP, SEXP numeric_datesSEXP, SEXP stringsAsFactorsSEXP, SEXP bySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -47,8 +47,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type unbox(unboxSEXP);
     Rcpp::traits::input_parameter< int >::type digits(digitsSEXP);
     Rcpp::traits::input_parameter< bool >::type numeric_dates(numeric_datesSEXP);
-    Rcpp::traits::input_parameter< bool >::type factors_as_strings(factors_as_stringsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_to_json(lst, unbox, digits, numeric_dates, factors_as_strings));
+    Rcpp::traits::input_parameter< bool >::type stringsAsFactors(stringsAsFactorsSEXP);
+    Rcpp::traits::input_parameter< std::string >::type by(bySEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_to_json(lst, unbox, digits, numeric_dates, stringsAsFactors, by));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -68,7 +69,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
     {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
     {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},
-    {"_jsonify_rcpp_to_json", (DL_FUNC) &_jsonify_rcpp_to_json, 5},
+    {"_jsonify_rcpp_to_json", (DL_FUNC) &_jsonify_rcpp_to_json, 6},
     {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
     {NULL, NULL, 0}
 };

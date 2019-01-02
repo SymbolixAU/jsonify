@@ -5,7 +5,7 @@
 \title{To JSON}
 \usage{
 to_json(x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
-  factors_as_strings = FALSE)
+  stringsAsFactors = FALSE, by = "row")
 }
 \arguments{
 \item{x}{object to convert to JSON}
@@ -20,7 +20,9 @@ Default is \code{NULL} - no rounding}
 \item{numeric_dates}{logical indicating if dates should be treated as numerics. 
 Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone}
 
-\item{factors_as_strings}{}
+\item{stringsAsFactors}{}
+
+\item{by}{}
 }
 \description{
 Converts R objects to JSON

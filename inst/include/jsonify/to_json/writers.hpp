@@ -187,7 +187,8 @@ namespace writers {
    * For writing a single value of a vector
    */
   template< typename Writer >
-  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, size_t row, bool unbox = false, bool numeric_dates = false ) {
+  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, size_t row, 
+                           bool unbox = false, bool numeric_dates = false ) {
     
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
     
@@ -244,60 +245,111 @@ namespace writers {
   // ---------------------------------------------------------------------------
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, bool unbox = false ) {
+  inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, bool unbox = false,
+                           std::string by = "row" ) {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
-    int n = mat.nrow();
+    int n;
     int i;
-    for ( i = 0; i < n; i++ ) {
-      Rcpp::IntegerVector this_row = mat(i, Rcpp::_);
-      write_value( writer, this_row, unbox );
+    
+    // Rcpp::Rcout << "by: " << by << std::endl;
+    
+    
+    if ( by == "row" ) {
+      n = mat.nrow();
+      for ( i = 0; i < n; i++ ) {
+        Rcpp::IntegerVector this_row = mat(i, Rcpp::_);
+        write_value( writer, this_row, unbox );
+      }
+    } else { // by == "column"
+      n = mat.ncol();
+      for( i = 0; i < n; i++ ) {
+        Rcpp::IntegerVector this_col = mat( Rcpp::_, i );
+        write_value( writer, this_col, unbox );
+      }
     }
     jsonify::utils::end_array( writer, will_unbox );
   }
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::NumericMatrix& mat, bool unbox = false, int digits = -1 ) {
+  inline void write_value( Writer& writer, Rcpp::NumericMatrix& mat, bool unbox = false, 
+                           int digits = -1, std::string by = "row" ) {
+    
+    
+    // Rcpp::Rcout << "by: " << by << std::endl;
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
     
-    int n = mat.nrow();
+    int n;
     int i;
-    for ( i = 0; i < n; i++ ) {
-      Rcpp::NumericVector this_row = mat(i, Rcpp::_);
-      write_value( writer, this_row, unbox, digits );
+    if ( by == "row" ) {
+      n = mat.nrow();
+      for ( i = 0; i < n; i++ ) {
+        Rcpp::NumericVector this_row = mat(i, Rcpp::_);
+        write_value( writer, this_row, unbox, digits );
+      }
+    } else { // by == "column"
+      n = mat.ncol();
+      for( i = 0; i < n; i++ ) {
+        Rcpp::NumericVector this_col = mat( Rcpp::_, i );
+        // Rcpp::Rcout << "this_col: " << this_col << std::endl;
+        write_value( writer, this_col, unbox, digits );
+      }
     }
     jsonify::utils::end_array( writer, will_unbox );
   }
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::CharacterMatrix& mat, bool unbox = false ) {
+  inline void write_value( Writer& writer, Rcpp::CharacterMatrix& mat, bool unbox = false,
+                           std::string by = "row" ) {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
-    int n = mat.nrow();
     int i;
-    for ( i = 0; i < n; i++ ) {
-      Rcpp::StringVector this_row = mat(i, Rcpp::_);
-      write_value( writer, this_row, unbox );
+    int n;
+    
+    if( by == "row" ) {
+      n = mat.nrow();
+      for ( i = 0; i < n; i++ ) {
+        Rcpp::StringVector this_row = mat( i, Rcpp::_ );
+        write_value( writer, this_row, unbox );
+      }
+    } else { // by == column
+      n = mat.ncol();
+      for ( i = 0; i < n; i++ ) {
+        Rcpp::StringVector this_col = mat( Rcpp::_, i );
+        write_value( writer, this_col, unbox );
+      }
     }
     jsonify::utils::end_array( writer, will_unbox );
   }
   
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::LogicalMatrix& mat, bool unbox = false ) {
+  inline void write_value( Writer& writer, Rcpp::LogicalMatrix& mat, bool unbox = false, 
+                           std::string by = "row" ) {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
-    
-    int n = mat.nrow();
     int i;
-    for ( i = 0; i < n; i++ ) {
-      Rcpp::LogicalVector this_row = mat(i, Rcpp::_);
-      write_value( writer, this_row, unbox );
+    int n;
+    
+    if( by == "row" ) {
+      n = mat.nrow();
+      
+      for ( i = 0; i < n; i++ ) {
+        Rcpp::LogicalVector this_row = mat(i, Rcpp::_);
+        write_value( writer, this_row, unbox );
+      }
+    } else { // by == "column;
+      n = mat.ncol();
+      
+      for( i = 0; i < n; i++ ) {
+        Rcpp::LogicalVector this_col = mat( Rcpp::_, i );
+        write_value( writer, this_col, unbox);
+      }
     }
     jsonify::utils::end_array( writer, will_unbox );
   }
@@ -308,7 +360,7 @@ namespace writers {
   template< typename Writer>
   inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, 
                            int digits = -1, bool numeric_dates = true,
-                           bool factors_as_strings = false) {
+                           bool stringsAsFactors = false, std::string by = "row") {
     
     size_t i, j;
     
@@ -322,22 +374,22 @@ namespace writers {
       switch( TYPEOF( list_element ) ) {
       case REALSXP: {
         Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( list_element );
-        return write_value( writer, nm, unbox, digits );
+        return write_value( writer, nm, unbox, digits, by );
         break;
       }
       case INTSXP: {
         Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( list_element );
-        return write_value( writer, im, unbox );
+        return write_value( writer, im, unbox, by );
         break;
       }
       case LGLSXP: {
         Rcpp::LogicalMatrix lm = Rcpp::as< Rcpp::LogicalMatrix >( list_element );
-        return write_value( writer, lm, unbox );
+        return write_value( writer, lm, unbox, by );
         break;
       }
       default :{
         Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( list_element );
-        return write_value( writer, sm, unbox );
+        return write_value( writer, sm, unbox, by );
         break;
       }
       }
@@ -349,58 +401,90 @@ namespace writers {
       Rcpp::StringVector column_names = df.names();
       
       writer.StartArray();
-      
-      for( i = 0; i < n_rows; i++ ) {
-        writer.StartObject();
-        for( j = 0; j < n_cols; j++ ) {
-          const char *h = column_names[ j ];
+      if ( by == "column") {
+        
+        for( i = 0; i < n_cols; i++ ) {
+          const char *h = column_names[ i ];
           write_value( writer, h );
-          SEXP this_vec = df[ h ];
+          SEXP this_col = df[ h ];
           
-          switch( TYPEOF( this_vec ) ) {
+          switch( TYPEOF( this_col ) ) {
           case VECSXP: {
-            Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-            SEXP s = lst[ i ];
-            write_value( writer, s, unbox, digits, numeric_dates );
+            //Rcpp::List lst = Rcpp::as< Rcpp::List >( this_col );
+            write_value( writer, this_col, unbox, digits, numeric_dates, stringsAsFactors, by );
             break;
           }
           case REALSXP: {
-            Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-            write_value( writer, nv, i, unbox, digits, numeric_dates );
+            Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_col );
+            write_value( writer, nv, unbox, digits, numeric_dates );
             break;
           }
           case INTSXP: {
-            Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-            //Rcpp::Rcout << "iv: " << iv << std::endl;
-            //bool isFactor = Rf_isFactor( this_vec );
-            //bool factors_as_strings = false;
-            if( Rf_isFactor( this_vec ) && factors_as_strings ) {
-              //Rcpp::Rcout << "isFactor: " << isFactor << std::endl;
-              //Rcpp::IntegerVector this_int_vec = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-              Rcpp::CharacterVector lvls = iv.attr("levels");
-              int this_int = iv[i];
-              //Rcpp::Rcout << "this_int: " << this_int << std::endl;
-              const char * this_char = lvls[ this_int -1 ];
-              write_value( writer, this_char );
-              //Rcpp::Rcout << "lvls: " << lvls << std::endl;
-            } else {
-              write_value( writer, iv, i, unbox, numeric_dates );
-            }
+            Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_col );
+            write_value( writer, iv, unbox, numeric_dates );
             break;
           }
           case LGLSXP: {
-            Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-            write_value( writer, lv, i, unbox );
+            Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_col );
+            write_value( writer, lv, unbox );
             break;
           }
           default: {
-            Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-            write_value( writer, sv, i, unbox );
+            Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_col );
+            write_value( writer, sv, unbox );
             break;
           }
           }
         }
-        writer.EndObject();
+      } else { // by == "row"
+      
+        
+        for( i = 0; i < n_rows; i++ ) {
+          writer.StartObject();
+          for( j = 0; j < n_cols; j++ ) {
+            const char *h = column_names[ j ];
+            write_value( writer, h );
+            SEXP this_vec = df[ h ];
+            
+            switch( TYPEOF( this_vec ) ) {
+            case VECSXP: {
+              Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
+              SEXP s = lst[ i ];
+              write_value( writer, s, unbox, digits, numeric_dates, stringsAsFactors, by );
+              break;
+            }
+            case REALSXP: {
+              Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
+              write_value( writer, nv, i, unbox, digits, numeric_dates );
+              break;
+            }
+            case INTSXP: {
+              Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
+              if( !stringsAsFactors && Rf_isFactor( this_vec ) ) {
+                Rcpp::CharacterVector lvls = iv.attr("levels");
+                int this_int = iv[i];
+                const char * this_char = lvls[ this_int -1 ];
+                write_value( writer, this_char );
+
+              } else {
+                write_value( writer, iv, i, unbox, numeric_dates );
+              }
+              break;
+            }
+            case LGLSXP: {
+              Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
+              write_value( writer, lv, i, unbox );
+              break;
+            }
+            default: {
+              Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
+              write_value( writer, sv, i, unbox );
+              break;
+            }
+            }
+          }
+          writer.EndObject();
+        }
       }
       writer.EndArray();
       
@@ -439,7 +523,7 @@ namespace writers {
             const char *s = list_names[ i ];
             write_value( writer, s );
           }
-          write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_strings );
+          write_value( writer, recursive_list, unbox, digits, numeric_dates, stringsAsFactors, by );
         }
         jsonify::utils::writer_ender( writer, has_names );
         break;

@@ -10,7 +10,8 @@
 #' Default is \code{NULL} - no rounding
 #' @param numeric_dates logical indicating if dates should be treated as numerics. 
 #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone
-#' @param factors_as_strings 
+#' @param stringsAsFactors 
+#' @param by 
 #' 
 #' @examples 
 #' 
@@ -40,9 +41,12 @@
 #' 
 #' 
 #' @export
-to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE, factors_as_strings = FALSE ) {
+to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE, 
+                     stringsAsFactors = FALSE, by = "row" ) {
+  if( "col" %in% by ) by <- "column"
+  by <- match.arg( by, choices = c("row", "column") )
   digits <- handle_digits( digits )
-  rcpp_to_json( x, unbox, digits, numeric_dates, factors_as_strings )
+  rcpp_to_json( x, unbox, digits, numeric_dates, stringsAsFactors, by )
 }
 
 handle_digits <- function( digits ) {
