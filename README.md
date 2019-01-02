@@ -19,14 +19,14 @@ integrating into other packages.
 
 ### Is it fast?
 
-It does alright
+yeah it’s pretty good.
 
 ``` r
 
 library(microbenchmark)
 library(jsonlite)
 
-n <- 5e6
+n <- 1e6
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -46,9 +46,9 @@ microbenchmark(
 )
 
 # Unit: seconds
-#      expr       min        lq      mean    median        uq       max neval
-#  jsonlite 11.243452 13.174676 14.721483 15.105899 16.460498 17.815098     3
-#   jsonify  4.607378  4.696038  5.419219  4.784698  5.825139  6.865581     3
+#      expr      min       lq     mean   median       uq      max neval
+#  jsonlite 4.204652 4.327804 5.367306 4.450957 5.948634 7.446310     3
+#   jsonify 2.437399 3.256403 4.723197 4.075407 5.866097 7.656786     3
 
 n <- 1e4
 x <- list(
@@ -75,10 +75,61 @@ microbenchmark(
 )
  
 # Unit: milliseconds
-#      expr       min        lq      mean    median        uq       max neval
-#  jsonlite 19.226906 19.488125 20.310911 19.768292 21.142979 21.928253     5
-#   jsonify  7.638329  7.715288  7.944044  7.879122  7.924961  8.562521     5
+#      expr      min       lq     mean   median       uq      max neval
+#  jsonlite 34.51573 37.85838 39.06570 39.86556 40.15261 42.93620     5
+#   jsonify 33.27312 35.57159 36.40071 36.80128 37.76846 38.58911     5
    
+```
+
+### I thought you had an example of it being MUCH quicker than `jsonlite` ?
+
+Yeah, but I realised it was comparing two different methods. When
+`jsonify` was parsing nested lists, it was parsing data.frames
+column-wise, whereas jsonlite was row-wise. Which is a slower operation
+
+### Oh right. So it wasn’t a fair test then.
+
+Correct.
+
+Here’s a more suitable comparison
+
+``` r
+n <- 1e4
+x <- list(
+  x = rnorm(n = n)
+  , y = list(x = rnorm(n = n))
+  , z = list( list( x = rnorm(n = n)))
+  , xx = rnorm(n = n)
+  , yy = data.frame(
+      id = 1:n
+      , value = sample(letters, size = n, replace = T)
+      , val2 = rnorm(n = n)
+      , log = sample(c(T,F), size = n, replace = T)
+    )
+)
+
+microbenchmark(
+  jsonlite_row = {
+    js <- jsonlite::toJSON( x )
+  },
+  jsonlite_col = {
+    js <- jsonlite::toJSON( x, dataframe = "columns" )
+  },
+  jsonify_row = {
+    js <- jsonify::to_json( x )
+  },
+  jsonify_col = {
+    js <- jsonify::to_json( x, by = "column" )
+  },
+  times = 5
+)
+
+# Unit: milliseconds
+#          expr      min       lq     mean   median       uq      max neval
+#  jsonlite_row 34.93630 35.17458 41.44464 36.74871 47.34143 53.02217     5
+#  jsonlite_col 24.93064 27.78434 30.88678 28.55122 30.07938 43.08830     5
+#   jsonify_row 33.62929 35.90877 36.78444 36.43218 38.16549 39.78647     5
+#   jsonify_col 12.91980 14.91945 16.20517 17.16689 17.28481 18.73488     5
 ```
 
 ### There’s no `Date` type in JSON, how have you handled this?
@@ -99,6 +150,8 @@ jsonify::to_json( df, numeric_dates = FALSE )
 
 ### And `POSIXct` and `POSIXlt`?
 
+The same
+
 ``` r
 
 jsonify::to_json( as.POSIXct("2018-01-01 10:00:00") )
@@ -107,7 +160,8 @@ jsonify::to_json( as.POSIXct("2018-01-01 10:00:00"), numeric_dates = FALSE)
 #  ["2017-12-31T23:00:00"]
 ```
 
-Note here that **POSIXct** values are returned in UTC timezone.
+However, here the **POSIXct** values are returned in UTC timezone. This
+is by design.
 
 **POSIXlt** will return each component of the date-time
 
@@ -176,8 +230,9 @@ jsonify::pretty_json( js )
 #  }
 ```
 
-And it’s still
-fast
+And it’s still fast because of the design choice to coerce dates to UTC.
+All the date handling is done at the C++ leve, not R. So it’s
+faster.
 
 ``` r
 dtes <- seq(as.Date("2018-01-01"), as.Date("2019-01-01"), length.out = 365)
@@ -210,9 +265,9 @@ microbenchmark(
 )
 #  Unit: milliseconds
 #       expr       min        lq      mean    median        uq       max
-#   jsonify1  130.4760  136.5254  176.1251  142.5748  198.9496  255.3243
-#   jsonify2  678.8992  730.5589  928.0832  782.2186 1052.6752 1323.1318
-#   jsonlite 1849.3437 1897.8639 2028.3890 1946.3841 2117.9116 2289.4391
+#   jsonify1  104.8780  110.8610  123.6041  116.8440  132.9671  149.0903
+#   jsonify2  704.8197  728.4839  751.5097  752.1482  774.8546  797.5611
+#   jsonlite 1628.5961 1686.8710 1723.8135 1745.1460 1771.4222 1797.6984
 #   neval
 #       3
 #       3
@@ -260,7 +315,7 @@ df <- data.frame(
   , val = letters[1:3]
   )
 jsonify::to_json( df )
-#  [{"id":1,"val":1},{"id":2,"val":2},{"id":3,"val":3}]
+#  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]
 ```
 
 ### Why are there numbers instead of letters?

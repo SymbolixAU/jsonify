@@ -13,8 +13,8 @@ rcpp_pretty_print <- function(json) {
     invisible(.Call(`_jsonify_rcpp_pretty_print`, json))
 }
 
-rcpp_to_json <- function(lst, unbox = FALSE, digits = -1L, numeric_dates = TRUE) {
-    .Call(`_jsonify_rcpp_to_json`, lst, unbox, digits, numeric_dates)
+rcpp_to_json <- function(lst, unbox = FALSE, digits = -1L, numeric_dates = TRUE, stringsAsFactors = FALSE, by = "row") {
+    .Call(`_jsonify_rcpp_to_json`, lst, unbox, digits, numeric_dates, stringsAsFactors, by)
 }
 
 rcpp_validate_json <- function(json) {
