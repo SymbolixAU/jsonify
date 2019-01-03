@@ -13,17 +13,3 @@ Rcpp::StringVector rcpp_to_json( SEXP lst, bool unbox = false, int digits = -1,
   return jsonify::api::to_json( lst, unbox, digits, numeric_dates, factors_as_string, by );
 }
 
-// TESTING WARNINGS
-// #include "jsonify/to_json/dataframe.hpp"
-// 
-// // [[Rcpp::export]]
-// Rcpp::StringVector df_to_json( Rcpp::DataFrame df ) {
-//   return jsonify::dataframe::to_json( df, true, -1);
-// }
-// 
-// #include "jsonify/to_json/vectors.hpp"
-// 
-// // [[Rcpp::export]]
-// Rcpp::StringVector vec_to_json( Rcpp::NumericVector v ) {
-//   return jsonify::vectors::to_json( v, true, -1);
-// }
