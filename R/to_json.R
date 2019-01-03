@@ -5,13 +5,13 @@
 #' @param x object to convert to JSON
 #' @param unbox logical indicating if single-value arrays should be 'unboxed', 
 #' that is, not contained inside an array.
-#' @param digits integer specifying the number of decimal places to round numerics. 
-#' numeric values are coorced using \code{as.integer}, which may round-down the value you supply.
+#' @param digits integer specifying the number of decimal places to round numerics.
 #' Default is \code{NULL} - no rounding
 #' @param numeric_dates logical indicating if dates should be treated as numerics. 
 #' Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone
-#' @param factors_as_string 
-#' @param by 
+#' @param factors_as_string logical indicating if factors should be treated as strings. Defaults to TRUE.
+#' @param by either "row" or "column" indicating if data.frames and matrices should be processed
+#' row-wise or column-wise. Defaults to "row"
 #' 
 #' @examples 
 #' 
@@ -36,8 +36,11 @@
 #' 
 #' ## rounding numbers using the digits argument
 #' to_json(1.23456789, digits = 2)
-#' to_json(data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3], 
-#'   stringsAsFactors = FALSE), digits = 0 )
+#' df <- data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3])
+#' to_json(df, digits = 0 )
+#' 
+#' ## keeping factors
+#' to_json(df, digits = 2, factors_as_string = FALSE )
 #' 
 #' 
 #' @export
@@ -50,7 +53,7 @@ to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
 }
 
 handle_digits <- function( digits ) {
-  if( is.null( digits )) return(-1)
+  if( is.null( digits ) ) return(-1)
   return( as.integer( digits ) )
 }
 
