@@ -23,6 +23,7 @@ test_that("data.frame - complex columns are jsonified", {
   df <- data.frame( id = 1, val = I(list(c(0))))
   expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[0.0]}]")
   
+  
   df <- data.frame( id = 1, val = I(list(c(0))))
   expect_equal( as.character( to_json( df, unbox = T ) ), "[{\"id\":1.0,\"val\":0.0}]")
   
