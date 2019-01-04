@@ -350,10 +350,75 @@ namespace writers {
   // ---------------------------------------------------------------------------
   // List
   // ---------------------------------------------------------------------------
-  template< typename Writer>
+  
+  // // When a colunn of a data.frame is a list, and we're parsing by row
+  // template< typename Writer >
+  // inline void write_value( Writer& writer, Rcpp::List lst, size_t row, bool unbox = false, 
+  //   int digits = -1, bool numeric_dates = true, bool factors_as_string = true, 
+  //   std::string by = "row" ) {
+  //     size_t n, i;
+  //     n = lst.size();
+  //     
+  //     for( i = 0; i < n; i++ ) {
+  //       
+  //       SEXP this_vec = lst[ i ];
+  //       
+  //       switch( TYPEOF( this_vec ) ) {
+  //       case VECSXP: {
+  //         Rcpp::Rcout << "writing list" << std::endl;
+  //         Rcpp::List recursive_list = Rcpp::as< Rcpp::List >( this_vec );
+  //         // TODO
+  //         // If it's a recursive list, we no longer use the row?
+  //         write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by );
+  //         break;
+  //       }
+  //       case REALSXP: {
+  //         Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
+  //         write_value( writer, nv, row, unbox, digits, numeric_dates );
+  //         break;
+  //       }
+  //       case INTSXP: {
+  //         Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
+  //         if( factors_as_string && Rf_isFactor( this_vec ) ) {
+  //           Rcpp::CharacterVector lvls = iv.attr("levels");
+  //           if ( lvls.length() == 0 ) {
+  //             // no levls - from NA_character_ vector
+  //             
+  //             Rcpp::StringVector s(1);
+  //             s[0] = NA_STRING;
+  //             write_value( writer, s, 0, unbox );
+  //           } else {
+  //             int this_int = iv[ row ];
+  //             const char * this_char = lvls[ this_int -1 ];
+  //             write_value( writer, this_char );
+  //           }
+  //           
+  //         } else {
+  //           write_value( writer, iv, row, unbox, numeric_dates );
+  //         }
+  //         break;
+  //       }
+  //       case LGLSXP: {
+  //         Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
+  //         write_value( writer, lv, row, unbox );
+  //         break;
+  //       }
+  //       default: {
+  //         Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
+  //         write_value( writer, sv, row, unbox );
+  //         break;
+  //       }
+  //       }
+  //       }
+  //     }
+  
+  template< typename Writer >
   inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, 
                            int digits = -1, bool numeric_dates = true,
-                           bool factors_as_string = true, std::string by = "row") {
+                           bool factors_as_string = true, std::string by = "row", 
+                           int row = -1   // for when we are recursing into a row of a data.frame
+                             )
+    {
     
     size_t i, j;
     
@@ -388,6 +453,8 @@ namespace writers {
       }
     } else if ( Rf_inherits( list_element, "data.frame" ) ) {
 
+      Rcpp::Rcout << "writing data.frame" << std::endl;
+      
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
       size_t n_cols = df.ncol();
       size_t n_rows = df.nrows();
@@ -430,20 +497,40 @@ namespace writers {
           }
         }
       } else { // by == "row"
-      
+        
+        // TODO( if the row is supplied, it's because we're iterating into another data.frame )??
+        // so we don't loop over rows, but instead just extract the row of interest?
         
         for( i = 0; i < n_rows; i++ ) {
           writer.StartObject();
+          
+          Rcpp::Rcout << "row: " << row << std::endl;
+          Rcpp::Rcout << "i: " << i << std::endl;
+        
           for( j = 0; j < n_cols; j++ ) {
+            
             const char *h = column_names[ j ];
             write_value( writer, h );
             SEXP this_vec = df[ h ];
             
             switch( TYPEOF( this_vec ) ) {
             case VECSXP: {
+              Rcpp::Rcout << "writing list" << std::endl;
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-              SEXP s = lst[ i ];
-              write_value( writer, s, unbox, digits, numeric_dates, factors_as_string, by );
+              // need to iterate over lst...
+              // int k = lst.size();
+              // Rcpp::Rcout << "k: " << k << std::endl;
+              // TOOD( we've got a list, but, we only want the ith row of that list )
+              // So we need to have another method which accepts a list, and a ROW value, 
+              // and iterates over the list (cols), and only picks out the ith row
+              
+              write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, i );
+              
+              //write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
+              // for ( int k = 0; k <= lst.size(); k++ ) {
+              //   SEXP s = lst[ k ];
+              //   write_value( writer, s, unbox, digits, numeric_dates, factors_as_string, by );
+              // }
               break;
             }
             case REALSXP: {
@@ -544,41 +631,41 @@ namespace writers {
         write_value( writer, lv, unbox );
         break;
       }
-      case LISTSXP: {
+      case LISTSXP: { // lists of dotted paires
         Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
         Rcpp::List l = Rcpp::as< Rcpp::List >( s );
-        write_value( writer, l, unbox, digits, numeric_dates );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
         break;
-      }  // lists of dotted paires
+      }
       case LANGSXP: {   // language constructs (special lists)
         Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
         Rcpp::List l = Rcpp::as< Rcpp::List >( s );
-        write_value( writer, l, unbox, digits, numeric_dates );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
         break;
       }
       case CLOSXP: {   // closures
         Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
         break;
       }
       case BUILTINSXP: {
         Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
         break;
       }
       case SPECIALSXP: {
         Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
         break;
       }
       case ENVSXP: {
         Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
         break;
       }
       case FUNSXP: {
         Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
         break;
       }
       default: {
