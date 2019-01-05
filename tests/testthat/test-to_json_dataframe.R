@@ -2,37 +2,66 @@ context("dataframes")
 
 test_that("data.frame - all R data types are converted", {
   df <- data.frame(id = 1:2, stringsAsFactors = F)        ## numeric
-  expect_equal('[{"id":1},{"id":2}]', as.character(to_json(df)))
+  js <- to_json( df )
+  expect_true( validate_json( js ) ) 
+  expect_equal('[{"id":1},{"id":2}]', as.character( js ) )
+  
   df <- data.frame(id = 1L:2L, stringsAsFactors = F)      ## integer
-  expect_equal('[{"id":1},{"id":2}]', as.character(to_json(df)))
+  js <- to_json( df )
+  expect_true( validate_json( js ) ) 
+  expect_equal('[{"id":1},{"id":2}]', as.character( js ) ) 
+  
   df <- data.frame(id = c("a","b"), stringsAsFactors = T) ## factor
-  expect_equal('[{"id":1},{"id":2}]', as.character(to_json(df, factors_as_string = FALSE)))
+  js <- to_json( df, factors_as_string = FALSE )
+  expect_true( validate_json( js ) ) 
+  expect_equal('[{"id":1},{"id":2}]', as.character( js ) )
+  
   df <- data.frame(id = c("a","b"), stringsAsFactors = F) ## character
-  expect_equal('[{"id":"a"},{"id":"b"}]', as.character(to_json(df)))
+  js <- to_json( df )
+  expect_true( validate_json( js ) ) 
+  expect_equal('[{"id":"a"},{"id":"b"}]', as.character( js ) )
+  
   df <- data.frame(id = c(T,FALSE))                       ## logical
-  expect_equal('[{"id":true},{"id":false}]', as.character(to_json(df)))
+  js <- to_json( df )
+  expect_true( validate_json( js ) ) 
+  expect_equal('[{"id":true},{"id":false}]', as.character( js ) )
+  
   df <- data.frame(id = as.Date("2018-01-01"))            ## Date
-  expect_equal('[{"id":"2018-01-01"}]', as.character(to_json(df, numeric_dates = FALSE)))
+  js <- to_json( df, numeric_dates = FALSE )
+  expect_true( validate_json( js ) ) 
+  expect_equal('[{"id":"2018-01-01"}]', as.character( js ) )
+  
   df <- data.frame(id = as.POSIXct("2018-01-01 00:00:59", tz = "Australia/Melbourne"))            ## Posixct
-  expect_equal('[{"id":"2017-12-31T13:00:59"}]', as.character(to_json(df, numeric_dates = FALSE)))
+  js <- to_json( df, numeric_dates = FALSE )
+  expect_true( validate_json( js ) ) 
+  expect_equal('[{"id":"2017-12-31T13:00:59"}]', as.character( js ) )
+  
   df <- data.frame(id = as.POSIXlt("2018-01-01 00:00:59", tz = "Australia/Melbourne"))            ## Posixct
-  expect_equal('[{"id":"2017-12-31T13:00:59"}]', as.character(to_json(df, numeric_dates = FALSE)))
+  js <- to_json( df, numeric_dates = FALSE )
+  expect_true( validate_json( js ) ) 
+  expect_equal('[{"id":"2017-12-31T13:00:59"}]', as.character( js ) )
 })
 
 test_that("data.frame - complex columns are jsonified", {
   df <- data.frame( id = 1, val = I(list(c(0))))
-  expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[0.0]}]")
-  
+  js <- to_json( df )
+  expect_equal( as.character( js ), "[{\"id\":1.0,\"val\":[[0.0]]}]")
+  expect_true( jsonify::validate_json( js ) ) 
   
   df <- data.frame( id = 1, val = I(list(c(0))))
-  expect_equal( as.character( to_json( df, unbox = T ) ), "[{\"id\":1.0,\"val\":0.0}]")
+  js <- to_json( df, unbox = TRUE  )
+  expect_equal( as.character( js ), "[{\"id\":1.0,\"val\":[0.0]}]")
+  expect_true( jsonify::validate_json( js ) ) 
   
   df <- data.frame( id = 1, val = I(list(c(0,0))))
-  expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[0.0,0.0]}]")
+  js <- to_json( df )
+  expect_equal( as.character( js ), "[{\"id\":1.0,\"val\":[[0.0,0.0]]}]")
+  expect_true( jsonify::validate_json( js ) ) 
   
   df <- data.frame( id = 1, val = I(list(letters[1:5])))
-  expect_equal( as.character( to_json( df ) ), "[{\"id\":1.0,\"val\":[\"a\",\"b\",\"c\",\"d\",\"e\"]}]")
-  expect_true( jsonify::validate_json( to_json( df ) ) ) 
+  js <- to_json( df )
+  expect_equal( as.character( js ), "[{\"id\":1.0,\"val\":[[\"a\",\"b\",\"c\",\"d\",\"e\"]]}]")
+  expect_true( jsonify::validate_json( js ) ) 
   
   df <- data.frame(
     id = 1:3
@@ -40,12 +69,12 @@ test_that("data.frame - complex columns are jsonified", {
     , letters = c("a","x","B")
     , val = I(list(c(0,0),1,list(c(2,3), myname = c(4,5), c("a"))))
    , stringsAsFactors = F)
-  
+  js <- to_json( df ) 
   expect_equal(
-    as.character( to_json( df ) ) , 
-    "[{\"id\":1,\"norm\":1.1,\"letters\":\"a\",\"val\":[0.0,0.0]},{\"id\":2,\"norm\":2.2,\"letters\":\"x\",\"val\":[1.0]},{\"id\":3,\"norm\":3.3,\"letters\":\"B\",\"val\":{\"1\":[2.0,3.0],\"myname\":[4.0,5.0],\"3\":[\"a\"]}}]"
+    as.character( js ) , 
+    '[{"id":1,"norm":1.1,"letters":"a","val":[[0.0,0.0],[1.0],{"1":[2.0,3.0],"myname":[4.0,5.0],"3":["a"]}]},{"id":2,"norm":2.2,"letters":"x","val":[[0.0,0.0],[1.0],{"1":[2.0,3.0],"myname":[4.0,5.0],"3":["a"]}]},{"id":3,"norm":3.3,"letters":"B","val":[[0.0,0.0],[1.0],{"1":[2.0,3.0],"myname":[4.0,5.0],"3":["a"]}]}]'
   )
-  expect_true(jsonify::validate_json( to_json( df ) ) )
+  expect_true( jsonify::validate_json( js ) ) 
   
   
   df <- data.frame(
@@ -54,12 +83,12 @@ test_that("data.frame - complex columns are jsonified", {
     , letters = c("a","x","B")
     , val = I(list(c(0),1,list(c(2), myname = c(4,5), c("a"))))
     , stringsAsFactors = F)
-  
+  js <- to_json( df, unbox = TRUE )
   expect_equal(
-    as.character( to_json( df, unbox = T ) ) , 
-    "[{\"id\":1,\"norm\":1.1,\"letters\":\"a\",\"val\":0.0},{\"id\":2,\"norm\":2.2,\"letters\":\"x\",\"val\":1.0},{\"id\":3,\"norm\":3.3,\"letters\":\"B\",\"val\":{\"1\":2.0,\"myname\":[4.0,5.0],\"3\":\"a\"}}]"
+    as.character( js ) , 
+    '[{"id":1,"norm":1.1,"letters":"a","val":[0.0,1.0,{"1":2.0,"myname":[4.0,5.0],"3":"a"}]},{"id":2,"norm":2.2,"letters":"x","val":[0.0,1.0,{"1":2.0,"myname":[4.0,5.0],"3":"a"}]},{"id":3,"norm":3.3,"letters":"B","val":[0.0,1.0,{"1":2.0,"myname":[4.0,5.0],"3":"a"}]}]'
   )
-  expect_true(jsonify::validate_json( to_json( df, unbox = T ) ) )
+  expect_true( validate_json( js ) )
 })
 
 test_that("Nulls, NAs and Infs work",{
