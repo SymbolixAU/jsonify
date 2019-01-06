@@ -522,7 +522,7 @@ namespace writers {
         // AND we are in the 'data.frame' section, so we know (?) the row value will work
         if ( row >= 0 ) {
           
-          Rcpp::Rcout << "row specified " << std::endl;
+          // Rcpp::Rcout << "row specified " << std::endl;
           // Rcpp::Rcout << "row: " << row << std::endl;
           
           for( df_col = 0; df_col < n_cols; df_col++ ) {
@@ -535,7 +535,7 @@ namespace writers {
             
             switch( TYPEOF( this_vec ) ) {
             case VECSXP: {
-              Rcpp::Rcout << "writing list" << std::endl;
+              //Rcpp::Rcout << "writing list" << std::endl;
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
               // need to iterate over lst...
               // int k = lst.size();
@@ -544,8 +544,9 @@ namespace writers {
               // So we need to have another method which accepts a list, and a ROW value, 
               // and iterates over the list (cols), and only picks out the ith row
               
-              write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row );
+              //Rcpp::Rcout << "row: " << row << std::endl;
               
+              write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row );
               //write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
               // for ( int k = 0; k <= lst.size(); k++ ) {
               //   SEXP s = lst[ k ];
@@ -595,7 +596,7 @@ namespace writers {
           
         } else {
           
-          Rcpp::Rcout << "row not specified" << std::endl;
+          // Rcpp::Rcout << "row not specified" << std::endl;
           writer.StartArray();
         
           for( df_row = 0; df_row < n_rows; df_row++ ) {
@@ -620,9 +621,13 @@ namespace writers {
                 // So we need to have another method which accepts a list, and a ROW value, 
                 // and iterates over the list (cols), and only picks out the ith row
                 
-                Rcpp::Rcout << "df_row: " << df_row << std::endl;
-                write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, df_row );
-                
+                // Rcpp::Rcout << "df_row: " << df_row << std::endl;
+                //if( row >= 0 ) {
+                //  Rcpp::List lst_interior = lst[ row ];
+                //  write_value( writer, lst_interior, unbox, digits, numeric_dates, factors_as_string, by );
+                //} else {
+                  write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, df_row );
+                //}
                 //write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
                 // for ( int k = 0; k <= lst.size(); k++ ) {
                 //   SEXP s = lst[ k ];
@@ -681,7 +686,17 @@ namespace writers {
       switch( TYPEOF( list_element ) ) {
       
       case VECSXP: {
+        // Rcpp::Rcout << "list elelment is another list " << std::endl;
+        // TODO( handle the case where the list item is a row of a data.frame)
+        
         Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
+
+        // Rcpp::List lst;
+        // if( row >= 0 ) {
+        //   lst = temp_lst[ row ];
+        // } else {
+        //   lst = temp_lst;
+        // }
         size_t n = lst.size();
         
         if ( n == 0 ) {
@@ -717,20 +732,13 @@ namespace writers {
           //Rcpp::Rcout << "recursive list " << std::endl;
           write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by );
         }
-        jsonify::utils::writer_ender( writer, has_names );
-        break;
+      jsonify::utils::writer_ender( writer, has_names );
+      break;
       }
         
       case REALSXP: {
-        // Rcpp::Rcout << "REALSXP" << std::endl;
-        // Rcpp::Rcout << "row: " << row << std::endl;
         Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
-        // if ( row >= 0 ) {
-        //    write_value( writer, nv, row, unbox, digits, numeric_dates );
-        // } else {
-          write_value( writer, nv, unbox, digits, numeric_dates );
-        // }
-
+        write_value( writer, nv, unbox, digits, numeric_dates );
         break;
       }
       case INTSXP: { 
