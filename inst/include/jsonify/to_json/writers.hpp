@@ -688,15 +688,17 @@ namespace writers {
       case VECSXP: {
         // Rcpp::Rcout << "list elelment is another list " << std::endl;
         // TODO( handle the case where the list item is a row of a data.frame)
+        // ISSUE #32
         
-        Rcpp::List lst = Rcpp::as< Rcpp::List >( list_element );
+        Rcpp::List temp_lst = Rcpp::as< Rcpp::List >( list_element );
 
-        // Rcpp::List lst;
-        // if( row >= 0 ) {
-        //   lst = temp_lst[ row ];
-        // } else {
-        //   lst = temp_lst;
-        // }
+        Rcpp::List lst;
+        if( row >= 0 ) {   // we came in from a data.frame, going by-row
+          lst = temp_lst[ row ];
+          //unbox = true;
+        } else {
+          lst = temp_lst;
+        }
         size_t n = lst.size();
         
         if ( n == 0 ) {
