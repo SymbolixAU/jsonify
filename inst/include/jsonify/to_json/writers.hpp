@@ -691,10 +691,26 @@ namespace writers {
         // ISSUE #32
         
         Rcpp::List temp_lst = Rcpp::as< Rcpp::List >( list_element );
+        bool has_names;
+        
+        has_names = temp_lst.hasAttribute("names");
 
         Rcpp::List lst;
         if( row >= 0 ) {   // we came in from a data.frame, going by-row
           lst = temp_lst[ row ];
+          //
+          // If we're working 'by row' on a list, we need to attach the list names
+          // to each 'row' in the vector
+          
+          // if (has_names ) {
+          //   Rcpp::Rcout << "has names: " << has_names << std::endl;
+          //   Rcpp::CharacterVector temp_list_names = temp_lst.names();
+          //   Rcpp::Rcout << temp_list_names << std::endl;
+          //   lst.names() = temp_list_names[ row ];
+          // }
+          
+          //Rcpp::StringVector nmes = lst.names();
+          //Rcpp::Rcout << nmes << std::endl;
           //unbox = true;
         } else {
           lst = temp_lst;
@@ -710,7 +726,9 @@ namespace writers {
         // LIST NAMES
         Rcpp::IntegerVector int_names = Rcpp::seq(1, lst.size());
         Rcpp::CharacterVector list_names = Rcpp::as< Rcpp::CharacterVector >( int_names );
-        bool has_names = Rf_isNull(lst.names()) ? false : true;
+        //bool has_names = Rf_isNull(lst.names()) ? false : true;
+        has_names = lst.hasAttribute("names");
+        
         
         if ( has_names ) {
           Rcpp::CharacterVector temp_names = lst.names();
