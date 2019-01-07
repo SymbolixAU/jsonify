@@ -296,7 +296,23 @@ namespace complex {
         if( row >= 0 ) {   // we came in from a data.frame, going by-row
           // if operating 'by row' on a list, we need to convert the lsit elements in the
           // row to a vector, but some how maintain the 'list-iness' of it. 
-          lst = temp_lst[ row ];
+          lst[0] = temp_lst[ row ];
+          
+          // Rcpp::Rcout << "lst.size() " << lst.size() << std::endl;
+          // Rcpp::Rcout << "TYPEOF( lst ) " << TYPEOF( lst ) << std::endl;
+          
+          if( temp_lst.hasAttribute("names") ) {
+            Rcpp::CharacterVector templstnames = temp_lst.names();
+            // Rcpp::Rcout << "temp_lst.names() " <<  templstnames << std::endl;
+            const char* this_name = templstnames[ row ];
+            lst.names() = this_name;
+            //lst.names() = templstnames[ row ];
+          }
+          
+          if( lst.hasAttribute("names") ) {
+            Rcpp::CharacterVector lstnames = lst.names();
+            // Rcpp::Rcout << "lst.names() " << lstnames << std::endl;
+          }
           
           write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );  
           // Rcpp::Rcout << "lst.size: " << lst.size() << std::endl;
