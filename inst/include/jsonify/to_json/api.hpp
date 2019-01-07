@@ -3,7 +3,7 @@
 
 #include <Rcpp.h>
 #include "jsonify/to_json/utils.hpp"
-#include "jsonify/to_json/writers.hpp"
+#include "jsonify/to_json/writers/complex.hpp"
 
 using namespace rapidjson;
 
@@ -15,7 +15,7 @@ namespace api {
                                        std::string by = "row") {
         rapidjson::StringBuffer sb;
         rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-        jsonify::writers::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
+        jsonify::writers::complex::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
         return jsonify::utils::finalise_json( sb );
     }
 
