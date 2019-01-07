@@ -47,8 +47,8 @@ microbenchmark(
 
 # Unit: seconds
 #      expr      min       lq     mean   median       uq      max neval
-#  jsonlite 4.204652 4.327804 5.367306 4.450957 5.948634 7.446310     3
-#   jsonify 2.437399 3.256403 4.723197 4.075407 5.866097 7.656786     3
+#  jsonlite 2.017081 2.063732 2.540350 2.110383 2.801984 3.493585     3
+#   jsonify 1.186239 1.202719 1.514067 1.219198 1.677981 2.136763     3
 
 n <- 1e4
 x <- list(
@@ -76,8 +76,8 @@ microbenchmark(
  
 # Unit: milliseconds
 #      expr      min       lq     mean   median       uq      max neval
-#  jsonlite 34.51573 37.85838 39.06570 39.86556 40.15261 42.93620     5
-#   jsonify 33.27312 35.57159 36.40071 36.80128 37.76846 38.58911     5
+#  jsonlite 18.52028 18.82241 19.32112 18.99683 19.18103 21.08508     5
+#   jsonify 17.72060 18.19092 19.58308 19.52457 21.14687 21.33241     5
    
 ```
 
@@ -125,11 +125,11 @@ microbenchmark(
 )
 
 # Unit: milliseconds
-#          expr      min       lq     mean   median       uq      max neval
-#  jsonlite_row 34.93630 35.17458 41.44464 36.74871 47.34143 53.02217     5
-#  jsonlite_col 24.93064 27.78434 30.88678 28.55122 30.07938 43.08830     5
-#   jsonify_row 33.62929 35.90877 36.78444 36.43218 38.16549 39.78647     5
-#   jsonify_col 12.91980 14.91945 16.20517 17.16689 17.28481 18.73488     5
+#          expr       min        lq      mean    median        uq       max neval
+#  jsonlite_row 20.533642 20.717894 27.294220 21.122860 21.426250 52.670456     5
+#  jsonlite_col 13.691643 13.812459 15.683795 14.293177 15.655705 20.965993     5
+#   jsonify_row 17.506507 17.951948 20.929641 19.827791 21.161389 28.200572     5
+#   jsonify_col  7.262305  7.382238  7.409085  7.434759  7.435476  7.530645     5
 ```
 
 ### There’s no `Date` type in JSON, how have you handled this?
@@ -264,10 +264,10 @@ microbenchmark(
   times = 3
 )
 #  Unit: milliseconds
-#       expr       min       lq      mean    median        uq      max neval
-#   jsonify1  55.68364  57.4662  62.25306  59.24876  65.53778  71.8268     3
-#   jsonify2 305.26440 307.0950 308.18880 308.92558 309.65099 310.3764     3
-#   jsonlite 665.03588 676.6636 700.38709 688.29131 718.06270 747.8341     3
+#       expr       min        lq     mean    median        uq       max neval
+#   jsonify1  57.61869  60.75988  63.8870  63.90106  67.02115  70.14124     3
+#   jsonify2 308.03909 314.36571 317.2089 320.69232 321.79381 322.89529     3
+#   jsonlite 692.80273 698.84349 714.4054 704.88426 725.20679 745.52933     3
 ```
 
 ### That output looks nice, is that `pretty_json()` function new?
