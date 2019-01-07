@@ -297,7 +297,7 @@ namespace complex {
           // if operating 'by row' on a list, we need to convert the lsit elements in the
           // row to a vector, but some how maintain the 'list-iness' of it. 
           lst = temp_lst[ row ];
-
+          
           write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );  
           // Rcpp::Rcout << "lst.size: " << lst.size() << std::endl;
           // Rcpp::CharacterVector temp_list_names;
@@ -318,6 +318,7 @@ namespace complex {
           // // so, we need to loop through each lst element, and call write_values
           // // but, as we've already accessed the correct 'row' from temp_list[ row ]
           // // can we just 'write_values as per usual?
+          // // we still need to keep track of the list names (row value, though)
           // 
           // int t = TYPEOF( lst[0] );
           // Rcpp::Rcout << "list element types: " << t << std::endl;
@@ -400,7 +401,7 @@ namespace complex {
           
           if ( has_names ) {
             Rcpp::CharacterVector temp_names = lst.names();
-            Rcpp::Rcout << "temp_names: " << temp_names << std::endl;
+            //Rcpp::Rcout << "temp_names: " << temp_names << std::endl;
             for( i = 0; i < n; i++ ) {
               list_names[i] = temp_names[i] == "" ? list_names[i] : temp_names[i];
             }
