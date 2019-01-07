@@ -69,7 +69,7 @@ test_that("data.frame - complex columns are jsonified", {
     , letters = c("a","x","B")
     , val = I(list(c(0,0),1,list(c(2,3), myname = c(4,5), c("a"))))
    , stringsAsFactors = F)
-  js <- to_json( df ) 
+  df <- to_json( df ) 
   expect_equal(
     as.character( js ) , 
     '[{"id":1,"norm":1.1,"letters":"a","val":[[0.0,0.0],[1.0],{"1":[2.0,3.0],"myname":[4.0,5.0],"3":["a"]}]},{"id":2,"norm":2.2,"letters":"x","val":[[0.0,0.0],[1.0],{"1":[2.0,3.0],"myname":[4.0,5.0],"3":["a"]}]},{"id":3,"norm":3.3,"letters":"B","val":[[0.0,0.0],[1.0],{"1":[2.0,3.0],"myname":[4.0,5.0],"3":["a"]}]}]'
