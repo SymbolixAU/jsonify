@@ -522,7 +522,7 @@ namespace from_json {
     int doc_len = doc.Size();
     Rcpp::List out(doc_len);
     
-    bool df_out = true;
+    bool return_df = true;
     names_map.clear();
     
     for(int i = 0; i < doc_len; ++i) {
@@ -533,21 +533,21 @@ namespace from_json {
       // bool - false
       case 1: {
         out[i] = doc[i].GetBool();
-        df_out = false;
+        return_df = false;
         break;
       }
         
       // bool - true
       case 2: {
         out[i] = doc[i].GetBool();
-        df_out = false;
+        return_df = false;
         break;
       }
         
       // string
       case 5: {
         out[i] = doc[i].GetString();
-        df_out = false;
+        return_df = false;
         break;
       }
         
@@ -560,14 +560,14 @@ namespace from_json {
           // int
           out[i] = doc[i].GetInt();
         }
-        df_out = false;
+        return_df = false;
         break;
       }
       
       // null
       case 0: {
         out[i] = R_NA_VAL;
-        df_out = false;
+        return_df = false;
         break;
       }
         
@@ -575,7 +575,7 @@ namespace from_json {
       case 4: {
         rapidjson::Value::Array curr_array = doc[i].GetArray();
         out[i] = parse_array<rapidjson::Value::Array>(curr_array);
-        df_out = false;
+        return_df = false;
         break;
       }
         
@@ -597,24 +597,24 @@ namespace from_json {
           break;
         }
         
-        // If simplifyDataFrame and df_out are both true, compare the data 
+        // If simplifyDataFrame and return_df are both true, compare the data 
         // types of each named element of doc[i] with the elements in 
         // names_map. If the names do not align, or the data types of the 
-        // names do not align, set df_out to false.
-        if(simplifyDataFrame && df_out) {
+        // names do not align, set return_df to false.
+        if(simplifyDataFrame && return_df) {
           if(pv_list.size() != pv_len) {
-            df_out = false;
+            return_df = false;
             break;
           }
           names = pv_list.attr("names");
           for(unsigned int n = 0; n < names.size(); ++n) {
             temp_name = Rcpp::as<std::string>(names[n]);
             if(names_map.count(temp_name) == 0) {
-              df_out = false;
+              return_df = false;
               break;
             }
             if(names_map[temp_name] != TYPEOF(pv_list[n])) {
-              df_out = false;
+              return_df = false;
               break;
             }
           }
@@ -630,9 +630,9 @@ namespace from_json {
       }
     }
     
-    // If simplifyDataFrame and df_out are both true, convert List "out" to a 
-    // dataframe, with the names of "out" making up the df col headers.
-    if(simplifyDataFrame && df_out) {
+    // If simplifyDataFrame and return_df are both true, convert List "out" to 
+    // a dataframe, with the names of "out" making up the df col headers.
+    if(simplifyDataFrame && return_df) {
       Rcpp::List df_out = Rcpp::List(pv_len);
       for(int i = 0; i < pv_len; ++i) {
         temp_name = names[i];
