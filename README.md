@@ -264,14 +264,10 @@ microbenchmark(
   times = 3
 )
 #  Unit: milliseconds
-#       expr       min        lq      mean    median        uq       max
-#   jsonify1  136.0230  142.6240  159.1319  149.2250  170.6864  192.1478
-#   jsonify2  910.7382  912.7783  970.9419  914.8184 1001.0437 1087.2691
-#   jsonlite 1758.9345 1951.1584 2027.1144 2143.3824 2161.2044 2179.0264
-#   neval
-#       3
-#       3
-#       3
+#       expr       min       lq      mean    median        uq      max neval
+#   jsonify1  55.68364  57.4662  62.25306  59.24876  65.53778  71.8268     3
+#   jsonify2 305.26440 307.0950 308.18880 308.92558 309.65099 310.3764     3
+#   jsonlite 665.03588 676.6636 700.38709 688.29131 718.06270 747.8341     3
 ```
 
 ### That output looks nice, is that `pretty_json()` function new?
