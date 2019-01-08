@@ -158,9 +158,10 @@ namespace simple {
     }
   }
   
-  template <typename Writer>
+  template < typename Writer >
   inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, bool unbox = false, 
-                           bool numeric_dates = true ) {
+                           bool numeric_dates = true,
+                           bool factors_as_string = true ) {
     
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
 
@@ -174,6 +175,16 @@ namespace simple {
       Rcpp::StringVector sv = jsonify::dates::posixct_to_string( iv );
       write_value( writer, sv, unbox );
       
+    } else if ( factors_as_string && Rf_isFactor( iv ) ) {
+      Rcpp::CharacterVector lvls = iv.attr( "levels" );
+      if (lvls.length() == 0 ) {
+        // no level s- from NA_character_ vector
+        Rcpp::StringVector s(1);
+        s[0] = NA_STRING;
+        write_value( writer, s, 0, unbox );
+      } else {
+        write_value( writer, lvls, unbox );
+      }
     } else {
     
       int n = iv.size();
@@ -196,7 +207,7 @@ namespace simple {
    */
   template< typename Writer >
   inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, size_t row, 
-                           bool unbox = false, bool numeric_dates = false ) {
+                           bool unbox = false, bool numeric_dates = false) {
     
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
     
