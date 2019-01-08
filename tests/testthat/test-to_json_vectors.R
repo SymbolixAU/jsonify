@@ -15,6 +15,10 @@ test_that("different vector types work", {
   expect_equal(as.character(to_json(complex(1))),"[\"0+0i\"]")
   expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = F)), '{"x":[\"2018-01-01\"]}')
   expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = T)), '{"x":[17532.0]}')
+  
+  expect_equal(as.character(to_json( as.factor(letters[1:5]))), '["a","b","c","d","e"]')
+  expect_equal(as.character(to_json( as.factor(letters[1:5]), factors_as_string = FALSE )),'[1,2,3,4,5]')
+  
 })
 
 test_that("NAs, NULLS and Infs work", {
@@ -60,8 +64,13 @@ test_that("round trips with jsonlite work", {
   expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
 })
 
-## TODO( test list of all mixed types, inc Date, POSIXct and POSIXlt)
+test_that("some randome thoughts I had work", {
 
-# lst <- list(x = as.Date("2018-01-01"), y = list(as.POSIXct("2018-01-01 10:00:00")), z = NA)
-# as.character(to_json( lst, numeric_dates = F, unbox = T ))
+  lst <- list(x = as.Date("2018-01-01"), y = list(as.POSIXct("2018-01-01 10:00:00")), z = NA)
+  js <- to_json( lst, numeric_dates = FALSE, unbox = TRUE )
+  expect_true( validate_json( js ) ) 
+  expect_equal( as.character(js), '{"x":"2018-01-01","y":["2017-12-31T23:00:00"],"z":null}')
+  
+})
+
 

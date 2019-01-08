@@ -3,9 +3,13 @@
 
 #include <Rcpp.h>
 
+#include "jsonify/to_json/writers/simple.hpp"
+#include "jsonify/to_json/writers/complex.hpp"
 #include "jsonify/to_json/writers.hpp"
 
 using namespace rapidjson;
+
+// TODO( remove this once spatialwidget v0.2 is on CRAN)
 
 namespace jsonify {
 namespace dataframe {
@@ -20,7 +24,7 @@ namespace dataframe {
     case VECSXP: {
       Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
       SEXP s = lst[ row ];
-      jsonify::writers::write_value( writer, s, unbox, digits );
+      jsonify::writers::simple::write_value( writer, s, unbox, digits );
       break;
     }
     case REALSXP: {
@@ -29,7 +33,7 @@ namespace dataframe {
         writer.Null();
       } else {
         double n = nv[ row ];
-        jsonify::writers::write_value( writer, n, digits );
+        jsonify::writers::simple::write_value( writer, n, digits );
       }
       break;
     }
@@ -39,7 +43,7 @@ namespace dataframe {
         writer.Null();
       } else {
         int i = iv[ row ];
-        jsonify::writers::write_value( writer, i );
+        jsonify::writers::simple::write_value( writer, i );
       }
       break;
     }
@@ -49,7 +53,7 @@ namespace dataframe {
         writer.Null();
       } else {
         bool l = lv[ row ];
-        jsonify::writers::write_value( writer, l );
+        jsonify::writers::simple::write_value( writer, l );
       }
       break;
     }
@@ -59,7 +63,7 @@ namespace dataframe {
         writer.Null();
       } else {
         const char *s = sv[ row ];
-        jsonify::writers::write_value( writer, s );
+        jsonify::writers::simple::write_value( writer, s );
       }
       break;
     }
@@ -77,7 +81,7 @@ namespace dataframe {
     //SEXP s = df;
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::write_value( writer, df, unbox, digits );
+    jsonify::writers::complex::write_value( writer, df, unbox, digits );
     return jsonify::utils::finalise_json( sb );
   }
 
