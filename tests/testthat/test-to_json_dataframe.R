@@ -104,6 +104,15 @@ test_that("data.frame - complex columns are jsonified", {
   expect_true( validate_json( js ) )
 })
 
+test_that("column factors return levels and characters", {
+  
+  df <- data.frame( id = 1:5, val = letters[1:5] )
+  js <- to_json( df, by = "column", factors_as_string = FALSE )
+  expect_equal( as.character( js ), '{"id":[1,2,3,4,5],"val":[1,2,3,4,5]}')
+  expect_true( validate_json( js ) )
+  
+})
+
 test_that("Nulls, NAs and Infs work",{
   expect_equal(as.character(to_json(data.frame(x = NA))), "[{\"x\":null}]" )
   expect_equal(as.character(to_json(data.frame(x = NA_character_))), "[{\"x\":null}]"  )

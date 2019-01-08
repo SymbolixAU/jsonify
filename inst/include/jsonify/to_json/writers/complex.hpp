@@ -5,6 +5,7 @@
 #include "jsonify/to_json/utils.hpp"
 #include "jsonify/to_json/dates/dates.hpp"
 #include "jsonify/to_json/writers/simple.hpp"
+#include "jsonify/to_json/vectors.hpp"
 #include <math.h>
 
 using namespace rapidjson;
@@ -20,23 +21,15 @@ namespace complex {
                            int row = -1   // for when we are recursing into a row of a data.frame
   )
   {
-    
-    // Rcpp::Rcout << "entered function" << std::endl;
-    // Rcpp::Rcout << "with row: " << row << std::endl;
-    
-    size_t i, j;
-    
-    size_t df_col, df_row;
+    size_t i, df_col, df_row;
     
     if( Rf_isNull( list_element ) ) {
-      // Rcpp::Rcout << "empty" << std::endl;
       writer.StartObject();
       writer.EndObject();
       return;
     } 
     
     if( Rf_isMatrix( list_element ) ) {
-      // Rcpp::Rcout << "matrix" << std::endl;
       
       switch( TYPEOF( list_element ) ) {
       case REALSXP: {
@@ -62,8 +55,6 @@ namespace complex {
       }
     } else if ( Rf_inherits( list_element, "data.frame" ) ) {
       
-      // Rcpp::Rcout << "writing data.frame" << std::endl;
-      
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
       size_t n_cols = df.ncol();
       size_t n_rows = df.nrows();
@@ -72,41 +63,21 @@ namespace complex {
       //writer.StartArray();
       
       if ( by == "column") {
-        // Rcpp::Rcout << "column" << std::endl;
         writer.StartObject();
         
         for( df_col = 0; df_col < n_cols; df_col++ ) {
-          
-          
+
           const char *h = column_names[ df_col ];
           jsonify::writers::simple::write_value( writer, h );
-          SEXP this_col = df[ h ];
+          SEXP this_vec = df[ h ];
           
-          switch( TYPEOF( this_col ) ) {
+          switch( TYPEOF( this_vec ) ) {
           case VECSXP: {
-            //Rcpp::List lst = Rcpp::as< Rcpp::List >( this_col );
-            write_value( writer, this_col, unbox, digits, numeric_dates, factors_as_string, by );
-            break;
-          }
-          case REALSXP: {
-            Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_col );
-            jsonify::writers::simple::write_value( writer, nv, unbox, digits, numeric_dates );
-            break;
-          }
-          case INTSXP: {
-            Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_col );
-            jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates );
-            break;
-          }
-          case LGLSXP: {
-            Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_col );
-            jsonify::writers::simple::write_value( writer, lv, unbox );
+            write_value( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, by );
             break;
           }
           default: {
-            Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_col );
-            jsonify::writers::simple::write_value( writer, sv, unbox );
-            break;
+            jsonify::vectors::switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string );
           }
           }
         }
@@ -114,13 +85,7 @@ namespace complex {
         
       } else { // by == "row"
         
-        // TODO( if the row is supplied, it's because we're iterating into another data.frame )??
-        // so we don't loop over rows, but instead just extract the row of interest?
-        // AND we are in the 'data.frame' section, so we know (?) the row value will work
         if ( row >= 0 ) {
-          
-          // Rcpp::Rcout << "row specified " << std::endl;
-          // Rcpp::Rcout << "row: " << row << std::endl;
           
           for( df_col = 0; df_col < n_cols; df_col++ ) {
             
@@ -132,74 +97,23 @@ namespace complex {
             
             switch( TYPEOF( this_vec ) ) {
             case VECSXP: {
-              //Rcpp::Rcout << "writing list" << std::endl;
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-              // need to iterate over lst...
-              // int k = lst.size();
-              // Rcpp::Rcout << "k: " << k << std::endl;
-              // TOOD( we've got a list, but, we only want the ith row of that list )
-              // So we need to have another method which accepts a list, and a ROW value, 
-              // and iterates over the list (cols), and only picks out the ith row
-              
-              //Rcpp::Rcout << "row: " << row << std::endl;
-              
               write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row );
-              //write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
-              // for ( int k = 0; k <= lst.size(); k++ ) {
-              //   SEXP s = lst[ k ];
-              //   write_value( writer, s, unbox, digits, numeric_dates, factors_as_string, by );
-              // }
-              break;
-            }
-            case REALSXP: {
-              Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-              jsonify::writers::simple::write_value( writer, nv, row, unbox, digits, numeric_dates );
-              break;
-            }
-            case INTSXP: {
-              Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-              if( factors_as_string && Rf_isFactor( this_vec ) ) {
-                Rcpp::CharacterVector lvls = iv.attr("levels");
-                if ( lvls.length() == 0 ) {
-                  // no levls - from NA_character_ vector
-                  
-                  Rcpp::StringVector s(1);
-                  s[0] = NA_STRING;
-                  jsonify::writers::simple::write_value( writer, s, 0, unbox );
-                } else {
-                  int this_int = iv[ row ];
-                  const char * this_char = lvls[ this_int -1 ];
-                  jsonify::writers::simple::write_value( writer, this_char );
-                }
-                
-              } else {
-                jsonify::writers::simple::write_value( writer, iv, row, unbox, numeric_dates );
-              }
-              break;
-            }
-            case LGLSXP: {
-              Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-              jsonify::writers::simple::write_value( writer, lv, row, unbox );
               break;
             }
             default: {
-              Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-              jsonify::writers::simple::write_value( writer, sv, row, unbox );
-              break;
+              jsonify::vectors::switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, row );
             }
-            } // end swithc
+            } // end switch
             writer.EndObject();
           } // end for
           
         } else {
           
-          // Rcpp::Rcout << "row not specified" << std::endl;
           writer.StartArray();
           
           for( df_row = 0; df_row < n_rows; df_row++ ) {
             writer.StartObject();
-            
-            // Rcpp::Rcout << "df_row: " << df_row << std::endl;
             
             for( df_col = 0; df_col < n_cols; df_col++ ) {
               
@@ -209,64 +123,12 @@ namespace complex {
               
               switch( TYPEOF( this_vec ) ) {
               case VECSXP: {
-                // Rcpp::Rcout << "writing list" << std::endl;
                 Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-                // need to iterate over lst...
-                // int k = lst.size();
-                // Rcpp::Rcout << "k: " << k << std::endl;
-                // TOOD( we've got a list, but, we only want the ith row of that list )
-                // So we need to have another method which accepts a list, and a ROW value, 
-                // and iterates over the list (cols), and only picks out the ith row
-                
-                // Rcpp::Rcout << "df_row: " << df_row << std::endl;
-                //if( row >= 0 ) {
-                //  Rcpp::List lst_interior = lst[ row ];
-                //  write_value( writer, lst_interior, unbox, digits, numeric_dates, factors_as_string, by );
-                //} else {
                 write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, df_row );
-                //}
-                //write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
-                // for ( int k = 0; k <= lst.size(); k++ ) {
-                //   SEXP s = lst[ k ];
-                //   write_value( writer, s, unbox, digits, numeric_dates, factors_as_string, by );
-                // }
-                break;
-              }
-              case REALSXP: {
-                Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-                jsonify::writers::simple::write_value( writer, nv, df_row, unbox, digits, numeric_dates );
-                break;
-              }
-              case INTSXP: {
-                Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-                if( factors_as_string && Rf_isFactor( this_vec ) ) {
-                  Rcpp::CharacterVector lvls = iv.attr("levels");
-                  if ( lvls.length() == 0 ) {
-                    // no levls - from NA_character_ vector
-                    
-                    Rcpp::StringVector s(1);
-                    s[0] = NA_STRING;
-                    jsonify::writers::simple::write_value( writer, s, 0, unbox );
-                  } else {
-                    int this_int = iv[ df_row ];
-                    const char * this_char = lvls[ this_int -1 ];
-                    jsonify::writers::simple::write_value( writer, this_char );
-                  }
-                  
-                } else {
-                  jsonify::writers::simple::write_value( writer, iv, df_row, unbox, numeric_dates );
-                }
-                break;
-              }
-              case LGLSXP: {
-                Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-                jsonify::writers::simple::write_value( writer, lv, df_row, unbox );
                 break;
               }
               default: {
-                Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-                jsonify::writers::simple::write_value( writer, sv, df_row, unbox );
-                break;
+                jsonify::vectors::switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, df_row );
               }
               }
             }
@@ -279,7 +141,6 @@ namespace complex {
       
     } else {
       
-      // Rcpp::Rcout << "list element " << std::endl;
       switch( TYPEOF( list_element ) ) {
       
       case VECSXP: {
@@ -294,112 +155,20 @@ namespace complex {
         
         Rcpp::List lst(1);
         if( row >= 0 ) {   // we came in from a data.frame, going by-row
-          // if operating 'by row' on a list, we need to convert the lsit elements in the
-          // row to a vector, but some how maintain the 'list-iness' of it. 
+          // ISSUE 32
           lst[0] = temp_lst[ row ];
-          
-          // Rcpp::Rcout << "lst.size() " << lst.size() << std::endl;
-          // Rcpp::Rcout << "TYPEOF( lst ) " << TYPEOF( lst ) << std::endl;
           
           if( temp_lst.hasAttribute("names") ) {
             Rcpp::CharacterVector templstnames = temp_lst.names();
-            // Rcpp::Rcout << "temp_lst.names() " <<  templstnames << std::endl;
             const char* this_name = templstnames[ row ];
             lst.names() = this_name;
-            //lst.names() = templstnames[ row ];
           }
-          
-          if( lst.hasAttribute("names") ) {
-            Rcpp::CharacterVector lstnames = lst.names();
-            // Rcpp::Rcout << "lst.names() " << lstnames << std::endl;
-          }
-          
+
           write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );  
-          // Rcpp::Rcout << "lst.size: " << lst.size() << std::endl;
-          // Rcpp::CharacterVector temp_list_names;
-          // 
-          // if (has_names ) {
-          //   Rcpp::Rcout << "has names: " << has_names << std::endl;
-          //   temp_list_names = temp_lst.names();
-          //   Rcpp::Rcout << temp_list_names << std::endl;
-          //   //std::string t = temp_list_names[ row ];
-          //   //lst.names() = temp_list_names[ row ];
-          //   //lst.names() = "test";
-          //   Rcpp::Rcout << "assigned names " << std::endl;
-          // }
-          // 
-          // // TODO( rather than access lst[0], we need to recurse into the list again )
-          // // because it might be a list of lists of lists of lists...
-          // // but keeping the 'row' structure
-          // // so, we need to loop through each lst element, and call write_values
-          // // but, as we've already accessed the correct 'row' from temp_list[ row ]
-          // // can we just 'write_values as per usual?
-          // // we still need to keep track of the list names (row value, though)
-          // 
-          // int t = TYPEOF( lst[0] );
-          // Rcpp::Rcout << "list element types: " << t << std::endl;
-          // 
-          // switch( TYPEOF( lst[0] ) ) { // in a data.frame, by-row, all liste elements will be the same type?
-          // case INTSXP: {
-          //   Rcpp::Rcout << "creating integer vector" << std::endl;
-          //   Rcpp::Rcout << "lst.size() " << lst.size() << std::endl;
-          //   Rcpp::IntegerVector iv( lst.size() );
-          //   // TODO( if it's a recursive list... )
-          //   Rcpp::List innerList = lst[0];
-          //   Rcpp::Rcout << "innerlist size: " << innerList.size() << std::endl;
-          //   for( i = 0; i < lst.size(); i++ ) {
-          //     iv[i] = lst[i];
-          //   }
-          //   Rcpp::Rcout << iv << std::endl;
-          //   Rcpp::List lst_iv(1);
-          //   lst_iv[0] = iv;
-          //   Rcpp::Rcout << "temp_list_names " << std::endl;
-          //   Rcpp::Rcout << "row: " << row << std::endl;
-          //   if( has_names ) {
-          //     const char* this_name = temp_list_names[ row ];
-          //     lst_iv.names() = this_name;
-          //   }
-          //   write_value( writer, lst_iv, unbox, digits, numeric_dates, factors_as_string, by );
-          //   break;
-          // }
-          // case REALSXP: {
-          //   Rcpp::NumericVector nv( lst.size() );
-          //   for( i = 0; i < lst.size(); i++ ) {
-          //     nv[i] = lst[i];
-          //   }
-          //   //lst[0] = nv;
-          //   Rcpp::List lst_nv(1);
-          //   lst_nv[0] = nv;
-          //   if( has_names ) {
-          //     const char* this_name = temp_list_names[ row ];
-          //     lst_nv.names() = this_name;
-          //   }
-          //   write_value( writer, lst_nv, unbox, digits, numeric_dates, factors_as_string, by );
-          //   break;
-          // }
-          // default: {
-          //   Rcpp::StringVector sv( lst.size() );
-          //   for( i = 0; i < lst.size(); i++ ) {
-          //     std::string s = lst[i];
-          //     sv[i] = s;
-          //   }
-          //   Rcpp::List lst_sv(1);
-          //   lst_sv[0] = sv;
-          //   if( has_names ) {
-          //     const char* this_name = temp_list_names[ row ];
-          //     lst_sv.names() = this_name;
-          //   }
-          //   write_value( writer, lst_sv, unbox, digits, numeric_dates, factors_as_string, by );
-          //   break;
-          // }
-          // }
           
-          //Rcpp::StringVector nmes = lst.names();
-          //Rcpp::Rcout << nmes << std::endl;
-          //unbox = true;
         } else {
           lst = temp_lst;
-        //}
+
           size_t n = lst.size();
           
           if ( n == 0 ) {
@@ -417,7 +186,6 @@ namespace complex {
           
           if ( has_names ) {
             Rcpp::CharacterVector temp_names = lst.names();
-            //Rcpp::Rcout << "temp_names: " << temp_names << std::endl;
             for( i = 0; i < n; i++ ) {
               list_names[i] = temp_names[i] == "" ? list_names[i] : temp_names[i];
             }
@@ -428,14 +196,11 @@ namespace complex {
           
           for ( i = 0; i < n; i++ ) {
             
-            // Rcpp::Rcout << "list loop i - " << i << ", n: " << n << std::endl;
-            
             SEXP recursive_list = lst[ i ];
             if ( has_names ) {
               const char *s = list_names[ i ];
               jsonify::writers::simple::write_value( writer, s );
             }
-            //Rcpp::Rcout << "recursive list " << std::endl;
             write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by );
           }
         jsonify::utils::writer_ender( writer, has_names );

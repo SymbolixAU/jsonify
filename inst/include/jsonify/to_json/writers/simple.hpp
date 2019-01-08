@@ -52,7 +52,7 @@ namespace simple {
   }
   
   template< typename Writer> 
-  inline void write_value( Writer& writer, bool& value, int digits = -1 ) {
+  inline void write_value( Writer& writer, bool& value ) {
     writer.Bool( value );
   }
   
@@ -79,7 +79,8 @@ namespace simple {
    * for writing a single value of a vector
    */
   template <typename Writer >
-  inline void write_value( Writer& writer, Rcpp::StringVector& sv, size_t row, bool unbox = false ) {
+  inline void write_value( Writer& writer, Rcpp::StringVector& sv, size_t row, 
+                           bool unbox = false ) {
     if ( Rcpp::StringVector::is_na( sv[ row ] ) ) {
       writer.Null();
     } else {
@@ -89,7 +90,9 @@ namespace simple {
   }
   
   template< typename Writer>
-  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, 
+                           bool unbox = false, int digits = -1,
+                           bool numeric_dates = true ) {
 
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv );
     
@@ -127,7 +130,9 @@ namespace simple {
    * For writing a single value of a vector
    */
   template< typename Writer >
-  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, size_t row, bool unbox = false, int digits = -1, bool numeric_dates = true ) {
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, 
+                           size_t row, bool unbox = false, int digits = -1, 
+                           bool numeric_dates = true ) {
 
     // Rcpp::Rcout << "writing nv with row: " << row << std::endl;
     
@@ -154,7 +159,8 @@ namespace simple {
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, bool unbox = false, bool numeric_dates = true ) {
+  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, bool unbox = false, 
+                           bool numeric_dates = true ) {
     
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
 
@@ -242,6 +248,66 @@ namespace simple {
     }
   }
   
+  /*
+   * template for R SEXPs for single-row from a vector
+   */
+  template < typename Writer, typename T >
+  inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox = false, 
+                           int digits = -1, bool numeric_dates = true ) {
+    //bool factors_as_string = false; 
+    
+    // Rcpp::Rcout << "writing SEXP vector with a row" << std::endl;
+    
+    //Rcpp::Rcout << "TYPEOF( SEXP ) " << TYPEOF( sexp ) << std::endl;
+    
+    switch( TYPEOF( sexp ) ) {
+    case REALSXP: {
+      // Rcpp::Rcout << "it's a REALSXP" << std::endl;
+      Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( sexp );
+      write_value( writer, nv, row, unbox, digits, numeric_dates );
+      break;
+    }
+    case INTSXP: {
+      // Rcpp::Rcout << "it's an INTSXP " << std::endl;
+      Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
+      write_value( writer, iv, row, unbox, numeric_dates );
+      break;
+    }
+    case LGLSXP: {
+      Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( sexp );
+      write_value( writer, lv, row, unbox );
+      break;
+    }
+    case STRSXP: {
+      Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( sexp );
+      write_value( writer, sv, row, unbox );
+      break;
+    }
+    default: {
+      Rcpp::stop("Unknown R object type");
+    }
+    }
+    //write_value( writer, sexp, row, unbox, numeric_dates );
+  }
+  
+  /*
+   * template for C++ single object types
+   */
+  template < typename Writer, typename T >
+  inline void write_value( Writer& writer, T& val, int digits = -1 ) {
+    switch( TYPEOF( val ) ) {
+    case REALSXP: {
+      write_value( writer, val, digits );
+      break;
+    }
+    default: {
+      write_value( writer, val );
+      break;
+    }
+    }
+  }
+  
+
   // ---------------------------------------------------------------------------
   // matrix values
   // ---------------------------------------------------------------------------
