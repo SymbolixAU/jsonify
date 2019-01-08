@@ -60,7 +60,7 @@ namespace vectors {
           jsonify::writers::simple::write_value( writer, lvls, unbox );
         }
       } else {
-        jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates );
+        jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates, factors_as_string );
       }
       break;
     }
@@ -81,7 +81,7 @@ namespace vectors {
   template < typename Writer >
   inline void switch_vector( Writer& writer, SEXP this_vec, bool unbox, 
                              int digits, bool numeric_dates, 
-                             bool factors_as_string, int row) {
+                             bool factors_as_string, size_t row) {
     
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {

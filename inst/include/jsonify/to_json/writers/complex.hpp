@@ -215,7 +215,7 @@ namespace complex {
       }
       case INTSXP: { 
         Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
-        jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates );
+        jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates, factors_as_string );
         break;
       }
       case LGLSXP: {
