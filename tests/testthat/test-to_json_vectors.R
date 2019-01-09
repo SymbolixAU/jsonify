@@ -66,10 +66,10 @@ test_that("round trips with jsonlite work", {
 
 test_that("some randome thoughts I had work", {
 
-  lst <- list(x = as.Date("2018-01-01"), y = list(as.POSIXct("2018-01-01 10:00:00")), z = NA)
+  lst <- list(x = as.Date("2018-01-01"), y = list(as.POSIXct("2018-01-01 10:00:00", tz = "UTC")), z = NA)
   js <- to_json( lst, numeric_dates = FALSE, unbox = TRUE )
   expect_true( validate_json( js ) ) 
-  expect_equal( as.character(js), '{"x":"2018-01-01","y":["2017-12-31T23:00:00"],"z":null}')
+  expect_equal( as.character(js), '{"x":"2018-01-01","y":["2018-01-01T10:00:00"],"z":null}')
   
 })
 
