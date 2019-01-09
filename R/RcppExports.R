@@ -13,8 +13,8 @@ rcpp_pretty_print <- function(json) {
     invisible(.Call(`_jsonify_rcpp_pretty_print`, json))
 }
 
-test <- function() {
-    invisible(.Call(`_jsonify_test`))
+source_tests <- function() {
+    invisible(.Call(`_jsonify_source_tests`))
 }
 
 rcpp_to_json <- function(lst, unbox = FALSE, digits = -1L, numeric_dates = TRUE, factors_as_string = TRUE, by = "row") {

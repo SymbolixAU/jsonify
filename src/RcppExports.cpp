@@ -37,12 +37,12 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// test
-void test();
-RcppExport SEXP _jsonify_test() {
+// source_tests
+void source_tests();
+RcppExport SEXP _jsonify_source_tests() {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    test();
+    source_tests();
     return R_NilValue;
 END_RCPP
 }
@@ -78,7 +78,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
     {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
     {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},
-    {"_jsonify_test", (DL_FUNC) &_jsonify_test, 0},
+    {"_jsonify_source_tests", (DL_FUNC) &_jsonify_source_tests, 0},
     {"_jsonify_rcpp_to_json", (DL_FUNC) &_jsonify_rcpp_to_json, 6},
     {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
     {NULL, NULL, 0}
