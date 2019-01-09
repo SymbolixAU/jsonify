@@ -37,6 +37,15 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// test
+void test();
+RcppExport SEXP _jsonify_test() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    test();
+    return R_NilValue;
+END_RCPP
+}
 // rcpp_to_json
 Rcpp::StringVector rcpp_to_json(SEXP lst, bool unbox, int digits, bool numeric_dates, bool factors_as_string, std::string by);
 RcppExport SEXP _jsonify_rcpp_to_json(SEXP lstSEXP, SEXP unboxSEXP, SEXP digitsSEXP, SEXP numeric_datesSEXP, SEXP factors_as_stringSEXP, SEXP bySEXP) {
@@ -69,6 +78,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
     {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
     {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},
+    {"_jsonify_test", (DL_FUNC) &_jsonify_test, 0},
     {"_jsonify_rcpp_to_json", (DL_FUNC) &_jsonify_rcpp_to_json, 6},
     {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
     {NULL, NULL, 0}

@@ -3,7 +3,6 @@
 
 #include <Rcpp.h>
 #include <boost/date_time.hpp>
-#include "jsonify/to_json/utils.hpp"
 
 // [[Rcpp::depends(BH)]]
 

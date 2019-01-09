@@ -17,7 +17,7 @@ namespace dataframe {
   // keeping these dataframe_cell functions so they can be called directly by other libraries
   //, e.g., geojsonsf
   template <typename Writer>
-  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row,
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, int& row,
                               bool unbox, int digits, bool numeric_dates = true, 
                               bool factors_as_string = true ) {
 
@@ -75,7 +75,7 @@ namespace dataframe {
 
   // overload for when you dont' specify 'unbox'
   template <typename Writer>
-  inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row ) {
+  inline void dataframe_cell( Writer& writer, SEXP& this_vec, int& row ) {
     dataframe_cell( writer, this_vec, row, false, -1 );
   }
 

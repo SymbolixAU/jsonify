@@ -33,7 +33,8 @@ namespace complex {
           
           Rcpp::StringVector s(1);
           s[0] = NA_STRING;
-          jsonify::writers::simple::write_value( writer, s, 0, unbox );
+          int ele = 0;
+          jsonify::writers::simple::write_value( writer, s, ele );
         } else {
           jsonify::writers::simple::write_value( writer, lvls, unbox );
         }
@@ -59,15 +60,21 @@ namespace complex {
   template < typename Writer >
   inline void switch_vector( Writer& writer, SEXP this_vec, bool unbox, 
                              int digits, bool numeric_dates, 
-                             bool factors_as_string, size_t row) {
+                             bool factors_as_string, int row) {
     
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
+      // Rcpp::Rcout << "switch to num vector " << std::endl;
+      // Rcpp::Rcout << "row: " << row << std::endl;
+      // Rcpp::Rcout << "unbox: " << unbox << std::endl;
+      // Rcpp::Rcout << "digits: " << digits << std::endl;
+      // Rcpp::Rcout << "numeric dates: " << numeric_dates << std::endl;
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-      jsonify::writers::simple::write_value( writer, nv, row, unbox, digits, numeric_dates );
+      jsonify::writers::simple::write_value( writer, nv, row, digits, numeric_dates );
       break;
     }
     case INTSXP: {
+      // Rcpp::Rcout << "switch to int vector " << std::endl;
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
       if( factors_as_string && Rf_isFactor( this_vec ) ) {
         Rcpp::CharacterVector lvls = iv.attr("levels");
@@ -76,7 +83,8 @@ namespace complex {
           
           Rcpp::StringVector s(1);
           s[0] = NA_STRING;
-          jsonify::writers::simple::write_value( writer, s, 0, unbox );
+          int ele = 0;
+          jsonify::writers::simple::write_value( writer, s, ele );
         } else {
           int this_int = iv[ row ];
           const char * this_char = lvls[ this_int -1 ];
@@ -85,18 +93,18 @@ namespace complex {
         }
         
       } else {
-        jsonify::writers::simple::write_value( writer, iv, row, unbox, numeric_dates, factors_as_string );
+        jsonify::writers::simple::write_value( writer, iv, row, numeric_dates, factors_as_string );
       }
       break;
     }
     case LGLSXP: {
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-      jsonify::writers::simple::write_value( writer, lv, row, unbox );
+      jsonify::writers::simple::write_value( writer, lv, row );
       break;
     }
     default: {
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-      jsonify::writers::simple::write_value( writer, sv, row, unbox );
+      jsonify::writers::simple::write_value( writer, sv, row );
       break;
     }
     }
@@ -107,9 +115,9 @@ namespace complex {
                            int digits = -1, bool numeric_dates = true,
                            bool factors_as_string = true, std::string by = "row", 
                            int row = -1   // for when we are recursing into a row of a data.frame
-  )
-  {
-    size_t i, df_col, df_row;
+                             ) {
+    
+    int i, df_col, df_row;
     
     if( Rf_isNull( list_element ) ) {
       writer.StartObject();
@@ -144,8 +152,8 @@ namespace complex {
     } else if ( Rf_inherits( list_element, "data.frame" ) ) {
       
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
-      size_t n_cols = df.ncol();
-      size_t n_rows = df.nrows();
+      int n_cols = df.ncol();
+      int n_rows = df.nrows();
       Rcpp::StringVector column_names = df.names();
       
       //writer.StartArray();
@@ -181,7 +189,6 @@ namespace complex {
             writer.StartObject();
             
             const char *h = column_names[ df_col ];
-            //jsonify::writers::simple::write_value( writer, h );
             writer.String( h );
             SEXP this_vec = df[ h ];
             
@@ -219,6 +226,7 @@ namespace complex {
                 break;
               }
               default: {
+                // Rcpp::Rcout << "default dates : " << numeric_dates << std::endl;
                 switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, df_row );
               }
               }
@@ -260,7 +268,7 @@ namespace complex {
         } else {
           lst = temp_lst;
 
-          size_t n = lst.size();
+          int n = lst.size();
           
           if ( n == 0 ) {
             writer.StartArray();
@@ -271,9 +279,7 @@ namespace complex {
           // LIST NAMES
           Rcpp::IntegerVector int_names = Rcpp::seq(1, lst.size());
           Rcpp::CharacterVector list_names = Rcpp::as< Rcpp::CharacterVector >( int_names );
-          //bool has_names = Rf_isNull(lst.names()) ? false : true;
           has_names = lst.hasAttribute("names");
-          
           
           if ( has_names ) {
             Rcpp::CharacterVector temp_names = lst.names();
@@ -315,38 +321,17 @@ namespace complex {
         jsonify::writers::simple::write_value( writer, lv, unbox );
         break;
       }
-      case LISTSXP: { // lists of dotted paires
-        Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
-        Rcpp::List l = Rcpp::as< Rcpp::List >( s );
-        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
-        break;
-      }
+      case LISTSXP: {} // lists of dotted paires
       case LANGSXP: {   // language constructs (special lists)
         Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
         Rcpp::List l = Rcpp::as< Rcpp::List >( s );
         write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
         break;
       }
-      case CLOSXP: {   // closures
-        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
-        break;
-      }
-      case BUILTINSXP: {
-        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
-        break;
-      }
-      case SPECIALSXP: {
-        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
-        break;
-      }
-      case ENVSXP: {
-        Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
-        break;
-      }
+      case CLOSXP: {}   // closures
+      case BUILTINSXP: {}
+      case SPECIALSXP: {}
+      case ENVSXP: {}
       case FUNSXP: {
         Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
         write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );

@@ -17,6 +17,7 @@ namespace simple {
   // ---------------------------------------------------------------------------
   template <typename Writer>
   inline void write_value( Writer& writer, Rcpp::StringVector& sv, bool unbox ) {
+
     int n = sv.size();
     bool will_unbox = jsonify::utils::should_unbox( n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
@@ -35,7 +36,8 @@ namespace simple {
    * for writing a single value of a vector
    */
   template <typename Writer >
-  inline void write_value( Writer& writer, Rcpp::StringVector& sv, size_t row, bool unbox ) {
+  inline void write_value( Writer& writer, Rcpp::StringVector& sv, int row ) {
+    
     if ( Rcpp::StringVector::is_na( sv[ row ] ) ) {
       writer.Null();
     } else {
@@ -48,6 +50,8 @@ namespace simple {
   inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox, 
                            int digits, bool numeric_dates ) {
 
+    // Rcpp::Rcout << "unbox function" << std::endl;
+    
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv );
     
     if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
@@ -83,9 +87,9 @@ namespace simple {
    */
   template< typename Writer >
   inline void write_value( Writer& writer, Rcpp::NumericVector& nv, 
-                           size_t row, bool unbox, int digits, 
-                           bool numeric_dates ) {
+                           int row, int digits, bool numeric_dates ) {
 
+    // Rcpp::Rcout << "row fucntion " << std::endl;
     // Rcpp::Rcout << "writing nv with row: " << row << std::endl;
     
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv );
@@ -93,12 +97,12 @@ namespace simple {
     if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
 
       Rcpp::StringVector sv = jsonify::dates::date_to_string( nv );
-      write_value( writer, sv, row, unbox );
+      write_value( writer, sv, row );
       
     } else if ( !numeric_dates && jsonify::dates::is_in( "POSIXt", cls ) ) {
       
       Rcpp::StringVector sv = jsonify::dates::posixct_to_string( nv );
-      write_value( writer, sv, row, unbox );
+      write_value( writer, sv, row );
       
     } else {
       if ( Rcpp::NumericVector::is_na( nv[ row ] ) ) {
@@ -134,7 +138,8 @@ namespace simple {
         // no level s- from NA_character_ vector
         Rcpp::StringVector s(1);
         s[0] = NA_STRING;
-        write_value( writer, s, 0, unbox );
+        int ele = 0;
+        write_value( writer, s, ele );
       } else {
         write_value( writer, lvls, unbox );
       }
@@ -161,8 +166,8 @@ namespace simple {
    * For writing a single value of a vector
    */
   template< typename Writer >
-  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, size_t row, 
-                           bool unbox, bool numeric_dates, bool factors_as_string ) {
+  inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, int row, 
+                           bool numeric_dates, bool factors_as_string ) {
     
     // Rcpp::Rcout << "int vector" << std::endl;
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
@@ -171,11 +176,11 @@ namespace simple {
     if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
       
       Rcpp::StringVector sv = jsonify::dates::date_to_string( iv );
-      write_value( writer, sv, row, unbox );
+      write_value( writer, sv, row );
     } else if ( !numeric_dates && jsonify::dates::is_in( "POSIXt", cls ) ) {
       
       Rcpp::StringVector sv = jsonify::dates::posixct_to_string( iv );
-      write_value( writer, sv, row, unbox );
+      write_value( writer, sv, row );
       
     } else if ( factors_as_string && Rf_isFactor( iv ) ) {
       
@@ -184,11 +189,12 @@ namespace simple {
         // no level s- from NA_character_ vector
         Rcpp::StringVector s(1);
         s[0] = NA_STRING;
-        write_value( writer, s, 0, unbox );
+        int ele = 0;
+        write_value( writer, s, ele );
       } else {
         // Rcpp::Rcout << "writing lvls: " << lvls << std::endl;
         // Rcpp::Rcout << "row: " << row << std::endl;
-        write_value( writer, lvls, row, unbox );
+        write_value( writer, lvls, row );
       }
       
     } else {
@@ -221,7 +227,7 @@ namespace simple {
   }
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, size_t row, bool unbox ) {
+  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, int row ) {
     if ( Rcpp::LogicalVector::is_na( lv[ row ] ) ) { 
       writer.Null();
     } else {
@@ -295,33 +301,33 @@ namespace simple {
    * template for R SEXPs for single-row from a vector
    */
   template < typename Writer >
-  inline void write_value( Writer& writer, SEXP sexp, size_t row, bool unbox,
+  inline void write_value( Writer& writer, SEXP sexp, int row, 
                            int digits, bool numeric_dates, bool factors_as_string) {
 
-    // Rcpp::Rcout << "writing value: factors_as_string: " << factors_as_string << std::endl;
+    //Rcpp::Rcout << "writing value: factors_as_string: " << factors_as_string << std::endl;
     
     // Rcpp::Rcout << "writing value from vector" << std::endl;
 
     switch( TYPEOF( sexp ) ) {
     case REALSXP: {
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( sexp );
-      write_value( writer, nv, row, unbox, digits, numeric_dates );
+      write_value( writer, nv, row, digits, numeric_dates );
       break;
     }
     case INTSXP: {
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
       // TODO( do we need factors_as_string here, or will it be sorted by the time it comes to this step?)
-      write_value( writer, iv, row, unbox, numeric_dates, factors_as_string );
+      write_value( writer, iv, row, numeric_dates, factors_as_string );
       break;
     }
     case LGLSXP: {
       Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( sexp );
-      write_value( writer, lv, row, unbox );
+      write_value( writer, lv, row );
       break;
     }
     case STRSXP: {
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( sexp );
-      write_value( writer, sv, row, unbox );
+      write_value( writer, sv, row );
       break;
     }
     default: {
