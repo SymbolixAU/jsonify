@@ -1,4 +1,7 @@
 
+#' @export
+print.json <- function( x, ... ) cat( x )
+
 #' Pretty Json
 #' 
 #' Adds indentiation to a JSON string
