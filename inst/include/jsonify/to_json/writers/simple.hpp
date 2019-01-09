@@ -128,6 +128,7 @@ namespace simple {
       write_value( writer, sv, unbox );
       
     } else if ( factors_as_string && Rf_isFactor( iv ) ) {
+      
       Rcpp::CharacterVector lvls = iv.attr( "levels" );
       if (lvls.length() == 0 ) {
         // no level s- from NA_character_ vector
@@ -137,6 +138,7 @@ namespace simple {
       } else {
         write_value( writer, lvls, unbox );
       }
+      
     } else {
     
       int n = iv.size();
@@ -160,8 +162,9 @@ namespace simple {
    */
   template< typename Writer >
   inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, size_t row, 
-                           bool unbox, bool numeric_dates ) {
+                           bool unbox, bool numeric_dates, bool factors_as_string ) {
     
+    // Rcpp::Rcout << "int vector" << std::endl;
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
     
     
@@ -174,8 +177,23 @@ namespace simple {
       Rcpp::StringVector sv = jsonify::dates::posixct_to_string( iv );
       write_value( writer, sv, row, unbox );
       
+    } else if ( factors_as_string && Rf_isFactor( iv ) ) {
+      
+      Rcpp::StringVector lvls = iv.attr( "levels" );
+      if (lvls.length() == 0 ) {
+        // no level s- from NA_character_ vector
+        Rcpp::StringVector s(1);
+        s[0] = NA_STRING;
+        write_value( writer, s, 0, unbox );
+      } else {
+        // Rcpp::Rcout << "writing lvls: " << lvls << std::endl;
+        // Rcpp::Rcout << "row: " << row << std::endl;
+        write_value( writer, lvls, row, unbox );
+      }
+      
     } else {
     
+      // Rcpp::Rcout << "standard iv " << std::endl;
       if ( Rcpp::IntegerVector::is_na( iv[ row ] ) ) {
         writer.Null();
       } else {
@@ -293,7 +311,7 @@ namespace simple {
     case INTSXP: {
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
       // TODO( do we need factors_as_string here, or will it be sorted by the time it comes to this step?)
-      write_value( writer, iv, row, unbox, numeric_dates );
+      write_value( writer, iv, row, unbox, numeric_dates, factors_as_string );
       break;
     }
     case LGLSXP: {

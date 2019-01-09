@@ -1,6 +1,7 @@
 context("dataframes")
 
 test_that("data.frame - all R data types are converted", {
+  
   df <- data.frame(id = 1:2, stringsAsFactors = F)        ## numeric
   js <- to_json( df )
   expect_true( validate_json( js ) ) 

@@ -85,7 +85,7 @@ namespace complex {
         }
         
       } else {
-        jsonify::writers::simple::write_value( writer, iv, row, unbox, numeric_dates );
+        jsonify::writers::simple::write_value( writer, iv, row, unbox, numeric_dates, factors_as_string );
       }
       break;
     }
