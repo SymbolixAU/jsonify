@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include "jsonify/to_json/utils.hpp"
+#include "jsonify/to_json/writers/scalars.hpp"
 
 using namespace rapidjson;
 
@@ -10,53 +11,7 @@ namespace jsonify {
 namespace writers {
 namespace simple {
 
-  // ---------------------------------------------------------------------------
-  // scalar values
-  // ---------------------------------------------------------------------------
-  template <typename Writer>
-  inline void write_value( Writer& writer, const char* value ) {
-    writer.String( value );
-  }
-  
-  template <typename Writer>
-  inline void write_value( Writer& writer, int& value ) {
-     if( std::isnan( value ) ) {
-      writer.Null();
-    } else {
-      writer.Int( value );
-    }
-  }
-  
-  template <typename Writer>
-  inline void write_value( Writer& writer, double& value, int digits ) {
-    
-    if(std::isnan( value ) ) {
-      writer.Null();
-    } else if ( std::isinf( value ) ) {
-      
-      std::string str = std::to_string( value );
-      // https://stackoverflow.com/a/14744016/5977215
-      if ( str[0] == '-') { 
-        str[1] = toupper( str[1] );
-      } else {
-        str[0] = toupper(str[0]);
-      }
-      writer.String( str.c_str() );
-    } else {
-      
-      if ( digits >= 0 ) {
-        double e = std::pow( 10.0, digits );
-        value = round( value * e ) / e;
-      }
-      writer.Double( value );
-    }
-  }
-  
-  template< typename Writer> 
-  inline void write_value( Writer& writer, bool& value ) {
-    writer.Bool( value );
-  }
-  
+
   // ---------------------------------------------------------------------------
   // vectors
   // ---------------------------------------------------------------------------
@@ -70,7 +25,7 @@ namespace simple {
       if (Rcpp::StringVector::is_na( sv[i] ) ) {
         writer.Null();
       } else{
-        write_value( writer, sv[i] );
+        jsonify::writers::scalars::write_value( writer, sv[i] );
       }
     }
     jsonify::utils::end_array( writer, will_unbox );
@@ -85,13 +40,13 @@ namespace simple {
       writer.Null();
     } else {
       const char *s = sv[ row ];
-      write_value( writer, s );
+      jsonify::writers::scalars::write_value( writer, s );
     }
   }
   
   template< typename Writer>
-  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox, int digits,
-                           bool numeric_dates ) {
+  inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox, 
+                           int digits, bool numeric_dates ) {
 
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv );
     
@@ -108,8 +63,6 @@ namespace simple {
     } else {
     
       int n = nv.size();
-      // Rcpp::Rcout << "nv.size: " << n << std::endl;
-      // Rcpp::Rcout << "unbox: " << unbox << std::endl; 
       bool will_unbox = jsonify::utils::should_unbox( n, unbox );
       
       jsonify::utils::start_array( writer, will_unbox );
@@ -118,7 +71,7 @@ namespace simple {
         if( Rcpp::NumericVector::is_na( nv[i] ) ) {
           writer.Null();
         } else {
-          write_value( writer, nv[i], digits );
+          jsonify::writers::scalars::write_value( writer, nv[i], digits );
         }
       }
     jsonify::utils::end_array( writer, will_unbox );
@@ -152,7 +105,7 @@ namespace simple {
         writer.Null();
       } else {
         double n = nv[ row ];
-        write_value( writer, n, digits );
+        jsonify::writers::scalars::write_value( writer, n, digits );
       }
     }
   }
@@ -194,7 +147,7 @@ namespace simple {
         if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
           writer.Null();
         } else {
-          write_value( writer, iv[i] );
+          jsonify::writers::scalars::write_value( writer, iv[i] );
         }
       }
       jsonify::utils::end_array( writer, will_unbox );
@@ -227,7 +180,7 @@ namespace simple {
         writer.Null();
       } else {
         int i = iv[ row ];
-        write_value( writer, i );
+        jsonify::writers::scalars::write_value( writer, i );
       }
     }
   }
@@ -243,7 +196,7 @@ namespace simple {
         writer.Null();
       } else {
         bool l = lv[i];             // required for logical vectors
-        write_value( writer, l );
+        jsonify::writers::scalars::write_value( writer, l );
       }
     }
     jsonify::utils::end_array( writer, will_unbox );
@@ -255,27 +208,22 @@ namespace simple {
       writer.Null();
     } else {
       bool l = lv[ row ];
-      write_value( writer, l );
+      jsonify::writers::scalars::write_value( writer, l );
     }
   }
   
-  /*
-   * template for R SEXPs vectors
-   */
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, bool unbox, 
+  template < typename Writer >
+  inline void write_value( Writer& writer, SEXP sexp, bool unbox, 
                            int digits, bool numeric_dates,
                            bool factors_as_string ) {
     
     switch( TYPEOF( sexp ) ) {
     case REALSXP: {
-      // Rcpp::Rcout << "it's a REALSXP" << std::endl;
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( sexp );
       write_value( writer, nv, unbox, digits, numeric_dates );
       break;
     }
     case INTSXP: {
-      // Rcpp::Rcout << "it's an INTSXP " << std::endl;
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
       write_value( writer, iv, unbox, numeric_dates, factors_as_string );
       break;
@@ -296,41 +244,45 @@ namespace simple {
     }
   }
   
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, bool unbox, 
-                           int digits, bool numeric_dates ) {
-    
-    bool factors_as_string = true;
-    write_value( writer, sexp, unbox, digits, numeric_dates, factors_as_string );
-  }
-  
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, bool unbox, int digits) {
-    
-    bool numeric_dates = true;
-    write_value( writer, sexp, unbox, digits, numeric_dates );
-  }
-  
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, bool unbox ) {
-    
-    int digits = -1;
-    write_value( writer, sexp, unbox, digits );
-  }
-  
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp) {
-    
-    bool unbox = false;
-    write_value( writer, sexp, unbox );
-  }
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& sexp, bool unbox,
+  //                          int digits, bool numeric_dates ) {
+  // 
+  //   bool factors_as_string = true;
+  //   write_value( writer, sexp, unbox, digits, numeric_dates, factors_as_string );
+  // }
+  // 
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& sexp, bool unbox, int digits) {
+  // 
+  //   bool numeric_dates = true;
+  //   write_value( writer, sexp, unbox, digits, numeric_dates );
+  // }
+  // 
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& sexp, bool unbox ) {
+  // 
+  //   int digits = -1;
+  //   write_value( writer, sexp, unbox, digits );
+  // }
+  // 
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& sexp) {
+  // 
+  //   bool unbox = false;
+  //   write_value( writer, sexp, unbox );
+  // }
   
   /*
    * template for R SEXPs for single-row from a vector
    */
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox, 
+  template < typename Writer >
+  inline void write_value( Writer& writer, SEXP sexp, size_t row, bool unbox,
                            int digits, bool numeric_dates, bool factors_as_string) {
+
+    // Rcpp::Rcout << "writing value: factors_as_string: " << factors_as_string << std::endl;
+    
+    // Rcpp::Rcout << "writing value from vector" << std::endl;
 
     switch( TYPEOF( sexp ) ) {
     case REALSXP: {
@@ -340,6 +292,7 @@ namespace simple {
     }
     case INTSXP: {
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
+      // TODO( do we need factors_as_string here, or will it be sorted by the time it comes to this step?)
       write_value( writer, iv, row, unbox, numeric_dates );
       break;
     }
@@ -358,53 +311,53 @@ namespace simple {
     }
     }
   }
-  
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox, 
-                           int digits, bool numeric_dates ) {
-    
-    bool factors_as_string = true;
-    write_value( writer, sexp, row, unbox, digits, numeric_dates, factors_as_string );
-  }
-  
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox, int digits) {
-    
-    bool numeric_dates = true;
-    write_value( writer, sexp, row, unbox, digits, numeric_dates );
-  }
-  
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox ) {
-    
-    int digits = -1;
-    write_value( writer, sexp, row, unbox, digits );
-  }
-  
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& sexp, size_t row) {
-    
-    bool unbox = false;
-    write_value( writer, sexp, row, unbox );
-  }
+
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox,
+  //                          int digits, bool numeric_dates ) {
+  // 
+  //   bool factors_as_string = true;
+  //   write_value( writer, sexp, row, unbox, digits, numeric_dates, factors_as_string );
+  // }
+  // 
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox, int digits) {
+  // 
+  //   bool numeric_dates = true;
+  //   write_value( writer, sexp, row, unbox, digits, numeric_dates );
+  // }
+  // 
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox ) {
+  // 
+  //   int digits = -1;
+  //   write_value( writer, sexp, row, unbox, digits );
+  // }
+  // 
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& sexp, size_t row) {
+  // 
+  //   bool unbox = false;
+  //   write_value( writer, sexp, row, unbox );
+  // }
   
   
   /*
    * template for C++ single object types
    */
-  template < typename Writer, typename T >
-  inline void write_value( Writer& writer, T& val, int digits = -1 ) {
-    switch( TYPEOF( val ) ) {
-    case REALSXP: {
-      write_value( writer, val, digits );
-      break;
-    }
-    default: {
-      write_value( writer, val );
-      break;
-    }
-    }
-  }
+  // template < typename Writer, typename T >
+  // inline void write_value( Writer& writer, T& val, int digits = -1 ) {
+  //   switch( TYPEOF( val ) ) {
+  //   case REALSXP: {
+  //     write_value( writer, val, digits );
+  //     break;
+  //   }
+  //   default: {
+  //     write_value( writer, val );
+  //     break;
+  //   }
+  //   }
+  // }
   
 
   // ---------------------------------------------------------------------------
@@ -424,13 +377,13 @@ namespace simple {
       n = mat.nrow();
       for ( i = 0; i < n; i++ ) {
         Rcpp::IntegerVector this_row = mat(i, Rcpp::_);
-        write_value( writer, this_row, unbox );
+        write_value( writer, this_row, unbox, true, true );  // true, true : numeric_dates, factors_as_string
       }
     } else { // by == "column"
       n = mat.ncol();
       for( i = 0; i < n; i++ ) {
         Rcpp::IntegerVector this_col = mat( Rcpp::_, i );
-        write_value( writer, this_col, unbox );
+        write_value( writer, this_col, unbox, true, true ); // true, true : numeric_dates, factors_as_string
       }
     }
     jsonify::utils::end_array( writer, will_unbox );
@@ -449,13 +402,13 @@ namespace simple {
       n = mat.nrow();
       for ( i = 0; i < n; i++ ) {
         Rcpp::NumericVector this_row = mat(i, Rcpp::_);
-        write_value( writer, this_row, unbox, digits );
+        write_value( writer, this_row, unbox, digits, true );  // true : numeric dates
       }
     } else { // by == "column"
       n = mat.ncol();
       for( i = 0; i < n; i++ ) {
         Rcpp::NumericVector this_col = mat( Rcpp::_, i );
-        write_value( writer, this_col, unbox, digits );
+        write_value( writer, this_col, unbox, digits, true );  // true : numeric dates
       }
     }
     jsonify::utils::end_array( writer, will_unbox );

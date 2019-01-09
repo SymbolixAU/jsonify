@@ -80,7 +80,8 @@ namespace complex {
         } else {
           int this_int = iv[ row ];
           const char * this_char = lvls[ this_int -1 ];
-          jsonify::writers::simple::write_value( writer, this_char );
+          //jsonify::writers::simple::write_value( writer, this_char );
+          writer.String( this_char );
         }
         
       } else {
@@ -155,7 +156,8 @@ namespace complex {
         for( df_col = 0; df_col < n_cols; df_col++ ) {
 
           const char *h = column_names[ df_col ];
-          jsonify::writers::simple::write_value( writer, h );
+          //jsonify::writers::simple::write_value( writer, h );
+          writer.String( h );
           SEXP this_vec = df[ h ];
           
           switch( TYPEOF( this_vec ) ) {
@@ -179,7 +181,8 @@ namespace complex {
             writer.StartObject();
             
             const char *h = column_names[ df_col ];
-            jsonify::writers::simple::write_value( writer, h );
+            //jsonify::writers::simple::write_value( writer, h );
+            writer.String( h );
             SEXP this_vec = df[ h ];
             
             switch( TYPEOF( this_vec ) ) {
@@ -205,7 +208,8 @@ namespace complex {
             for( df_col = 0; df_col < n_cols; df_col++ ) {
               
               const char *h = column_names[ df_col ];
-              jsonify::writers::simple::write_value( writer, h );
+              //jsonify::writers::simple::write_value( writer, h );
+              writer.String( h );
               SEXP this_vec = df[ h ];
               
               switch( TYPEOF( this_vec ) ) {
@@ -286,7 +290,8 @@ namespace complex {
             SEXP recursive_list = lst[ i ];
             if ( has_names ) {
               const char *s = list_names[ i ];
-              jsonify::writers::simple::write_value( writer, s );
+              //jsonify::writers::simple::write_value( writer, s );
+              writer.String( s );
             }
             write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by );
           }

@@ -18,9 +18,10 @@ namespace dataframe {
   //, e.g., geojsonsf
   template <typename Writer>
   inline void dataframe_cell( Writer& writer, SEXP& this_vec, size_t& row,
-                              bool unbox, int digits ) {
+                              bool unbox, int digits, bool numeric_dates = true, 
+                              bool factors_as_string = true ) {
 
-    jsonify::writers::simple::write_value( writer, this_vec, row, unbox, digits);
+    jsonify::writers::simple::write_value( writer, this_vec, row, unbox, digits, numeric_dates, factors_as_string );
     
     // switch( TYPEOF( this_vec ) ) {
     // case VECSXP: {
