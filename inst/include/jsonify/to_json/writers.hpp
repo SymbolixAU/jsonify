@@ -108,8 +108,6 @@ namespace writers {
     
     for ( int i = 0; i < n; i++ ) {
       if (Rcpp::LogicalVector::is_na( lv[i] ) ) {
-        //Rcpp::Rcout << "NA logical found" << std::endl;
-        // write_value( writer, "NA" );
         writer.Null();
       } else {
         bool l = lv[i];             // required for logical vectors

@@ -64,17 +64,11 @@ namespace complex {
     
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
-      // Rcpp::Rcout << "switch to num vector " << std::endl;
-      // Rcpp::Rcout << "row: " << row << std::endl;
-      // Rcpp::Rcout << "unbox: " << unbox << std::endl;
-      // Rcpp::Rcout << "digits: " << digits << std::endl;
-      // Rcpp::Rcout << "numeric dates: " << numeric_dates << std::endl;
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
       jsonify::writers::simple::write_value( writer, nv, row, digits, numeric_dates );
       break;
     }
     case INTSXP: {
-      // Rcpp::Rcout << "switch to int vector " << std::endl;
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
       if( factors_as_string && Rf_isFactor( this_vec ) ) {
         Rcpp::CharacterVector lvls = iv.attr("levels");
@@ -88,7 +82,6 @@ namespace complex {
         } else {
           int this_int = iv[ row ];
           const char * this_char = lvls[ this_int -1 ];
-          //jsonify::writers::simple::write_value( writer, this_char );
           writer.String( this_char );
         }
         
@@ -156,15 +149,12 @@ namespace complex {
       int n_rows = df.nrows();
       Rcpp::StringVector column_names = df.names();
       
-      //writer.StartArray();
-      
       if ( by == "column") {
         writer.StartObject();
         
         for( df_col = 0; df_col < n_cols; df_col++ ) {
 
           const char *h = column_names[ df_col ];
-          //jsonify::writers::simple::write_value( writer, h );
           writer.String( h );
           SEXP this_vec = df[ h ];
           
@@ -215,7 +205,6 @@ namespace complex {
             for( df_col = 0; df_col < n_cols; df_col++ ) {
               
               const char *h = column_names[ df_col ];
-              //jsonify::writers::simple::write_value( writer, h );
               writer.String( h );
               SEXP this_vec = df[ h ];
               
@@ -226,7 +215,6 @@ namespace complex {
                 break;
               }
               default: {
-                // Rcpp::Rcout << "default dates : " << numeric_dates << std::endl;
                 switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, df_row );
               }
               }
@@ -236,15 +224,13 @@ namespace complex {
           writer.EndArray();
         } // end if
       }
-      //writer.EndArray();
       
     } else {
       
       switch( TYPEOF( list_element ) ) {
       
       case VECSXP: {
-        // Rcpp::Rcout << "list elelment is another list " << std::endl;
-        // TODO( handle the case where the list item is a row of a data.frame)
+        // the case where the list item is a row of a data.frame
         // ISSUE #32
         
         Rcpp::List temp_lst = Rcpp::as< Rcpp::List >( list_element );
@@ -296,7 +282,6 @@ namespace complex {
             SEXP recursive_list = lst[ i ];
             if ( has_names ) {
               const char *s = list_names[ i ];
-              //jsonify::writers::simple::write_value( writer, s );
               writer.String( s );
             }
             write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by );

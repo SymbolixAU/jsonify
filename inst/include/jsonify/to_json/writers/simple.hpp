@@ -50,8 +50,6 @@ namespace simple {
   inline void write_value( Writer& writer, Rcpp::NumericVector& nv, bool unbox, 
                            int digits, bool numeric_dates ) {
 
-    // Rcpp::Rcout << "unbox function" << std::endl;
-    
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv );
     
     if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
@@ -89,9 +87,6 @@ namespace simple {
   inline void write_value( Writer& writer, Rcpp::NumericVector& nv, 
                            int row, int digits, bool numeric_dates ) {
 
-    // Rcpp::Rcout << "row fucntion " << std::endl;
-    // Rcpp::Rcout << "writing nv with row: " << row << std::endl;
-    
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv );
     
     if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
@@ -169,7 +164,6 @@ namespace simple {
   inline void write_value( Writer& writer, Rcpp::IntegerVector& iv, int row, 
                            bool numeric_dates, bool factors_as_string ) {
     
-    // Rcpp::Rcout << "int vector" << std::endl;
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
     
     
@@ -192,14 +186,11 @@ namespace simple {
         int ele = 0;
         write_value( writer, s, ele );
       } else {
-        // Rcpp::Rcout << "writing lvls: " << lvls << std::endl;
-        // Rcpp::Rcout << "row: " << row << std::endl;
         write_value( writer, lvls, row );
       }
       
     } else {
     
-      // Rcpp::Rcout << "standard iv " << std::endl;
       if ( Rcpp::IntegerVector::is_na( iv[ row ] ) ) {
         writer.Null();
       } else {
@@ -268,34 +259,7 @@ namespace simple {
     }
   }
   
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& sexp, bool unbox,
-  //                          int digits, bool numeric_dates ) {
-  // 
-  //   bool factors_as_string = true;
-  //   write_value( writer, sexp, unbox, digits, numeric_dates, factors_as_string );
-  // }
-  // 
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& sexp, bool unbox, int digits) {
-  // 
-  //   bool numeric_dates = true;
-  //   write_value( writer, sexp, unbox, digits, numeric_dates );
-  // }
-  // 
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& sexp, bool unbox ) {
-  // 
-  //   int digits = -1;
-  //   write_value( writer, sexp, unbox, digits );
-  // }
-  // 
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& sexp) {
-  // 
-  //   bool unbox = false;
-  //   write_value( writer, sexp, unbox );
-  // }
+  
   
   /*
    * template for R SEXPs for single-row from a vector
@@ -303,10 +267,6 @@ namespace simple {
   template < typename Writer >
   inline void write_value( Writer& writer, SEXP sexp, int row, 
                            int digits, bool numeric_dates, bool factors_as_string) {
-
-    //Rcpp::Rcout << "writing value: factors_as_string: " << factors_as_string << std::endl;
-    
-    // Rcpp::Rcout << "writing value from vector" << std::endl;
 
     switch( TYPEOF( sexp ) ) {
     case REALSXP: {
@@ -335,54 +295,6 @@ namespace simple {
     }
     }
   }
-
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox,
-  //                          int digits, bool numeric_dates ) {
-  // 
-  //   bool factors_as_string = true;
-  //   write_value( writer, sexp, row, unbox, digits, numeric_dates, factors_as_string );
-  // }
-  // 
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox, int digits) {
-  // 
-  //   bool numeric_dates = true;
-  //   write_value( writer, sexp, row, unbox, digits, numeric_dates );
-  // }
-  // 
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& sexp, size_t row, bool unbox ) {
-  // 
-  //   int digits = -1;
-  //   write_value( writer, sexp, row, unbox, digits );
-  // }
-  // 
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& sexp, size_t row) {
-  // 
-  //   bool unbox = false;
-  //   write_value( writer, sexp, row, unbox );
-  // }
-  
-  
-  /*
-   * template for C++ single object types
-   */
-  // template < typename Writer, typename T >
-  // inline void write_value( Writer& writer, T& val, int digits = -1 ) {
-  //   switch( TYPEOF( val ) ) {
-  //   case REALSXP: {
-  //     write_value( writer, val, digits );
-  //     break;
-  //   }
-  //   default: {
-  //     write_value( writer, val );
-  //     break;
-  //   }
-  //   }
-  // }
-  
 
   // ---------------------------------------------------------------------------
   // matrix values
