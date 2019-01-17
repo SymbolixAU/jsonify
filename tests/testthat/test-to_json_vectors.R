@@ -94,4 +94,8 @@ test_that("factors work as expected", {
   expect_equal( to_json( df_factors ), to_json( df_strings ) )
   expect_equal( to_json( df_factors[1, ] ), to_json( df_strings[1, ] ) )
   
+  df <- data.frame( x = c("a","a","a") )
+  expect_equal( as.character( to_json( df ) ), '[{"x":"a"},{"x":"a"},{"x":"a"}]' )
+  expect_equal( as.character( to_json( df , factors_as_string = FALSE ) ), '[{"x":1},{"x":1},{"x":1}]' )
+  
 })
