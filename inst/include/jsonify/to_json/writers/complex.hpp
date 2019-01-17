@@ -36,7 +36,8 @@ namespace complex {
           int ele = 0;
           jsonify::writers::simple::write_value( writer, s, ele );
         } else {
-          jsonify::writers::simple::write_value( writer, lvls, unbox );
+          Rcpp::StringVector str = Rcpp::as< Rcpp::StringVector >( iv );
+          jsonify::writers::simple::write_value( writer, str, unbox );
         }
       } else {
         jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates, factors_as_string );
