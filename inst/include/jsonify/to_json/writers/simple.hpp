@@ -136,7 +136,9 @@ namespace simple {
         int ele = 0;
         write_value( writer, s, ele );
       } else {
-        write_value( writer, lvls, unbox );
+        Rcpp::StringVector str = Rcpp::as< Rcpp::StringVector >( iv );
+        write_value( writer, str, unbox );
+        //write_value( writer, lvls, unbox );
       }
       
     } else {
