@@ -129,8 +129,9 @@ namespace simple {
     } else if ( factors_as_string && Rf_isFactor( iv ) ) {
       
       Rcpp::CharacterVector lvls = iv.attr( "levels" );
+      //Rcpp::Rcout << "lvls: " << lvls << std::endl;
       if (lvls.length() == 0 ) {
-        // no level s- from NA_character_ vector
+        // no levels - from NA_character_ vector
         Rcpp::StringVector s(1);
         s[0] = NA_STRING;
         int ele = 0;
