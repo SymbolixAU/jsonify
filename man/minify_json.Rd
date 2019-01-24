@@ -4,10 +4,12 @@
 \alias{minify_json}
 \title{Minify Json}
 \usage{
-minify_json(json)
+minify_json(json, ...)
 }
 \arguments{
 \item{json}{string of JSON}
+
+\item{...}{other argments passed to \link{to_json}}
 }
 \description{
 Removes indentiation from a JSON string

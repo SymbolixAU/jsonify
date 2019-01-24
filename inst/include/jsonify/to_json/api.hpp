@@ -3,17 +3,24 @@
 
 #include <Rcpp.h>
 #include "jsonify/to_json/utils.hpp"
-#include "jsonify/to_json/writers.hpp"
+#include "jsonify/to_json/writers/complex.hpp"
 
 using namespace rapidjson;
 
 namespace jsonify {
 namespace api {
 
-    inline Rcpp::StringVector to_json( SEXP lst, bool unbox = false, int digits = -1, bool numeric_dates = true) {
+    inline Rcpp::StringVector to_json(
+            SEXP lst, 
+            bool unbox = false, 
+            int digits = -1, 
+            bool numeric_dates = true, 
+            bool factors_as_string = true, 
+            std::string by = "row") {
+        
         rapidjson::StringBuffer sb;
         rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-        jsonify::writers::write_value( writer, lst, unbox, digits, numeric_dates );
+        jsonify::writers::complex::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
         return jsonify::utils::finalise_json( sb );
     }
 

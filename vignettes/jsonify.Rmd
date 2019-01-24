@@ -1,0 +1,147 @@
+---
+title: "jsonify"
+author: "David Cooley"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "# "
+)
+
+library(jsonify)
+library(jsonlite)
+```
+
+There are two types of R objects we need to handle when converting to JSON, simple and complex.
+
+1. Simple - scalars, vectors, matrices
+2. Complex - data.frames and lists
+
+I've categorised them this way because 'simple' objects don't include any form of recursion. That is, a vector can't contain a data.frame or a list. But a list or data.frame can contain other data.frames, vectors, matrices, scalars, lists, and any combination thereof. 
+
+
+## Simple
+
+Simple objects ( scalars, vectors and matrices ) get converted to JSON ARRAYS
+
+```{r}
+## scalar -> single array
+to_json( 1 )
+to_json( "a" )
+
+## scalar (unboxed) -> single value
+to_json( 1, unbox = TRUE )
+to_json( "a", unbox = TRUE )
+
+## vector -> array
+to_json( 1:4 )
+to_json( letters[1:4] )
+
+## named vector - array (of the elements)
+to_json( c("a" = 1, "b" = 2) )
+
+## matrix -> array of arrays (by row)
+to_json( matrix(1:4, ncol = 2) )
+to_json( matrix(letters[1:4], ncol = 2))
+
+## matrix -> array of arrays (by column)
+to_json( matrix(1:4, ncol = 2), by = "column" )
+to_json( matrix(letters[1:4], ncol = 2 ), by = "column" )
+```
+
+## Complex - Lists
+
+List of unnamed vectors gives an ARRAY of ARRAYS (since a vector gets converted to an array)
+
+```{r}
+to_json( list( 1:2, c("a","b") )  )
+```
+
+A list with named elements gives an OBJECT with named ARRAYS
+
+```{r}
+## List of vectors -> object with named arrays
+to_json( list( x = 1:2 ) )
+```
+
+A combination of named and unnamed list elements gives both
+
+```{r}
+to_json( list( x = 1:2, y = list( letters[1:2] ) ) )
+```
+
+## Complex - Data Frames
+
+A data.frame will, by default, treat each row as an object (to maintain the relationship inherent in a row of data )
+
+```{r}
+## data.frame -> array of objects (by row) 
+to_json( data.frame( x = 1:2, y = 3:4) )
+to_json( data.frame( x = c("a","b"), y = c("c","d")))
+```
+
+You can set `by = "column"` to parse the data.frame by columns. And as each column (in this example) is a vector, each vector gets converted to an array. And since the vectors have names (the column names), we get an object of named arrays
+
+```{r}
+## data.frame -> object of arrays (by column)
+to_json( data.frame( x = 1:2, y = 3:4), by = "column" )
+to_json( data.frame( x = c("a","b"), y = c("c","d") ), by = "column" )
+```
+
+## Complex - Mixed objects
+
+A data.frame where one columns is 'AsIs' a list
+
+```{r}
+## data.frame where one colun is a list
+df <- data.frame( id = 1, val = I(list( x = 1:2 ) ) )
+to_json( df )
+```
+
+The data.frame is being parsed 'by row', so we get an array of objects. The second column is a list of a named vector, so the `val` column contains an object of a named array. 
+
+Here are the individual components to show how it's put together
+
+```{r}
+## which we see is made up of
+to_json( data.frame( id = 1 ) )
+## and
+to_json( list( x = 1:2 ) )
+```
+
+If we take the same example and parse it 'by column' we get the `id` column treated as a vector, but the list column remains the same
+
+
+```{r}
+to_json( df, by = "column" )
+```
+
+We can build up a more complex example with nested lists inside columns of `data.frames`
+
+```{r}
+
+df <- data.frame( id = 1, val = I(list(c(0,0))))
+df
+to_json( df )
+
+df <- data.frame( id = 1:2, val = I(list( x = 1:2, y = 3:4 ) ) )
+df
+to_json( df )
+
+df <- data.frame( id = 1:2, val = I(list( x = 1:2, y = 3:6 ) ), val2 = I(list( a = "a", b = c("b","c") ) ) )
+df
+pretty_json( df )
+
+df <- data.frame( id = 1:2, val = I(list( x = 1:2, y = 3:6 ) ), val2 = I(list( a = "a", b = c("b","c") ) ), val3 = I(list( l = list( 1:3, l2 = c("a","b")), 1)) )
+df
+pretty_json( df )
+
+```
+

@@ -1,8 +1,8 @@
 Package: jsonify
 Type: Package
 Title: Converts 'R' Objects to Javascript Object Notation (JSON)
-Version: 0.1.2003
-Date: 2019-01-07
+Version: 0.2.1
+Date: 2019-01-10
 Authors@R: c(
     person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre"))
     )
@@ -15,10 +15,13 @@ LinkingTo:
   BH,
   rapidjsonr,
   Rcpp
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests:
     covr,
     microbenchmark,
     jsonlite,
-    testthat
+    testthat,
+    knitr,
+    rmarkdown
 Encoding: UTF-8
+VignetteBuilder: knitr

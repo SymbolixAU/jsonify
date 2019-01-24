@@ -4,10 +4,12 @@
 \alias{pretty_json}
 \title{Pretty Json}
 \usage{
-pretty_json(json)
+pretty_json(json, ...)
 }
 \arguments{
 \item{json}{string of JSON}
+
+\item{...}{other argments passed to \link{to_json}}
 }
 \description{
 Adds indentiation to a JSON string

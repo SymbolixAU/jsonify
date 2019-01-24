@@ -1,9 +1,13 @@
 
+#' @export
+print.json <- function( x, ... ) cat( x )
+
 #' Pretty Json
 #' 
 #' Adds indentiation to a JSON string
 #' 
 #' @param json string of JSON
+#' @param ... other argments passed to \link{to_json}
 #' 
 #' @examples
 #' 
@@ -15,14 +19,14 @@
 #' pretty_json( df )
 #' 
 #' @export
-pretty_json <- function( json ) UseMethod("pretty_json") 
+pretty_json <- function( json, ... ) UseMethod("pretty_json") 
 
 #' @export
-pretty_json.json <- function( json ) rcpp_pretty_json( json )
+pretty_json.json <- function( json, ... ) rcpp_pretty_json( json )
 
 #' @export
-pretty_json.default <- function( json ) {
-  js <- to_json( json )
+pretty_json.default <- function( json, ... ) {
+  js <- to_json( json, ... )
   rcpp_pretty_json( js )
 }
 
@@ -32,6 +36,7 @@ pretty_json.default <- function( json ) {
 #' Removes indentiation from a JSON string
 #' 
 #' @param json string of JSON
+#' @param ... other argments passed to \link{to_json}
 #' 
 #' @examples 
 #' 
@@ -41,13 +46,13 @@ pretty_json.default <- function( json ) {
 #' minify_json( jsp )
 #' 
 #' @export
-minify_json <- function( json ) UseMethod("minify_json") 
+minify_json <- function( json, ... ) UseMethod("minify_json") 
 
 #' @export
-minify_json.json <- function( json ) rcpp_minify_json( json ) 
+minify_json.json <- function( json, ... ) rcpp_minify_json( json ) 
 
 #' @export
-minify_json.default <- function( json ) to_json( json )
+minify_json.default <- function( json, ... ) to_json( json, ... )
 
 
 

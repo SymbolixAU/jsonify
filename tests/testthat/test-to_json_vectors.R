@@ -15,6 +15,10 @@ test_that("different vector types work", {
   expect_equal(as.character(to_json(complex(1))),"[\"0+0i\"]")
   expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = F)), '{"x":[\"2018-01-01\"]}')
   expect_equal(as.character(to_json( list(x = as.Date("2018-01-01") ), numeric_dates = T)), '{"x":[17532.0]}')
+  
+  expect_equal(as.character(to_json( as.factor(letters[1:5]))), '["a","b","c","d","e"]')
+  expect_equal(as.character(to_json( as.factor(letters[1:5]), factors_as_string = FALSE )),'[1,2,3,4,5]')
+  
 })
 
 test_that("NAs, NULLS and Infs work", {
@@ -60,8 +64,38 @@ test_that("round trips with jsonlite work", {
   expect_equal( jsonlite::fromJSON( to_json( x ) ), x)
 })
 
-## TODO( test list of all mixed types, inc Date, POSIXct and POSIXlt)
+test_that("some randome thoughts I had work", {
 
-# lst <- list(x = as.Date("2018-01-01"), y = list(as.POSIXct("2018-01-01 10:00:00")), z = NA)
-# as.character(to_json( lst, numeric_dates = F, unbox = T ))
+  lst <- list(x = as.Date("2018-01-01"), y = list(as.POSIXct("2018-01-01 10:00:00", tz = "UTC")), z = NA)
+  js <- to_json( lst, numeric_dates = FALSE, unbox = TRUE )
+  expect_true( validate_json( js ) ) 
+  expect_equal( as.character(js), '{"x":"2018-01-01","y":["2018-01-01T10:00:00"],"z":null}')
+  
+})
 
+test_that("factors work as expected", {
+  
+  expect_equal( as.character( to_json( factor() ) ), "null" )
+  
+  expect_equal( as.character( to_json( factor( c("a","a") ) ) ), '["a","a"]')
+  expect_equal( as.character( to_json( factor( c("a","a") ), factors_as_string = FALSE ) ), '[1,1]')
+  
+  x <- factor(c("a", NA_character_, "B"))
+  expect_equal( as.character( to_json( x ) ), '["a",null,"B"]' )
+  
+  # expect_equal( to_json( factor() ), to_json( numeric() ) )
+  
+  expect_equal( as.character( to_json( factor( NA_integer_ ) ) ), "null" )
+  
+  df_factors <- data.frame( vals = sample(letters, size = 100, replace = TRUE))
+  df_strings <- df_factors
+  df_strings$vals <- as.character( df_factors$vals )
+  
+  expect_equal( to_json( df_factors ), to_json( df_strings ) )
+  expect_equal( to_json( df_factors[1, ] ), to_json( df_strings[1, ] ) )
+  
+  df <- data.frame( x = c("a","a","a") )
+  expect_equal( as.character( to_json( df ) ), '[{"x":"a"},{"x":"a"},{"x":"a"}]' )
+  expect_equal( as.character( to_json( df , factors_as_string = FALSE ) ), '[{"x":1},{"x":1},{"x":1}]' )
+  
+})

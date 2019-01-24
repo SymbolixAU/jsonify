@@ -4,7 +4,8 @@
 \alias{to_json}
 \title{To JSON}
 \usage{
-to_json(x, unbox = FALSE, digits = NULL, numeric_dates = TRUE)
+to_json(x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
+  factors_as_string = TRUE, by = "row")
 }
 \arguments{
 \item{x}{object to convert to JSON}
@@ -12,12 +13,16 @@ to_json(x, unbox = FALSE, digits = NULL, numeric_dates = TRUE)
 \item{unbox}{logical indicating if single-value arrays should be 'unboxed', 
 that is, not contained inside an array.}
 
-\item{digits}{integer specifying the number of decimal places to round numerics. 
-numeric values are coorced using \code{as.integer}, which may round-down the value you supply.
+\item{digits}{integer specifying the number of decimal places to round numerics.
 Default is \code{NULL} - no rounding}
 
 \item{numeric_dates}{logical indicating if dates should be treated as numerics. 
 Defaults to TRUE for speed. If FALSE, the dates will be coerced to character in UTC time zone}
+
+\item{factors_as_string}{logical indicating if factors should be treated as strings. Defaults to TRUE.}
+
+\item{by}{either "row" or "column" indicating if data.frames and matrices should be processed
+row-wise or column-wise. Defaults to "row"}
 }
 \description{
 Converts R objects to JSON
@@ -45,8 +50,11 @@ to_json(list(x = 1, y = c("a"), z = list(x = 2, y = c("b"))), unbox = TRUE)
 
 ## rounding numbers using the digits argument
 to_json(1.23456789, digits = 2)
-to_json(data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3], 
-  stringsAsFactors = FALSE), digits = 0 )
+df <- data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3])
+to_json(df, digits = 0 )
+
+## keeping factors
+to_json(df, digits = 2, factors_as_string = FALSE )
 
 
 }

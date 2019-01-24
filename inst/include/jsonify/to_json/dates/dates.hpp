@@ -3,7 +3,6 @@
 
 #include <Rcpp.h>
 #include <boost/date_time.hpp>
-#include "jsonify/to_json/utils.hpp"
 
 // [[Rcpp::depends(BH)]]
 
@@ -80,14 +79,6 @@ namespace dates {
     int n = nv.size();
     
     boost::local_time::tz_database tz_db;
-    //tz_db.load_from_file( "../../boost/libs/date_time/data/date_time_zonespec.csv" );
-    // tz_db.load_from_file("./date_time_zonespec.csv");
-    // 
-    // Rcpp::StringVector tz = nv.attr( "tzone" );
-    // Rcpp::Rcout << "tz: " << tz << std::endl;
-    // const char * str_tz = tz[0] ;
-    // boost::local_time::time_zone_ptr this_tz = tz_db.time_zone_from_region( str_tz );
-    //boost::local_time::time_zone_ptr this_tz{ new boost::local_time::posix_time_zone("CET+1")};
     
     Rcpp::StringVector sv( n );
     
@@ -99,18 +90,7 @@ namespace dates {
       boost::posix_time::seconds sec( d.getSeconds() );
       boost::posix_time::time_duration td = h + mins + sec;
       
-      //std::cout << "td " << td << std::endl;
-      
-      //boost::posix_time::ptime pt = boost::posix_time::ptime( dt, h );
       boost::posix_time::ptime pt = boost::posix_time::ptime( dt, td );
-      
-      // // if there's a time zone, do this bit
-      // // https://theboostcpplibraries.com/boost.datetime-location-dependent-times 
-      // boost::local_time::local_date_time ldt{ pt, this_tz };
-      // //
-      // Rcpp::Rcout << "utc time: " << ldt.utc_time() << std::endl;
-      // Rcpp::Rcout << "local time: " << ldt.local_time() << std::endl;
-      
       
       std::string s = boost::posix_time::to_iso_extended_string( pt );
       sv[i] = s.c_str();

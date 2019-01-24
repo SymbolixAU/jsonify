@@ -90,3 +90,14 @@ test_that("data.frames inside lists are converted correctly", {
   expect_equal( as.character( js ), expected )
 })
 
+test_that("factors in lists become characters", {
+  
+  l <- list( x = as.factor( letters[1:3] ) )
+  l2 <- list( x = letters[1:3] )
+  js <- to_json( l )
+  expect_true( js == to_json( l2 ) )
+  
+  js <- to_json( l, factors_as_string = FALSE )
+  l2 <- list( x = 1:3 )
+  expect_true( js == to_json( l2 ) )
+})
