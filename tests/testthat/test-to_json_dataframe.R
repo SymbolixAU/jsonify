@@ -145,3 +145,44 @@ test_that("roundtrips with jsonlite work", {
   df <- data.frame(x = c(1, -Inf), stringsAsFactors = F)
   expect_equal( jsonlite::fromJSON( to_json( df ) ), df )
 })
+
+
+test_that("data.frames inside data.frames works", {
+  
+  df <- structure(list(`_id` = 1, details = structure(list(
+    val1 = "a", 
+    val2 = "b", 
+    val3 = "c"
+  ), 
+  class = "data.frame", row.names = 1L)), class = "data.frame", row.names = 1L)
+  
+  js <- to_json( df )
+  expect_true( validate_json( js ) )
+  expect_equal(as.character(js), '[{"_id":1.0,"details":{"val1":"a","val2":"b","val3":"c"}}]')
+  
+  details <- data.frame(
+    val1 = c("a","b")
+    , val2 = c("b","c")
+    , val3 = c("c","d")
+    , stringsAsFactors = FALSE
+  )
+  
+  df <- data.frame(
+    id = 1
+    , details = I(details)
+  )
+  
+  js <- to_json( df )
+  expect_true( validate_json( js ) )
+  expect_equal(as.character(js), '[{"id":1.0,"details":{"val1":"a","val2":"b","val3":"c"}},{"id":1.0,"details":{"val1":"b","val2":"c","val3":"d"}}]')
+  
+  df <- data.frame(
+    id = 1
+    , details = details
+  )
+  
+  js <- to_json( df )
+  expect_true( validate_json( js ) )
+  expect_equal( as.character(js) , '[{"id":1.0,"details.val1":"a","details.val2":"b","details.val3":"c"},{"id":1.0,"details.val1":"b","details.val2":"c","details.val3":"d"}]')
+  
+})
