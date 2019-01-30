@@ -147,7 +147,7 @@ test_that("roundtrips with jsonlite work", {
 })
 
 
-test_that("data.frames inside data.frames works", {
+test_that("ISSUE 38 - data.frames inside data.frames works", {
   
   df <- structure(list(`_id` = 1, details = structure(list(
     val1 = "a", 
@@ -158,7 +158,7 @@ test_that("data.frames inside data.frames works", {
   
   js <- to_json( df )
   expect_true( validate_json( js ) )
-  expect_equal(as.character(js), '[{"_id":1.0,"details":{"val1":"a","val2":"b","val3":"c"}}]')
+  expect_equal( as.character(js), '[{"_id":1.0,"details":{"val1":"a","val2":"b","val3":"c"}}]' )
   
   details <- data.frame(
     val1 = c("a","b")
