@@ -283,6 +283,7 @@ namespace simple {
     }
     case INTSXP: {
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
+      // Rcpp::Rcout << "iv: " << iv << std::endl;
       // Rcpp::Rcout << "intsxp: " << iv << std::endl;
       // Rcpp::Rcout << "row: " << row << std::endl;
       // Rcpp::Rcout << "numeric_dates: " << numeric_dates << std::endl;
