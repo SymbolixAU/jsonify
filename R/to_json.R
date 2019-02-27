@@ -58,8 +58,11 @@ handle_digits <- function( digits ) {
 }
 
 
-
-
-
+#' @export
+as.json <- function(x) {
+  if( jsonify::validate_json( x ) ) 
+    attr(x, "class") <- "json"
+  x
+}
 
 
