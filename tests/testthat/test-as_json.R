@@ -3,8 +3,7 @@ context("as_json")
 test_that("json class set", {
   
   js <- "{x:1}"  ## Invalid
-  js <- as.json(js)
-  expect_null( attr(js, "class") )
+  expect_error( as.json(js), "Invalid JSON" )
   
   js <- '{"x":1}'
   js <- as.json(js)
