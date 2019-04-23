@@ -13,3 +13,15 @@ test_that("json class set", {
   js <- pretty_json(js)
   expect_equal( attr(js, "class"), "json" )
 })
+
+test_that("non-characters coerced to JSON", {
+  
+  # df <- data.frame(
+  #   x = 1:5
+  #   , y = letters[1:5]
+  #   , stringsAsFactors = F
+  # )
+  # 
+  # expect_true( to_json( df ) == as.json( df ) )
+  
+})

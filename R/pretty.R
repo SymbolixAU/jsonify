@@ -55,7 +55,7 @@ minify_json <- function( json, ... ) UseMethod("minify_json")
 minify_json.json <- function( json, ... ) rcpp_minify_json( json ) 
 
 #' @export
-minify_json.character <- function( json, ... ) minify_json( as.json( js ) )
+minify_json.character <- function( json, ... ) minify_json( as.json( json ) )
 
 #' @export
 minify_json.default <- function( json, ... ) to_json( json, ... )

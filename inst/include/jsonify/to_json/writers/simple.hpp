@@ -129,7 +129,6 @@ namespace simple {
     } else if ( factors_as_string && Rf_isFactor( iv ) ) {
       
       Rcpp::CharacterVector lvls = iv.attr( "levels" );
-      //Rcpp::Rcout << "lvls: " << lvls << std::endl;
       if (lvls.length() == 0 ) {
         // no levels - from NA_character_ vector
         Rcpp::StringVector s(1);
@@ -192,7 +191,6 @@ namespace simple {
         Rcpp::StringVector str = Rcpp::as< Rcpp::StringVector >( iv );
         write_value( writer, str, row );
       }
-      // Rcpp::Rcout << "lvls " << lvls  << std::endl;
       
     } else {
     
@@ -273,8 +271,6 @@ namespace simple {
   inline void write_value( Writer& writer, SEXP sexp, int row, 
                            int digits, bool numeric_dates, bool factors_as_string) {
 
-    // Rcpp::Rcout << "type of sexp: " << TYPEOF( sexp ) << std::endl;
-    
     switch( TYPEOF( sexp ) ) {
     case REALSXP: {
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( sexp );
@@ -283,11 +279,6 @@ namespace simple {
     }
     case INTSXP: {
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
-      // Rcpp::Rcout << "iv: " << iv << std::endl;
-      // Rcpp::Rcout << "intsxp: " << iv << std::endl;
-      // Rcpp::Rcout << "row: " << row << std::endl;
-      // Rcpp::Rcout << "numeric_dates: " << numeric_dates << std::endl;
-      // Rcpp::Rcout << "factors_as_string: " << factors_as_string << std::endl;
       // TODO( do we need factors_as_string here, or will it be sorted by the time it comes to this step?)
       write_value( writer, iv, row, numeric_dates, factors_as_string );
       break;
