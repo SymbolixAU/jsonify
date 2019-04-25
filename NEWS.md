@@ -2,6 +2,7 @@
 
 * `as.json()` method
 * Bug fix: AsIs data.frame inside another data.frame [issue #38](https://github.com/SymbolixAU/jsonify/issues/38)
+* BH -DBOOST_NO_AUTO_PTR flag
 
 ## v0.2.0
 
