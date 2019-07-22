@@ -196,6 +196,16 @@ test_that("data.frame with a matrix-column works", {
   
   js <- to_json( df, by = "col" )
   expect_equal( as.character( js ), '{"id":[1,2],"mat":[[1,2],[3,4]]}')
+
+  ## Issue 42
+  df <- structure(list(fill_colour = structure(c(68, 49, 53, 253, 1, 
+  104, 183, 231, 84, 142, 121, 37, 255, 255, 255, 255), .Dim = c(4L, 
+  4L)), geometry = c(1, 2, -5, 0.3), lat = 1:4, lon = c(1, 2, -5, 
+  0.3)), class = "data.frame", row.names = c(NA, 4L))
+  
+  js <- to_json( df, by = "row" )
+  expect_equal( as.character( js ), '[{"fill_colour":[68.0,1.0,84.0,255.0],"geometry":1.0,"lat":1,"lon":1.0},{"fill_colour":[49.0,104.0,142.0,255.0],"geometry":2.0,"lat":2,"lon":2.0},{"fill_colour":[53.0,183.0,121.0,255.0],"geometry":-5.0,"lat":3,"lon":-5.0},{"fill_colour":[253.0,231.0,37.0,255.0],"geometry":0.3,"lat":4,"lon":0.3}]')
+
   
 })
 
