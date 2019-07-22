@@ -17,7 +17,7 @@ namespace complex {
   inline void switch_vector( Writer& writer, SEXP this_vec, bool unbox, 
                              int digits, bool numeric_dates, 
                              bool factors_as_string ) {
-    
+    Rcpp::Rcout << "switch_vector  " << std::endl;
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
       Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
@@ -63,42 +63,66 @@ namespace complex {
                              int digits, bool numeric_dates, 
                              bool factors_as_string, int row) {
     
+    Rcpp::Rcout << "switch_vector by row " << row << std::endl;
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
-      Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
-      jsonify::writers::simple::write_value( writer, nv, row, digits, numeric_dates );
-      break;
+      Rcpp::Rcout << "this_vec is numeric matrix" << std::endl;
+      if( Rf_isMatrix( this_vec ) ) {
+        Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( this_vec );
+        jsonify::writers::simple::write_value( writer, nm, unbox );
+      } else {
+        Rcpp::Rcout << "this_vec is numeric vector" << std::endl;
+        Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
+        jsonify::writers::simple::write_value( writer, nv, row, digits, numeric_dates );
+      }
+    break;
     }
     case INTSXP: {
-      Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-      if( factors_as_string && Rf_isFactor( this_vec ) ) {
-        Rcpp::CharacterVector lvls = iv.attr("levels");
-        if ( lvls.length() == 0 ) {
-          // no levls - from NA_character_ vector
-          
-          Rcpp::StringVector s(1);
-          s[0] = NA_STRING;
-          int ele = 0;
-          jsonify::writers::simple::write_value( writer, s, ele );
-        } else {
-          int this_int = iv[ row ];
-          const char * this_char = lvls[ this_int -1 ];
-          writer.String( this_char );
-        }
-        
+      if( Rf_isMatrix( this_vec ) ) {
+        Rcpp::Rcout << "this_vec is integer matrix" << std::endl;
+        Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( this_vec );
+        jsonify::writers::simple::write_value( writer, im, row, unbox );
       } else {
-        jsonify::writers::simple::write_value( writer, iv, row, numeric_dates, factors_as_string );
+        Rcpp::Rcout << "this_vec is integer vector" << std::endl;
+        Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
+        if( factors_as_string && Rf_isFactor( this_vec ) ) {
+          Rcpp::CharacterVector lvls = iv.attr("levels");
+          if ( lvls.length() == 0 ) {
+            // no levls - from NA_character_ vector
+            
+            Rcpp::StringVector s(1);
+            s[0] = NA_STRING;
+            int ele = 0;
+            jsonify::writers::simple::write_value( writer, s, ele );
+          } else {
+            int this_int = iv[ row ];
+            const char * this_char = lvls[ this_int -1 ];
+            writer.String( this_char );
+          }
+        } else {
+          jsonify::writers::simple::write_value( writer, iv, row, numeric_dates, factors_as_string );
+        }
       }
       break;
     }
     case LGLSXP: {
-      Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
-      jsonify::writers::simple::write_value( writer, lv, row );
+      if( Rf_isMatrix( this_vec ) ) {
+        Rcpp::LogicalMatrix lm = Rcpp::as< Rcpp::LogicalMatrix >( this_vec );
+        jsonify::writers::simple::write_value( writer, lm, unbox );
+     } else {
+        Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
+        jsonify::writers::simple::write_value( writer, lv, row );
+      }
       break;
     }
     default: {
-      Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-      jsonify::writers::simple::write_value( writer, sv, row );
+      if( Rf_isMatrix( this_vec ) ) {
+        Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( this_vec );
+        jsonify::writers::simple::write_value( writer, sm, unbox );
+      } else {
+        Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
+        jsonify::writers::simple::write_value( writer, sv, row );
+      }
       break;
     }
     }
@@ -120,7 +144,7 @@ namespace complex {
     } 
     
     if( Rf_isMatrix( list_element ) ) {
-      
+      Rcpp::Rcout << "is_matrix" << std::endl;
       switch( TYPEOF( list_element ) ) {
       case REALSXP: {
         Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( list_element );
@@ -144,7 +168,7 @@ namespace complex {
       }
       }
     } else if ( Rf_inherits( list_element, "data.frame" ) ) {
-      
+      Rcpp::Rcout << "is data.frame" << std::endl;
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
       int n_cols = df.ncol();
       int n_rows = df.nrows();
@@ -172,7 +196,7 @@ namespace complex {
         writer.EndObject();
         
       } else { // by == "row"
-        
+        Rcpp::Rcout << "by row " << std::endl;
         if ( row >= 0 ) {
           
           writer.StartObject();
@@ -184,6 +208,7 @@ namespace complex {
             SEXP this_vec = df[ h ];
             
             switch( TYPEOF( this_vec ) ) {
+            Rcpp::Rcout << "this_vec column type 1 : " << TYPEOF( this_vec ) << std::endl;
             case VECSXP: {
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
               write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row );
@@ -209,7 +234,7 @@ namespace complex {
               const char *h = column_names[ df_col ];
               writer.String( h );
               SEXP this_vec = df[ h ];
-              
+              Rcpp::Rcout << "this_vec column type 2 : " << TYPEOF( this_vec ) << std::endl;
               switch( TYPEOF( this_vec ) ) {
               case VECSXP: {
                 Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
@@ -232,6 +257,7 @@ namespace complex {
       switch( TYPEOF( list_element ) ) {
       
       case VECSXP: {
+        Rcpp::Rcout << "data.frame row is VECSXP" << std::endl;
         // the case where the list item is a row of a data.frame
         // ISSUE #32
         Rcpp::List temp_lst = Rcpp::as< Rcpp::List >( list_element );
@@ -293,6 +319,7 @@ namespace complex {
       }
         
       case REALSXP: {
+        Rcpp::Rcout << "data.frame row is REALSXP" << std::endl;
         Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( list_element );
         jsonify::writers::simple::write_value( writer, nv, unbox, digits, numeric_dates );
         break;
