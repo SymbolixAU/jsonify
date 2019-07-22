@@ -69,7 +69,7 @@ namespace complex {
       Rcpp::Rcout << "this_vec is numeric matrix" << std::endl;
       if( Rf_isMatrix( this_vec ) ) {
         Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( this_vec );
-        jsonify::writers::simple::write_value( writer, nm, unbox );
+        jsonify::writers::simple::write_value( writer, nm, row, unbox );
       } else {
         Rcpp::Rcout << "this_vec is numeric vector" << std::endl;
         Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( this_vec );
@@ -108,7 +108,7 @@ namespace complex {
     case LGLSXP: {
       if( Rf_isMatrix( this_vec ) ) {
         Rcpp::LogicalMatrix lm = Rcpp::as< Rcpp::LogicalMatrix >( this_vec );
-        jsonify::writers::simple::write_value( writer, lm, unbox );
+        jsonify::writers::simple::write_value( writer, lm, row, unbox );
      } else {
         Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( this_vec );
         jsonify::writers::simple::write_value( writer, lv, row );
@@ -118,7 +118,7 @@ namespace complex {
     default: {
       if( Rf_isMatrix( this_vec ) ) {
         Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( this_vec );
-        jsonify::writers::simple::write_value( writer, sm, unbox );
+        jsonify::writers::simple::write_value( writer, sm, row, unbox );
       } else {
         Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
         jsonify::writers::simple::write_value( writer, sv, row );
