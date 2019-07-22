@@ -1,6 +1,7 @@
 ## Cran submission updates
 
 * Updates v0.2.0 to v0.2.1
+* updated date field
 * one bug fix and one new method
 
 ## R CMD check results
