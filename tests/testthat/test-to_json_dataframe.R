@@ -186,3 +186,16 @@ test_that("ISSUE 38 - data.frames inside data.frames works", {
   expect_equal( as.character(js) , '[{"id":1.0,"details.val1":"a","details.val2":"b","details.val3":"c"},{"id":1.0,"details.val1":"b","details.val2":"c","details.val3":"d"}]')
   
 })
+
+test_that("data.frame with a matrix-column works", {
+  
+  df <- data.frame( id = 1:2, mat = I(matrix(1:4, ncol = 2)))
+  js <- to_json( df )
+  expect_equal( as.character(js), '[{"id":1,"mat":[1,3]},{"id":2,"mat":[2,4]}]')
+  expect_true( validate_json( js ) )
+  
+  js <- to_json( df, by = "col" )
+  expect_equal( as.character( js ), '{"id":[1,2],"mat":[[1,2],[3,4]]}')
+  
+})
+

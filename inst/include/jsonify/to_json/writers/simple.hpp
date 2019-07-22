@@ -306,23 +306,18 @@ namespace simple {
   template < typename Writer >
   inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, 
                            int& row, bool unbox = false ) {
-    
-    Rcpp::Rcout << "this matrix : " << mat << std::endl;
-    
-    bool will_unbox = false;
-    jsonify::utils::start_array( writer, will_unbox );
+    //bool will_unbox = false;
+    //jsonify::utils::start_array( writer, will_unbox );
 
     Rcpp::IntegerVector this_row = mat(row, Rcpp::_);
     write_value( writer, this_row, unbox, true, true );  // true, true : numeric_dates, factors_as_string
         
-    jsonify::utils::end_array( writer, will_unbox );
+    //jsonify::utils::end_array( writer, will_unbox );
   }
   
   template < typename Writer >
   inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, bool unbox = false,
                            std::string by = "row" ) {
-    
-    Rcpp::Rcout << "this matrix : " << mat << std::endl;
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
@@ -348,13 +343,13 @@ namespace simple {
   template < typename Writer >
   inline void write_value( Writer& writer, Rcpp::NumericMatrix& mat, 
                            int& row, bool unbox = false ) {
-    bool will_unbox = false;
-    jsonify::utils::start_array( writer, will_unbox );
+    //bool will_unbox = false;
+    //jsonify::utils::start_array( writer, will_unbox );
     
     Rcpp::NumericVector this_row = mat(row, Rcpp::_);
     write_value( writer, this_row, unbox, true, true );  // true, true : numeric_dates, factors_as_string
     
-    jsonify::utils::end_array( writer, will_unbox );
+    //jsonify::utils::end_array( writer, will_unbox );
   }
   
   template < typename Writer >
@@ -386,13 +381,13 @@ namespace simple {
   inline void write_value( Writer& writer, Rcpp::StringMatrix& mat, 
                            int& row, bool unbox = false ) {
     
-    bool will_unbox = false;
-    jsonify::utils::start_array( writer, will_unbox );
+    //bool will_unbox = false;
+    //jsonify::utils::start_array( writer, will_unbox );
     
     Rcpp::StringVector this_row = mat(row, Rcpp::_);
-    write_value( writer, this_row, unbox, true, true );  // true, true : numeric_dates, factors_as_string
+    write_value( writer, this_row, unbox );  // true, true : numeric_dates, factors_as_string
     
-    jsonify::utils::end_array( writer, will_unbox );
+    //jsonify::utils::end_array( writer, will_unbox );
   }
   
   template < typename Writer >
@@ -424,13 +419,13 @@ namespace simple {
   inline void write_value( Writer& writer, Rcpp::LogicalMatrix& mat, 
                            int& row, bool unbox = false ) {
     
-    bool will_unbox = false;
-    jsonify::utils::start_array( writer, will_unbox );
+    //bool will_unbox = false;
+    //jsonify::utils::start_array( writer, will_unbox );
     
     Rcpp::LogicalVector this_row = mat(row, Rcpp::_);
-    write_value( writer, this_row, unbox, true, true );  // true, true : numeric_dates, factors_as_string
+    write_value( writer, this_row, unbox );  // true, true : numeric_dates, factors_as_string
     
-    jsonify::utils::end_array( writer, will_unbox );
+    //jsonify::utils::end_array( writer, will_unbox );
   }
   
   template < typename Writer >
