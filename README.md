@@ -17,6 +17,46 @@ jsonify converts R objects to JSON.
 Because I wanted it available at the source ( C++ ) level for
 integrating into other packages.
 
+### What do you mean by “available at the source” ?
+
+I want to be able to call the C++ code from another package, without
+going to & from R. Therefore, the C++ code is implemented in headers, so
+you can “link to” it in your own package.
+
+For example, the `LinkingTo` section in **DESCRIPTION** will look
+something like
+
+``` yaml
+LinkingTo: 
+    Rcpp,
+    jsonify
+```
+
+And in a c++ source file you can `#include` the header and use the
+available functions
+
+``` cpp
+// [[Rcpp::depends(jsonify)]]
+#include "jsonify/jsonify.hpp"
+
+Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
+  return jsonify::api::to_json( df );
+}
+```
+
+### Can I call it from R if I want to?
+
+Yes. Just like the examples in this readme use `to_json()`
+
+``` r
+df <- data.frame(
+  id = 1:3
+  , val = letters[1:3]
+  )
+jsonify::to_json( df )
+#  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]
+```
+
 ### Is it fast?
 
 yeah it’s pretty good.
@@ -231,8 +271,7 @@ jsonify::pretty_json( js )
 ```
 
 And it’s still fast because of the design choice to coerce dates to UTC.
-All the date handling is done at the C++ leve, not R. So it’s
-faster.
+All the date handling is done at the C++ leve, not R. So it’s faster.
 
 ``` r
 dtes <- seq(as.Date("2018-01-01"), as.Date("2019-01-01"), length.out = 365)
@@ -263,56 +302,23 @@ microbenchmark(
   },
   times = 3
 )
+#  Registered S3 method overwritten by 'jsonlite':
+#    method     from   
+#    print.json jsonify
 #  Unit: milliseconds
-#       expr       min        lq     mean    median        uq       max neval
-#   jsonify1  57.61869  60.75988  63.8870  63.90106  67.02115  70.14124     3
-#   jsonify2 308.03909 314.36571 317.2089 320.69232 321.79381 322.89529     3
-#   jsonlite 692.80273 698.84349 714.4054 704.88426 725.20679 745.52933     3
+#       expr       min        lq      mean    median        uq       max
+#   jsonify1  58.24201  59.55658  60.82796  60.87114  62.12094  63.37073
+#   jsonify2 313.52606 313.66925 314.99959 313.81244 315.73635 317.66025
+#   jsonlite 700.36038 716.17692 726.07386 731.99347 738.93061 745.86775
+#   neval
+#       3
+#       3
+#       3
 ```
 
 ### That output looks nice, is that `pretty_json()` function new?
 
 Yep, it’s a new feature in v0.2.0
-
-### What do you mean by “available at the source” ?
-
-I want to be able to call the C++ code from another package, without
-going to & from R. Therefore, the C++ code is implemented in headers, so
-you can “link to” it in your own package.
-
-For example, the `LinkingTo` section in **DESCRIPTION** will look
-something like
-
-``` yaml
-LinkingTo: 
-    Rcpp,
-    jsonify
-```
-
-And in a c++ source file you can `#include` the header and use the
-available functions
-
-``` cpp
-// [[Rcpp::depends(jsonify)]]
-#include "jsonify/jsonify.hpp"
-
-Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
-  return jsonify::api::to_json( df );
-}
-```
-
-### Can I call it from R if I want to?
-
-Yes. Just like the examples in this readme use `to_json()`
-
-``` r
-df <- data.frame(
-  id = 1:3
-  , val = letters[1:3]
-  )
-jsonify::to_json( df )
-#  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]
-```
 
 ### I see factors are converted to strings
 
@@ -330,7 +336,7 @@ call
 
 ``` r
 jsonify::to_json( df, factors_as_string = FALSE )
-#  [{"id":1,"val":1},{"id":2,"val":2},{"id":3,"val":3}]
+#  [{"dte":17532.0}]
 ```
 
 ### How do I install it?
