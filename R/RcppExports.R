@@ -17,6 +17,10 @@ rcpp_null_to_na <- function(x) {
     invisible(.Call(`_jsonify_rcpp_null_to_na`, x))
 }
 
+rcpp_get_dtypes <- function(json) {
+    .Call(`_jsonify_rcpp_get_dtypes`, json)
+}
+
 rcpp_pretty_json <- function(json) {
     .Call(`_jsonify_rcpp_pretty_json`, json)
 }

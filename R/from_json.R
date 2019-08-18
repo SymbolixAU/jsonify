@@ -24,11 +24,11 @@
 from_json <- function(x, simplifyDataFrame = TRUE) {
   res <- rcpp_from_json(x, simplifyDataFrame)
   
-  if (!simplifyDataFrame || !inherits(res, "list")) {
+  # if (!simplifyDataFrame || !inherits(res, "list")) {
     return(res)
-  }
-  
-  list_to_df(res)
+  # }
+  # 
+  # list_to_df(res)
 }
 
 # Helper function to convert a "from_json()" list to a data frame.

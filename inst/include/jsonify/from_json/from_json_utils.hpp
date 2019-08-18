@@ -11,7 +11,7 @@
 namespace jsonify {
 namespace from_json {
 
-  Rcpp::List parse_value(const rapidjson::Value& val);
+  Rcpp::List parse_value(const rapidjson::Value& val, int lvl);
 
   std::unordered_set<int> dtypes;
   std::unordered_map<std::string, int> names_map;

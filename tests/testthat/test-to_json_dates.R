@@ -92,3 +92,9 @@ test_that("Different R objects with dates are handled", {
 })
 
 
+test_that("posixlt not converted to numeric",{
+  
+  p <- as.POSIXlt("2019-01-01 00:00:00", tz = "GMT")  ## so travis works
+  res <- to_json(p, numeric_dates = F)
+  expect_equal( as.character( res ), '{"sec":[0.0],"min":[0],"hour":[0],"mday":[1],"mon":[0],"year":[119],"wday":[2],"yday":[0],"isdst":[0]}')
+})

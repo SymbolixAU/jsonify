@@ -13,4 +13,3 @@ test_that("matrix converted correctly",{
   m <- matrix(c(T,F,T,F),ncol= 2,byrow = T)
   expect_equal(as.character(to_json(m)), '[[true,false],[true,false]]')
 })
-

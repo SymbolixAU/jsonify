@@ -53,9 +53,12 @@ namespace from_json {
     dtypes.clear();
     
     int doc_len = doc.Size();
+    Rcpp::Rcout << "doc_len: " << doc_len << std::endl;
     int curr_dtype;
     for(int i = 0; i < doc_len; ++i) {
       curr_dtype = doc[i].GetType();
+      // int curr_size = doc[i].GetSize();
+      // Rcpp::Rcout << "curr_size: " << curr_size << std::endl;
       // rapidjson uses separate ints for types true (2) and false (1)...combine
       // them into one value such that bool is 1.
       if(curr_dtype == 2) {
@@ -82,6 +85,11 @@ namespace from_json {
         }
       }
     }
+    //Rcpp::Rcout << "dtypes: " << dtypes << std::endl;
+    //Rcpp::Rcout << "dtypes: " << std::endl;
+    // for( auto itr = dtypes.begin(); itr != dtypes.end(); itr++ ) {
+    //   Rcpp::Rcout << (*itr) << std::endl;
+    // }
   }
   
   
@@ -89,6 +97,7 @@ namespace from_json {
   // Can handle JSON objects that have keys and those that do not have keys.
   template<typename T>
   inline Rcpp::List array_to_list(T& array, int& array_len) {
+    Rcpp::Rcout << "array_to_list" << std::endl;
     Rcpp::List out(array_len);
     for(int i = 0; i < array_len; ++i) {
       
@@ -154,7 +163,10 @@ namespace from_json {
   // array.
   // Can handle JSON objects that have keys and those that do not have keys.
   template<typename T>
-  inline SEXP parse_array(T& array) {
+  inline SEXP parse_array(T& array, int lvl) {
+    
+    Rcpp::Rcout << "parse_array - lvl: " << lvl << std::endl;
+    
     int array_len = array.Size();
     
     // Get set of unique data types of each value in the array.
@@ -257,9 +269,10 @@ namespace from_json {
     // JSON object
     case 3: {
       Rcpp::List out(array_len);
+      lvl++;
       for(int i = 0; i < array_len; ++i) {
         const rapidjson::Value& curr_val = array[i];
-        out[i] = parse_value(curr_val);
+        out[i] = parse_value(curr_val, lvl);
       }
       return(out);
     }
@@ -267,9 +280,10 @@ namespace from_json {
     // array
     case 4: {
       Rcpp::List out(array_len);
+      lvl++;
       for(int i = 0; i < array_len; ++i) {
         T curr_array = array[i].GetArray();
-        out[i] = parse_array<T>(curr_array);
+        out[i] = parse_array<T>(curr_array, lvl);
       }
       return out;
     }
@@ -280,7 +294,10 @@ namespace from_json {
   
   
   // Parse rapidjson::Value object.
-  inline Rcpp::List parse_value(const rapidjson::Value& val) {
+  inline Rcpp::List parse_value(const rapidjson::Value& val, int lvl) {
+    
+    Rcpp::Rcout << "parse_value - lvl: " << lvl << std::endl;
+    
     int json_len = val.Size();
     Rcpp::List out(json_len);
     Rcpp::CharacterVector names(json_len);
@@ -333,14 +350,16 @@ namespace from_json {
       // array
       case 4: {
         rapidjson::Value::ConstArray curr_array = itr->value.GetArray();
-        out[i] = parse_array<rapidjson::Value::ConstArray>(curr_array);
+        lvl++;
+        out[i] = parse_array<rapidjson::Value::ConstArray>(curr_array, lvl);
         break;
       }
         
       // JSON object
       case 3: {
         const rapidjson::Value& curr_val = itr->value;
-        out[i] = parse_value(curr_val);
+        lvl++;
+        out[i] = parse_value(curr_val, lvl);
         break;
       }
         
@@ -359,9 +378,16 @@ namespace from_json {
   }
   
   
-  // Parse rapidjson::Document object.
-  inline SEXP parse_document(rapidjson::Document& doc) {
+  /*
+   * parse_document
+   * 
+   * Parse rapidjson::Document object
+   * 
+   */
+  inline SEXP parse_document(rapidjson::Document& doc, int lvl) {
     int json_len = doc.Size();
+    
+    Rcpp::Rcout << "parse_document" << std::endl;
     
     // If doc has length zero, return NULL.
     if(json_len == 0) {
@@ -419,14 +445,14 @@ namespace from_json {
       // array
       case 4: {
         rapidjson::Value::ConstArray curr_array = itr->value.GetArray();
-        out[i] = parse_array<rapidjson::Value::ConstArray>(curr_array);
+        out[i] = parse_array<rapidjson::Value::ConstArray>(curr_array, lvl);
         break;
       }
 
       // JSON object
       case 3: {
         const rapidjson::Value& temp_val = itr->value;
-        out[i] = parse_value(temp_val);
+        out[i] = parse_value(temp_val, lvl);
         break;
       }
 
@@ -440,6 +466,8 @@ namespace from_json {
       i++;
     }
     
+    Rcpp::Rcout << "names: " << names << std::endl;
+    
     out.attr("names") = names;
     return out;
   }
@@ -448,6 +476,9 @@ namespace from_json {
   // Parse rapidjson::Document object that contains "keyless" JSON data of the
   // same data type. Returns an R vector.
   inline SEXP doc_to_vector(rapidjson::Document& doc, int& dtype) {
+    
+    Rcpp::Rcout << "doc_to_vector" << std::endl;
+    
     int doc_len = doc.Size();
     
     // Get current value
@@ -518,7 +549,10 @@ namespace from_json {
   
   // Parse rapidjson::Document object that contains "keyless" JSON data that
   // contains a variety of data types. Returns an R list.
-  inline Rcpp::List doc_to_list(rapidjson::Document& doc, bool& simplifyDataFrame) {
+  inline Rcpp::List doc_to_list(rapidjson::Document& doc, bool& simplifyDataFrame, int lvl = 0) {
+    
+    Rcpp::Rcout << "doc_to_list" << std::endl;
+    
     int doc_len = doc.Size();
     Rcpp::List out(doc_len);
     
@@ -574,7 +608,7 @@ namespace from_json {
       // array
       case 4: {
         rapidjson::Value::Array curr_array = doc[i].GetArray();
-        out[i] = parse_array<rapidjson::Value::Array>(curr_array);
+        out[i] = parse_array<rapidjson::Value::Array>(curr_array, lvl);
         return_df = false;
         break;
       }
@@ -582,43 +616,43 @@ namespace from_json {
       // JSON object
       case 3: {
         const rapidjson::Value& temp_val = doc[i];
-        pv_list = parse_value(temp_val);
+        pv_list = parse_value(temp_val, lvl);
         out[i] = pv_list;
         
-        // If simplifyDataFrame is true and i is 0, record the data types of 
-        // each named element of doc[i] in unordered_map names_map.
-        if(simplifyDataFrame && i == 0) {
-          pv_len = pv_list.size();
-          names = pv_list.attr("names");
-          for(unsigned int n = 0; n < names.size(); ++n) {
-            temp_name = Rcpp::as<std::string>(names[n]);
-            names_map[temp_name] = TYPEOF(pv_list[n]);
-          }
-          break;
-        }
+        // // If simplifyDataFrame is true and i is 0, record the data types of 
+        // // each named element of doc[i] in unordered_map names_map.
+        // if(simplifyDataFrame && i == 0) {
+        //   pv_len = pv_list.size();
+        //   names = pv_list.attr("names");
+        //   for(unsigned int n = 0; n < names.size(); ++n) {
+        //     temp_name = Rcpp::as<std::string>(names[n]);
+        //     names_map[temp_name] = TYPEOF(pv_list[n]);
+        //   }
+        //   break;
+        // }
         
-        // If simplifyDataFrame and return_df are both true, compare the data 
-        // types of each named element of doc[i] with the elements in 
-        // names_map. If the names do not align, or the data types of the 
-        // names do not align, set return_df to false.
-        if(simplifyDataFrame && return_df) {
-          if(pv_list.size() != pv_len) {
-            return_df = false;
-            break;
-          }
-          names = pv_list.attr("names");
-          for(unsigned int n = 0; n < names.size(); ++n) {
-            temp_name = Rcpp::as<std::string>(names[n]);
-            if(names_map.count(temp_name) == 0) {
-              return_df = false;
-              break;
-            }
-            if(names_map[temp_name] != TYPEOF(pv_list[n])) {
-              return_df = false;
-              break;
-            }
-          }
-        }
+        // // If simplifyDataFrame and return_df are both true, compare the data 
+        // // types of each named element of doc[i] with the elements in 
+        // // names_map. If the names do not align, or the data types of the 
+        // // names do not align, set return_df to false.
+        // if(simplifyDataFrame && return_df) {
+        //   if(pv_list.size() != pv_len) {
+        //     return_df = false;
+        //     break;
+        //   }
+        //   names = pv_list.attr("names");
+        //   for(unsigned int n = 0; n < names.size(); ++n) {
+        //     temp_name = Rcpp::as<std::string>(names[n]);
+        //     if(names_map.count(temp_name) == 0) {
+        //       return_df = false;
+        //       break;
+        //     }
+        //     if(names_map[temp_name] != TYPEOF(pv_list[n])) {
+        //       return_df = false;
+        //       break;
+        //     }
+        //   }
+        // }
         
         break;
       }
@@ -630,42 +664,42 @@ namespace from_json {
       }
     }
     
-    // If simplifyDataFrame and return_df are both true, convert List "out" to 
-    // a dataframe, with the names of "out" making up the df col headers.
-    if(simplifyDataFrame && return_df) {
-      Rcpp::List df_out = Rcpp::List(pv_len);
-      for(int i = 0; i < pv_len; ++i) {
-        temp_name = names[i];
-        switch(names_map[temp_name]) {
-        case 10: {
-          extract_lgl_vector(out);
-          df_out[i] = df_out_lgl;
-          break;
-        }
-        case 13: {
-          extract_int_vector(out);
-          df_out[i] = df_out_int;
-          break;
-        }
-        case 14: {
-          extract_dbl_vector(out);
-          df_out[i] = df_out_dbl;
-          break;
-        }
-        default: { // string, case 16
-          extract_str_vector(out);
-          df_out[i] = df_out_str;
-          break;
-        }
-        }
-      }
-      
-      df_out.attr("names") = names;
-      df_out.attr("class") = "data.frame";
-      df_out.attr("row.names") = Rcpp::seq(1, doc_len);
-      
-      return df_out;
-    }
+    // // If simplifyDataFrame and return_df are both true, convert List "out" to 
+    // // a dataframe, with the names of "out" making up the df col headers.
+    // if(simplifyDataFrame && return_df) {
+    //   Rcpp::List df_out = Rcpp::List(pv_len);
+    //   for(int i = 0; i < pv_len; ++i) {
+    //     temp_name = names[i];
+    //     switch(names_map[temp_name]) {
+    //     case 10: {
+    //       extract_lgl_vector(out);
+    //       df_out[i] = df_out_lgl;
+    //       break;
+    //     }
+    //     case 13: {
+    //       extract_int_vector(out);
+    //       df_out[i] = df_out_int;
+    //       break;
+    //     }
+    //     case 14: {
+    //       extract_dbl_vector(out);
+    //       df_out[i] = df_out_dbl;
+    //       break;
+    //     }
+    //     default: { // string, case 16
+    //       extract_str_vector(out);
+    //       df_out[i] = df_out_str;
+    //       break;
+    //     }
+    //     }
+    //   }
+    //   
+    //   df_out.attr("names") = names;
+    //   df_out.attr("class") = "data.frame";
+    //   df_out.attr("row.names") = Rcpp::seq(1, doc_len);
+    //   
+    //   return df_out;
+    // }
 
     return out;
   }
@@ -679,6 +713,7 @@ namespace from_json {
   //'  input should be a character vector of length 1.
   //' @export
   inline SEXP from_json(const char * json, bool& simplifyDataFrame) {
+    int lvl = 0;
     rapidjson::Document doc;
     doc.Parse(json);
     
@@ -717,7 +752,7 @@ namespace from_json {
     // If input is not an array, pass doc through parse_document(), and return
     // the result.
     if(!doc.IsArray()) {
-      return parse_document(doc);
+      return parse_document(doc, lvl);
     }
     
     // If input is an empty array, return NULL.
@@ -728,22 +763,26 @@ namespace from_json {
     // Get set of unique data types in doc.
     get_dtypes<rapidjson::Document>(doc, true);
     int dtype_len = dtypes.size();
+    Rcpp::Rcout << "dtype_len: " << dtype_len << std::endl;
 
     // If dtype_len is greater than 2, return an R list of values.
     if(dtype_len > 2) {
-      return doc_to_list(doc, simplifyDataFrame);
+      Rcpp::Rcout << "doc_to_list 1" << std::endl;
+      return doc_to_list(doc, simplifyDataFrame, 0);
     }
 
     // If dtype_len is 2 and 0 does not appear in dtypes, return an
     // R list of values.
     if(dtype_len == 2 && dtypes.find(0) == dtypes.end()) {
-      return doc_to_list(doc, simplifyDataFrame);
+      Rcpp::Rcout << "doc_to_list 2" << std::endl;
+      return doc_to_list(doc, simplifyDataFrame, 0);
     }
 
     // If 3 or 4 is in dtypes, return an R list of values.
     if(dtypes.find(3) != dtypes.end() ||
        dtypes.find(4) != dtypes.end()) {
-      return doc_to_list(doc, simplifyDataFrame);
+      Rcpp::Rcout << "doc_to_list 3" << std::endl;
+      return doc_to_list(doc, simplifyDataFrame, 0);
     }
 
     // Dump ints from dtypes to an std vector.
@@ -763,6 +802,31 @@ namespace from_json {
     }
 
     return doc_to_vector(doc, dt);
+  }
+  
+  // Test array types
+  // If it's an object, it's 'simplify' value will be a data.frame
+  // if it's an array, this test finds the types inside the array
+  inline Rcpp::IntegerVector test_dtypes( const char * json ) {
+    
+    
+    rapidjson::Document doc;
+    doc.Parse(json);
+    
+    if(!doc.IsArray()) {
+      return Rcpp::IntegerVector(0); // if not an array it doesn't call get_dtypes
+    }
+    
+    get_dtypes<rapidjson::Document>(doc);
+    int dtype_len = dtypes.size();
+
+    Rcpp::IntegerVector iv(dtype_len);
+    
+    int i = 0;
+    for( auto itr = dtypes.begin(); itr != dtypes.end(); itr++ ) {
+      iv[i] = (*itr);
+    }
+    return iv;
   }
 
 } // namespace from_json

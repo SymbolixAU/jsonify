@@ -25,6 +25,40 @@ jsonify converts R objects to JSON.
 
 Because I wanted it available at the source ( C++ ) level for integrating into other packages.
 
+### What do you mean by "available at the source" ?
+
+I want to be able to call the C++ code from another package, without going to & from R. Therefore, the C++ code is implemented in headers, so you can "link to" it in your own package. 
+
+For example, the `LinkingTo` section in **DESCRIPTION** will look something like
+
+```yaml
+LinkingTo: 
+    Rcpp,
+    jsonify
+```
+And in a c++ source file you can `#include` the header and use the available functions
+
+```c++
+// [[Rcpp::depends(jsonify)]]
+#include "jsonify/jsonify.hpp"
+
+Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
+  return jsonify::api::to_json( df );
+}
+```
+
+### Can I call it from R if I want to?
+
+Yes. Just like the examples in this readme use `to_json()`
+
+```{r}
+df <- data.frame(
+  id = 1:3
+  , val = letters[1:3]
+  )
+jsonify::to_json( df )
+```
+
 ### Is it fast?
 
 yeah it's pretty good. 
@@ -237,40 +271,6 @@ microbenchmark(
 
 Yep, it's a new feature in v0.2.0
 
-
-### What do you mean by "available at the source" ?
-
-I want to be able to call the C++ code from another package, without going to & from R. Therefore, the C++ code is implemented in headers, so you can "link to" it in your own package. 
-
-For example, the `LinkingTo` section in **DESCRIPTION** will look something like
-
-```yaml
-LinkingTo: 
-    Rcpp,
-    jsonify
-```
-And in a c++ source file you can `#include` the header and use the available functions
-
-```c++
-// [[Rcpp::depends(jsonify)]]
-#include "jsonify/jsonify.hpp"
-
-Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
-  return jsonify::api::to_json( df );
-}
-```
-
-### Can I call it from R if I want to?
-
-Yes. Just like the examples in this readme use `to_json()`
-
-```{r}
-df <- data.frame(
-  id = 1:3
-  , val = letters[1:3]
-  )
-jsonify::to_json( df )
-```
 
 ### I see factors are converted to strings
 

@@ -129,7 +129,6 @@ namespace simple {
     } else if ( factors_as_string && Rf_isFactor( iv ) ) {
       
       Rcpp::CharacterVector lvls = iv.attr( "levels" );
-      //Rcpp::Rcout << "lvls: " << lvls << std::endl;
       if (lvls.length() == 0 ) {
         // no levels - from NA_character_ vector
         Rcpp::StringVector s(1);
@@ -192,7 +191,6 @@ namespace simple {
         Rcpp::StringVector str = Rcpp::as< Rcpp::StringVector >( iv );
         write_value( writer, str, row );
       }
-      // Rcpp::Rcout << "lvls " << lvls  << std::endl;
       
     } else {
     
@@ -264,52 +262,22 @@ namespace simple {
     }
   }
   
-  
-  
-  /*
-   * template for R SEXPs for single-row from a vector
-   */
-  template < typename Writer >
-  inline void write_value( Writer& writer, SEXP sexp, int row, 
-                           int digits, bool numeric_dates, bool factors_as_string) {
-
-    // Rcpp::Rcout << "type of sexp: " << TYPEOF( sexp ) << std::endl;
-    
-    switch( TYPEOF( sexp ) ) {
-    case REALSXP: {
-      Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( sexp );
-      write_value( writer, nv, row, digits, numeric_dates );
-      break;
-    }
-    case INTSXP: {
-      Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
-      // Rcpp::Rcout << "intsxp: " << iv << std::endl;
-      // Rcpp::Rcout << "row: " << row << std::endl;
-      // Rcpp::Rcout << "numeric_dates: " << numeric_dates << std::endl;
-      // Rcpp::Rcout << "factors_as_string: " << factors_as_string << std::endl;
-      // TODO( do we need factors_as_string here, or will it be sorted by the time it comes to this step?)
-      write_value( writer, iv, row, numeric_dates, factors_as_string );
-      break;
-    }
-    case LGLSXP: {
-      Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( sexp );
-      write_value( writer, lv, row );
-      break;
-    }
-    case STRSXP: {
-      Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( sexp );
-      write_value( writer, sv, row );
-      break;
-    }
-    default: {
-      Rcpp::stop("Unknown R object type");
-    }
-    }
-  }
 
   // ---------------------------------------------------------------------------
   // matrix values
   // ---------------------------------------------------------------------------
+  
+  template < typename Writer >
+  inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, 
+                           int& row, bool unbox = false ) {
+    //bool will_unbox = false;
+    //jsonify::utils::start_array( writer, will_unbox );
+
+    Rcpp::IntegerVector this_row = mat(row, Rcpp::_);
+    write_value( writer, this_row, unbox, true, true );  // true, true : numeric_dates, factors_as_string
+        
+    //jsonify::utils::end_array( writer, will_unbox );
+  }
   
   template < typename Writer >
   inline void write_value( Writer& writer, Rcpp::IntegerMatrix& mat, bool unbox = false,
@@ -334,6 +302,18 @@ namespace simple {
       }
     }
     jsonify::utils::end_array( writer, will_unbox );
+  }
+  
+  template < typename Writer >
+  inline void write_value( Writer& writer, Rcpp::NumericMatrix& mat, 
+                           int& row, bool unbox = false ) {
+    //bool will_unbox = false;
+    //jsonify::utils::start_array( writer, will_unbox );
+    
+    Rcpp::NumericVector this_row = mat(row, Rcpp::_);
+    write_value( writer, this_row, unbox, true, true );  // true, true : numeric_dates, factors_as_string
+    
+    //jsonify::utils::end_array( writer, will_unbox );
   }
   
   template < typename Writer >
@@ -362,6 +342,19 @@ namespace simple {
   }
   
   template < typename Writer >
+  inline void write_value( Writer& writer, Rcpp::StringMatrix& mat, 
+                           int& row, bool unbox = false ) {
+    
+    //bool will_unbox = false;
+    //jsonify::utils::start_array( writer, will_unbox );
+    
+    Rcpp::StringVector this_row = mat(row, Rcpp::_);
+    write_value( writer, this_row, unbox );  // true, true : numeric_dates, factors_as_string
+    
+    //jsonify::utils::end_array( writer, will_unbox );
+  }
+  
+  template < typename Writer >
   inline void write_value( Writer& writer, Rcpp::CharacterMatrix& mat, bool unbox = false,
                            std::string by = "row" ) {
     
@@ -386,6 +379,18 @@ namespace simple {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
+  template < typename Writer >
+  inline void write_value( Writer& writer, Rcpp::LogicalMatrix& mat, 
+                           int& row, bool unbox = false ) {
+    
+    //bool will_unbox = false;
+    //jsonify::utils::start_array( writer, will_unbox );
+    
+    Rcpp::LogicalVector this_row = mat(row, Rcpp::_);
+    write_value( writer, this_row, unbox );  // true, true : numeric_dates, factors_as_string
+    
+    //jsonify::utils::end_array( writer, will_unbox );
+  }
   
   template < typename Writer >
   inline void write_value( Writer& writer, Rcpp::LogicalMatrix& mat, bool unbox = false, 
@@ -412,6 +417,62 @@ namespace simple {
       }
     }
     jsonify::utils::end_array( writer, will_unbox );
+  }
+  
+  
+  /*
+   * template for R SEXPs for single-row from a vector
+   */
+  template < typename Writer >
+  inline void write_value( Writer& writer, SEXP sexp, int row, 
+                           int digits, bool numeric_dates, bool factors_as_string) {
+    
+    switch( TYPEOF( sexp ) ) {
+    case REALSXP: {
+    if( Rf_isMatrix( sexp ) ) {
+      Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( sexp );
+      write_value( writer, nm, row  );
+    } else {
+      Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( sexp );
+      write_value( writer, nv, row, digits, numeric_dates );
+    }
+    break;
+    }
+    case INTSXP: {
+    if( Rf_isMatrix( sexp ) ) {
+      Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( sexp );
+      write_value( writer, im, row );
+    } else {
+        Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( sexp );
+        // TODO( do we need factors_as_string here, or will it be sorted by the time it comes to this step?)
+        write_value( writer, iv, row, numeric_dates, factors_as_string );
+    }
+    break;
+    }
+    case LGLSXP: {
+    if( Rf_isMatrix( sexp ) ) {
+      Rcpp::LogicalMatrix lm = Rcpp::as< Rcpp::LogicalMatrix >( sexp );
+      write_value( writer, lm, row );
+    } else {
+      Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( sexp );
+      write_value( writer, lv, row );
+    }
+    break;
+    }
+    case STRSXP: {
+    if( Rf_isMatrix( sexp ) ) {
+      Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( sexp );
+      write_value( writer, sm, row );
+    } else {
+      Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( sexp );
+      write_value( writer, sv, row );
+    }
+    break;
+    }
+    default: {
+      Rcpp::stop("Unknown R object type");
+    }
+    }
   }
 
 } // namespace simple

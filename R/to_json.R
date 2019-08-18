@@ -57,9 +57,22 @@ handle_digits <- function( digits ) {
   return( as.integer( digits ) )
 }
 
+#' Coerce string to JSON
+#' 
+#' @param x string to coerce to JSON
+#' 
+#' @examples 
+#' 
+#' js <- '{"x":1,"y":2}'
+#' as.json(js)
+#' 
+#' @export
+as.json <- function(x) {
+  if( !jsonify::validate_json( x ) ) 
+    stop("Invalid JSON")
 
-
-
-
+  attr(x, "class") <- "json"
+  x
+}
 
 
