@@ -27,3 +27,8 @@ void rcpp_null_to_na( Rcpp::List& x ) {
 Rcpp::IntegerVector rcpp_get_dtypes( const char * json ) {
   return jsonify::from_json::test_dtypes( json );
 }
+
+// given the dtype, and the length we can work out the type of object to simplify to
+
+
+
