@@ -809,7 +809,6 @@ namespace from_json {
   // if it's an array, this test finds the types inside the array
   inline Rcpp::IntegerVector test_dtypes( const char * json ) {
     
-    
     rapidjson::Document doc;
     doc.Parse(json);
     
