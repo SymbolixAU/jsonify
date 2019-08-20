@@ -544,7 +544,7 @@ namespace from_json {
   
   // Parse rapidjson::Document object that contains "keyless" JSON data that
   // contains a variety of data types. Returns an R list.
-  inline SEXP doc_to_list(rapidjson::Document& doc, bool& simplify ) {
+  inline SEXP doc_to_list(rapidjson::Document& doc, bool& simplify, std::string by = "row" ) {
     
     int doc_len = doc.Size();
     Rcpp::Rcout << "simplify: " << simplify << std::endl;
@@ -557,7 +557,9 @@ namespace from_json {
     bool return_df = true;
     names_map.clear();
     
-    Rcpp::IntegerVector iv_lengths( doc_len );  // possibly make an unordered_set??
+//    Rcpp::IntegerVector iv_lengths( doc_len );  // possibly make an unordered_set??
+    std::unordered_set<int> list_lengths;
+    std::unordered_set<int> list_types;
     
     for(int i = 0; i < doc_len; ++i) {
       
@@ -567,7 +569,9 @@ namespace from_json {
       // bool - false
       case 1: {
         out[i] = doc[i].GetBool();
-        iv_lengths[i] = 1;
+        list_lengths.insert(1);
+        list_types.insert( LGLSXP );
+//        iv_lengths[i] = 1;
         return_df = false;
         break;
       }
@@ -575,7 +579,9 @@ namespace from_json {
       // bool - true
       case 2: {
         out[i] = doc[i].GetBool();
-        iv_lengths[i] = 1;
+        list_lengths.insert(1);
+        list_types.insert( LGLSXP );
+//        iv_lengths[i] = 1;
         return_df = false;
         break;
       }
@@ -583,7 +589,9 @@ namespace from_json {
       // string
       case 5: {
         out[i] = doc[i].GetString();
-        iv_lengths[i] = 1;
+        list_lengths.insert(1);
+        list_types.insert( STRSXP );
+//        iv_lengths[i] = 1;
         return_df = false;
         break;
       }
@@ -593,11 +601,14 @@ namespace from_json {
         if(doc[i].IsDouble()) {
           // double
           out[i] = doc[i].GetDouble();
+          list_types.insert( REALSXP );
         } else {
           // int
           out[i] = doc[i].GetInt();
+          list_types.insert( INTSXP );
         }
-        iv_lengths[i] = 1;
+        list_lengths.insert(1);
+//        iv_lengths[i] = 1;
         return_df = false;
         break;
       }
@@ -605,7 +616,9 @@ namespace from_json {
       // null
       case 0: {
         out[i] = R_NA_VAL;
-        iv_lengths[i] = 1;
+        list_lengths.insert(1);
+        list_types.insert( LGLSXP );
+//        iv_lengths[i] = 1;
         return_df = false;
         break;
       }
@@ -613,9 +626,11 @@ namespace from_json {
       // array
       case 4: {
         rapidjson::Value::Array curr_array = doc[i].GetArray();
-        iv_lengths[i] = curr_array.Size();
+        //iv_lengths[i] = curr_array.Size();
+        list_lengths.insert( curr_array.Size() );
         Rcpp::Rcout << "doc_to_list :: parse_array()" << std::endl;
         out[i] = parse_array<rapidjson::Value::Array>(curr_array);
+        list_types.insert( TYPEOF( out[i] ) );
         return_df = false;
         break;
       }
@@ -623,9 +638,11 @@ namespace from_json {
       // JSON object
       case 3: {
         const rapidjson::Value& temp_val = doc[i];
-        iv_lengths[i] = temp_val.Size();
+        //iv_lengths[i] = temp_val.Size();
+        list_lengths.insert( temp_val.Size() );
         pv_list = parse_value(temp_val);
         out[i] = pv_list;
+        list_types.insert( TYPEOF( out[i] ) );
         
         // // If simplify is true and i is 0, record the data types of 
         // // each named element of doc[i] in unordered_map names_map.
@@ -672,38 +689,118 @@ namespace from_json {
       }
     }
     
-    if( simplify ) {
+    if( simplify && list_lengths.size() == 1 ) { 
+      // one length means a tablular structure / all list items are the same length
+      
       // if dtype_len == 1 (only 1 data type)
       // 
       
       if( dtypes.size() == 1 ) {   // one object
-        // if array, make a matrix
+        // if array, make a matrix (and all lengths are the same)
         int this_type = iv_dtypes[0];
-        if( this_type == 4 ) {
+        if( this_type == 4 ) {  
           Rcpp::Rcout << "matrix needed here" << std::endl;
           int n_col = doc_len;
-          int n_row = iv_lengths[0]; // not happy wiht this
+          //int n_row = iv_lengths[0]; // not happy wiht this
+          std::unordered_set<int>::iterator it_lengths = list_lengths.begin();
+          int n_row = *(it_lengths);
           
-          // need to know the SEXP type too
-          // for my test i'm only inputting numeric
-          // Rcpp::NumericMatrix mat( n_row, n_col );
-          // if by == col
-          // for(int i = 0; i < n_col; i++ ) {
-          //   Rcpp::NumericVector this_vec = out[i];
-          //   mat( Rcpp::_, i ) = this_vec;
-          // }
-          // return mat;
-          
-          // if by == row
-          Rcpp::NumericMatrix mat( n_col, n_row );
-          for( int i = 0; i < n_col; i++ ) {
-            Rcpp::NumericVector this_vec = out[i];
-            for( int j = 0; j < n_row; j++ ) {
-              double this_number = this_vec[j];
-              mat( i, j ) = this_number;
+          std::unordered_set<int>::iterator it_types = list_types.begin();
+          int r_type = *(it_types);
+          Rcpp::Rcout << "r_type: " << r_type << std::endl;
+
+          switch( r_type ) {
+          case INTSXP: {
+            
+            if( by == "col") {
+              Rcpp::IntegerMatrix mat( n_row, n_col );
+            
+              for(int i = 0; i < n_col; i++ ) {
+                Rcpp::IntegerVector this_vec = out[i];
+                mat( Rcpp::_, i ) = this_vec;
+              }
+              return mat;
+            } else {
+              
+              Rcpp::IntegerMatrix mat( n_col, n_row );
+              for( int i = 0; i < n_col; i++ ) {
+                Rcpp::IntegerVector this_vec = out[i];
+                for( int j = 0; j < n_row; j++ ) {
+                  int this_val = this_vec[j];
+                  mat( i, j ) = this_val;
+                }
+              }
+              return mat;
             }
           }
-          return mat;
+          case REALSXP: {
+            if( by == "col" ) {
+              Rcpp::NumericMatrix mat( n_row, n_col );
+              //if by == col
+              for(int i = 0; i < n_col; i++ ) {
+                Rcpp::NumericVector this_vec = out[i];
+                mat( Rcpp::_, i ) = this_vec;
+              }
+              return mat;
+            } else {
+            
+              Rcpp::NumericMatrix mat( n_col, n_row );
+              for( int i = 0; i < n_col; i++ ) {
+                Rcpp::NumericVector this_vec = out[i];
+                for( int j = 0; j < n_row; j++ ) {
+                  double this_val = this_vec[j];
+                  mat( i, j ) = this_val;
+                }
+              }
+              return mat;
+            }
+          }
+          case LGLSXP: {
+            if( by == "col" ) {
+            Rcpp::LogicalMatrix mat( n_row, n_col );
+            //if by == col
+            for(int i = 0; i < n_col; i++ ) {
+              Rcpp::LogicalVector this_vec = out[i];
+              mat( Rcpp::_, i ) = this_vec;
+            }
+            return mat;
+          } else {
+            
+            Rcpp::LogicalMatrix mat( n_col, n_row );
+            for( int i = 0; i < n_col; i++ ) {
+              Rcpp::LogicalVector this_vec = out[i];
+              for( int j = 0; j < n_row; j++ ) {
+                bool this_val = this_vec[j];
+                mat( i, j ) = this_val;
+              }
+            }
+            return mat;
+          }
+          }
+          default: {
+            // string
+            if( by == "col" ) {
+            Rcpp::StringMatrix mat( n_row, n_col );
+            //if by == col
+            for(int i = 0; i < n_col; i++ ) {
+              Rcpp::StringVector this_vec = out[i];
+              mat( Rcpp::_, i ) = this_vec;
+            }
+            return mat;
+          } else {
+            
+            Rcpp::StringMatrix mat( n_col, n_row );
+            for( int i = 0; i < n_col; i++ ) {
+              Rcpp::StringVector this_vec = out[i];
+              for( int j = 0; j < n_row; j++ ) {
+                Rcpp::String this_val = this_vec[j];
+                mat( i, j ) = this_val;
+              }
+            }
+            return mat;
+          }
+          }
+          }
         }
       }
     }

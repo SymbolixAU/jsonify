@@ -51,13 +51,37 @@
 # ## type 4, length 3
 # ## - array == matrix( row = 3, col = ?? )
 # 
+# x <- matrix(c(1.1, 2:9), ncol = 3)
+# js <- to_json( x )
+# js
+# jsonify:::rcpp_get_dtypes( js )
+# res <- from_json( js )
+# ## type 4, length 3
+# ## - array == matrix( row = 3, col = ?? )
+# 
+# x <- matrix(sample(c(T,F), size = 9, replace = T), ncol = 3)
+# js <- to_json( x )
+# js
+# jsonify:::rcpp_get_dtypes( js )
+# res <- from_json( js )
+# ## type 4, length 3
+# ## - array == matrix( row = 3, col = ?? )
+# 
+# x <- matrix(letters[1:9], ncol = 3)
+# js <- to_json( x )
+# js
+# jsonify:::rcpp_get_dtypes( js )
+# res <- from_json( js )
+# ## type 4, length 3
+# ## - array == matrix( row = 3, col = ?? )
+
 # x <- matrix(1:12, ncol = 3)
 # js <- to_json( x )
 # js
 # jsonify:::rcpp_get_dtypes( js )
 # res <- from_json( js )
-# ## type 4, length 4
-# ## - array == matrix( row = 4, col = ?? )
+## type 4, length 4
+## - array == matrix( row = 4, col = ?? )
 # 
 # x <- data.frame(x = 1:4, y = 4:7)
 # js <- to_json( x )
