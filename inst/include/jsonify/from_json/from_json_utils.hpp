@@ -24,6 +24,217 @@ namespace from_json {
   Rcpp::CharacterVector names;
   Rcpp::List pv_list;
   
+  // Extract all logical values from each named element of a nested list.
+  inline void extract_lgl_vector(Rcpp::List& x) {
+    df_out_lgl.clear();
+    for(unsigned int i = 0; i < x.size(); ++ i) {
+      pv_list = x[i];
+      df_out_lgl.push_back(pv_list[temp_name]);
+    }
+  }
+  
+  // Extract all int values from each named element of a nested list.
+  inline void extract_int_vector(Rcpp::List& x) {
+    df_out_int.clear();
+    for(unsigned int i = 0; i < x.size(); ++ i) {
+      pv_list = x[i];
+      df_out_int.push_back(pv_list[temp_name]);
+    }
+  }
+  
+  // Extract all double values from each named element of a nested list.
+  inline void extract_dbl_vector(Rcpp::List& x) {
+    df_out_dbl.clear();
+    for(unsigned int i = 0; i < x.size(); ++ i) {
+      pv_list = x[i];
+      df_out_dbl.push_back(pv_list[temp_name]);
+    }
+  }
+  
+  // Extract all string values from each named element of a nested list.
+  inline void extract_str_vector(Rcpp::List& x) {
+    df_out_str.clear();
+    for(unsigned int i = 0; i < x.size(); ++ i) {
+      pv_list = x[i];
+      df_out_str.push_back(pv_list[temp_name]);
+    }
+  }
+  
+  SEXP simplify_matrix(
+      Rcpp::List& out,
+      int& doc_len, 
+      std::unordered_set<int>& list_lengths,
+      std::unordered_set<int>& list_types,
+      std::string by = "row"
+      ) {
+    int n_col = doc_len;
+    //int n_row = iv_lengths[0]; // not happy wiht this
+    std::unordered_set<int>::iterator it_lengths = list_lengths.begin();
+    int n_row = *(it_lengths);
+    
+    std::unordered_set<int>::iterator it_types = list_types.begin();
+    int r_type = *(it_types);
+    Rcpp::Rcout << "r_type: " << r_type << std::endl;
+    
+    switch( r_type ) {
+    case INTSXP: {
+      
+      if( by == "col") {
+      Rcpp::IntegerMatrix mat( n_row, n_col );
+      
+      for(int i = 0; i < n_col; i++ ) {
+        Rcpp::IntegerVector this_vec = out[i];
+        mat( Rcpp::_, i ) = this_vec;
+      }
+      return mat;
+    } else {
+      
+      Rcpp::IntegerMatrix mat( n_col, n_row );
+      for( int i = 0; i < n_col; i++ ) {
+        Rcpp::IntegerVector this_vec = out[i];
+        for( int j = 0; j < n_row; j++ ) {
+          int this_val = this_vec[j];
+          mat( i, j ) = this_val;
+        }
+      }
+      return mat;
+    }
+    }
+    case REALSXP: {
+      if( by == "col" ) {
+      Rcpp::NumericMatrix mat( n_row, n_col );
+      //if by == col
+      for(int i = 0; i < n_col; i++ ) {
+        Rcpp::NumericVector this_vec = out[i];
+        mat( Rcpp::_, i ) = this_vec;
+      }
+      return mat;
+    } else {
+      
+      Rcpp::NumericMatrix mat( n_col, n_row );
+      for( int i = 0; i < n_col; i++ ) {
+        Rcpp::NumericVector this_vec = out[i];
+        for( int j = 0; j < n_row; j++ ) {
+          double this_val = this_vec[j];
+          mat( i, j ) = this_val;
+        }
+      }
+      return mat;
+    }
+    }
+    case LGLSXP: {
+      if( by == "col" ) {
+      Rcpp::LogicalMatrix mat( n_row, n_col );
+      //if by == col
+      for(int i = 0; i < n_col; i++ ) {
+        Rcpp::LogicalVector this_vec = out[i];
+        mat( Rcpp::_, i ) = this_vec;
+      }
+      return mat;
+    } else {
+      
+      Rcpp::LogicalMatrix mat( n_col, n_row );
+      for( int i = 0; i < n_col; i++ ) {
+        Rcpp::LogicalVector this_vec = out[i];
+        for( int j = 0; j < n_row; j++ ) {
+          bool this_val = this_vec[j];
+          mat( i, j ) = this_val;
+        }
+      }
+      return mat;
+    }
+    }
+    default: {
+      // string
+      if( by == "col" ) {
+      Rcpp::StringMatrix mat( n_row, n_col );
+      //if by == col
+      for(int i = 0; i < n_col; i++ ) {
+        Rcpp::StringVector this_vec = out[i];
+        mat( Rcpp::_, i ) = this_vec;
+      }
+      return mat;
+    } else {
+      
+      Rcpp::StringMatrix mat( n_col, n_row );
+      for( int i = 0; i < n_col; i++ ) {
+        Rcpp::StringVector this_vec = out[i];
+        for( int j = 0; j < n_row; j++ ) {
+          Rcpp::String this_val = this_vec[j];
+          mat( i, j ) = this_val;
+        }
+      }
+      return mat;
+    }
+    }
+    }
+    return Rcpp::LogicalMatrix(0); // never reaches?
+  }
+  
+  SEXP simplify_dataframe(
+    Rcpp::List& out,
+    int& doc_len
+  ) {
+    
+    // If simplify and return_df are both true, compare the data
+    // types of each named element of doc[i] with the elements in
+    // names_map. If the names do not align, or the data types of the
+    // names do not align, set return_df to false.
+    if(pv_list.size() != pv_len) {
+      //return_df = false;
+      //break;
+      return out; // cant' simplify
+    }
+    names = pv_list.attr("names");
+    for(unsigned int n = 0; n < names.size(); ++n) {
+      temp_name = Rcpp::as<std::string>( names[n] );
+      if(names_map.count(temp_name) == 0) {
+        // return_df = false;
+        // break;
+        return out; // can't simplify
+      }
+      if(names_map[temp_name] != TYPEOF(pv_list[n])) {
+        // return_df = false;
+        // break;
+        return out; // can't simplify
+      }
+    }
+
+    Rcpp::List df_out = Rcpp::List(pv_len);
+    for(int i = 0; i < pv_len; ++i) {
+      temp_name = names[i];
+      switch(names_map[temp_name]) {
+      case 10: {
+        extract_lgl_vector(out);
+        df_out[i] = df_out_lgl;
+        break;
+      }
+      case 13: {
+        extract_int_vector(out);
+        df_out[i] = df_out_int;
+        break;
+      }
+      case 14: {
+        extract_dbl_vector(out);
+        df_out[i] = df_out_dbl;
+        break;
+      }
+      default: { // string, case 16
+        extract_str_vector(out);
+        df_out[i] = df_out_str;
+        break;
+      }
+      }
+    }
+
+    df_out.attr("names") = names;
+    df_out.attr("class") = "data.frame";
+    df_out.attr("row.names") = Rcpp::seq(1, doc_len);
+
+    return df_out;
+  }
+  
+  
   // Get all unique names from a list object.
   // Equivalent to the R command:
   // unique(unlist(lapply(list_obj, names), recursive = FALSE, use.names = FALSE))

@@ -75,6 +75,13 @@
 # ## type 4, length 3
 # ## - array == matrix( row = 3, col = ?? )
 
+## TODO
+## - the second element isn't named, so don't return a name?
+# x <- matrix( letters[1:9], ncol = 3)
+# l <- list( x = 1:5, x )
+# js <- to_json( l )
+# from_json( js )
+
 # x <- matrix(1:12, ncol = 3)
 # js <- to_json( x )
 # js
@@ -88,9 +95,15 @@
 # js
 # jsonify:::rcpp_get_dtypes( js )
 # res <- from_json( js )
-# ## type 3, length 4
-# ## - object == data.frame( row = 4 , col = ?? )
-# 
+## type 3, length 4
+## - object == data.frame( row = 4 , col = ?? )
+
+## TODO
+# data.frame with the last value as NA needs to also simplifyi to data.frame
+# x <- data.frame(x = 1:2, y = c(1, NA))
+# js <- to_json( x )
+# from_json( js )
+
 # x <- list(1:4)
 # js <- to_json( x )
 # js
