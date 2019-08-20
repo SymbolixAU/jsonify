@@ -183,19 +183,27 @@ namespace from_json {
     if(pv_list.size() != pv_len) {
       //return_df = false;
       //break;
+      Rcpp::Rcout << "pv_list.size != pv_len " << std::endl;
       return out; // cant' simplify
     }
     names = pv_list.attr("names");
     for(unsigned int n = 0; n < names.size(); ++n) {
       temp_name = Rcpp::as<std::string>( names[n] );
+      Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
+      Rcpp::Rcout << "tyep pv_list " << TYPEOF( pv_list[n] ) << std::endl;
       if(names_map.count(temp_name) == 0) {
         // return_df = false;
         // break;
+        Rcpp::Rcout << "names_map.count(temp_name) == 0 " << std::endl;
         return out; // can't simplify
       }
-      if(names_map[temp_name] != TYPEOF(pv_list[n])) {
+      // TODO
+      // is this check (TYPEOF( pv_list[n] ) != LGLSXP ) correct? 
+      // if it's logical && is NULL value it can be coerced to numeric NA?
+      if(names_map[temp_name] != TYPEOF( pv_list[n] ) && TYPEOF( pv_list[n] ) != LGLSXP  ) {
         // return_df = false;
         // break;
+        Rcpp::Rcout << "names_map[temp_name] != TYPEOF(pv_list[n])" << std::endl;
         return out; // can't simplify
       }
     }

@@ -261,14 +261,16 @@ namespace from_json {
   inline Rcpp::List parse_value(const rapidjson::Value& val) {
     
     int json_len = val.Size();
-    Rcpp::List out(json_len);
-    Rcpp::CharacterVector names(json_len);
+    Rcpp::List out( json_len );
+    Rcpp::CharacterVector names( json_len );
     
     int i = 0;
     for (rapidjson::Value::ConstMemberIterator itr = val.MemberBegin(); itr != val.MemberEnd(); ++itr) {
       
       // Get current key
       names[i] = itr->name.GetString();
+      
+      Rcpp::Rcout << "parse_value names: " << names << std::endl;
       
       // Get current value
       switch(itr->value.GetType()) {
@@ -305,7 +307,10 @@ namespace from_json {
       
       // null
       case 0: {
-        out[i] = R_NA_VAL;
+        out[i] = R_NA_VAL;  
+        // TODO
+        // Need to know the 'type' of null; 
+        // i.e., it should match the 'previous' null object type in the vector
         break;
       }
         
@@ -319,6 +324,7 @@ namespace from_json {
       // JSON object
       case 3: {
         const rapidjson::Value& curr_val = itr->value;
+        Rcpp::Rcout << "going back through parse_value() " << std::endl;
         out[i] = parse_value(curr_val);
         break;
       }
@@ -605,6 +611,7 @@ namespace from_json {
         const rapidjson::Value& temp_val = doc[i];
         //iv_lengths[i] = temp_val.Size();
         list_lengths.insert( temp_val.Size() );
+        Rcpp::Rcout << "doc_to_list :: parse_value()" << std::endl;
         pv_list = parse_value(temp_val);
         out[i] = pv_list;
         list_types.insert( TYPEOF( out[i] ) );
