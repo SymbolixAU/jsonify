@@ -64,17 +64,13 @@ namespace from_json {
       Rcpp::List& out,
       int& doc_len, 
       std::unordered_set<int>& list_lengths,
-      std::unordered_set<int>& list_types,
+      int& r_type,
       std::string by = "row"
       ) {
     int n_col = doc_len;
     //int n_row = iv_lengths[0]; // not happy wiht this
     std::unordered_set<int>::iterator it_lengths = list_lengths.begin();
     int n_row = *(it_lengths);
-    
-    std::unordered_set<int>::iterator it_types = list_types.begin();
-    int r_type = *(it_types);
-    Rcpp::Rcout << "r_type: " << r_type << std::endl;
     
     switch( r_type ) {
     case INTSXP: {
@@ -143,6 +139,11 @@ namespace from_json {
       }
       return mat;
     }
+    }
+    case VECSXP: {
+      // list / data.frame
+      Rcpp::Rcout << "VECSPX needs simplifying " << std::endl;
+      return out;
     }
     default: {
       // string
@@ -240,6 +241,58 @@ namespace from_json {
     df_out.attr("row.names") = Rcpp::seq(1, doc_len);
 
     return df_out;
+  }
+  
+  SEXP simplify_list(
+    Rcpp::List& out,
+    int& doc_len,
+    std::unordered_set< int >& list_types,
+    std::unordered_set< int >& list_lengths,
+    Rcpp::IntegerVector& iv_dtypes,
+    std::string by = "row"
+  ) {
+    
+    Rcpp::Rcout << "out size: " << out.size() << std::endl;
+    
+    if ( list_lengths.size() == 1 ) {
+    
+      // one length means a tablular structure / all list items are the same length
+      std::unordered_set<int>::iterator it_types = list_types.begin();
+      int r_type = *(it_types);
+      Rcpp::Rcout << "r_type: " << r_type << std::endl;
+      
+      // if dtype_len == 1 (only 1 data type)
+      Rcpp::Rcout << "simplify table" << std::endl;
+      
+      if( dtypes.size() == 1 ) {   // one object
+        
+        Rcpp::Rcout << "single type of object to simplify" << std::endl;
+        
+        // if array, make a matrix (and all lengths are the same)
+        int this_type = iv_dtypes[0];
+        
+        Rcpp::Rcout << "this_type: " << this_type << std::endl;
+        
+        if( this_type == 4 && r_type != VECSXP ) {
+          Rcpp::Rcout << "matrix (or list) needed here" << std::endl;
+          return jsonify::from_json::simplify_matrix( out, doc_len, list_lengths, r_type, by );
+          
+        } else if ( this_type == 3 ) {
+          Rcpp::Rcout << "object needs simplifying" << std::endl;
+          return jsonify::from_json::simplify_dataframe( out, doc_len );
+          
+        } else {
+          Rcpp::Rcout << "not simplifying " << std::endl;
+          return out;
+          
+        }
+      } else {
+        Rcpp::Rcout << "multiple types of objects to simplify " << std::endl;
+      }
+    } else {
+      Rcpp::Rcout << "list_lengths.size() != 1 " << std::endl;
+    }
+    return out;
   }
   
   

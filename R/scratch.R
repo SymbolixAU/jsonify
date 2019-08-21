@@ -127,5 +127,7 @@
 # res <- from_json( js )
 # 
 # 
+# l <- list( 1:4, v = 5:8, df = data.frame(id = 1:2, y = 3:4), m = matrix(1:12, ncol = 3), l = list( 1:4, v = 5:8, df = data.frame( id = 1:2, y = 3:4), m = matrix(1:12, ncol = 3)))
+# js <- to_json( l )
 # 
-# 
+# from_json( js )
