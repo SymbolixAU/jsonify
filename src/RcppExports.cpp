@@ -6,14 +6,14 @@
 using namespace Rcpp;
 
 // rcpp_from_json
-SEXP rcpp_from_json(const char * json, bool& simplifyDataFrame);
-RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP, SEXP simplifyDataFrameSEXP) {
+SEXP rcpp_from_json(const char * json, bool& simplify);
+RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP, SEXP simplifySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char * >::type json(jsonSEXP);
-    Rcpp::traits::input_parameter< bool& >::type simplifyDataFrame(simplifyDataFrameSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json, simplifyDataFrame));
+    Rcpp::traits::input_parameter< bool& >::type simplify(simplifySEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json, simplify));
     return rcpp_result_gen;
 END_RCPP
 }

@@ -3,8 +3,8 @@
 
 
 // [[Rcpp::export]]
-SEXP rcpp_from_json( const char * json, bool& simplifyDataFrame ) {
-  return jsonify::from_json::from_json( json, simplifyDataFrame );
+SEXP rcpp_from_json( const char * json, bool& simplify ) {
+  return jsonify::from_json::from_json( json, simplify );
 }
 
 // [[Rcpp::export]]

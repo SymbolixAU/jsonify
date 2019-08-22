@@ -131,14 +131,21 @@ namespace from_json {
   // array.
   // Can handle JSON objects that have keys and those that do not have keys.
   template<typename T>
-  inline SEXP parse_array(T& array) {
+  inline SEXP parse_array( T& array, bool& simplify, std::string by = "row" ) {
     
     Rcpp::Rcout << "parse_array" << std::endl;
     
     int array_len = array.Size();
     
     // Get set of unique data types of each value in the array.
-    get_dtypes<T>(array);
+    get_dtypes<T>( array );
+    
+    std::unordered_set<int> list_lengths;
+    std::unordered_set<int> list_types;
+
+    Rcpp::Rcout << "array_len: " << array_len << std::endl;
+    Rcpp::IntegerVector iv_dtypes( dtypes.begin(), dtypes.end() );
+    Rcpp::Rcout << "dtypes: " << iv_dtypes << std::endl;
     
     // simplify logic
     
@@ -147,7 +154,7 @@ namespace from_json {
     // string, bool), then return an R vector. Otherwise, return an R list.
     
     if(dtypes.size() > 2) {
-      return array_to_list<T>(array, array_len);
+      return array_to_list<T>( array, array_len );
     }
     
     int data_type;
@@ -155,7 +162,7 @@ namespace from_json {
       data_type = *dtypes.begin();
     } else {
       // Dump dtypes values to a vector.
-      std::vector<int> dtype_vect(dtypes.begin(), dtypes.end());
+      std::vector<int> dtype_vect( dtypes.begin(), dtypes.end() );
       
       // Check to see if 0 is in dtypes.
       if(dtypes.find(0) != dtypes.end()) {
@@ -176,11 +183,11 @@ namespace from_json {
     }
     
     // Get current value
-    switch(data_type) {
+    switch( data_type ) {
     
     // bool
     case 1: {
-      Rcpp::LogicalVector out(array_len);
+      Rcpp::LogicalVector out( array_len );
       for(int i = 0; i < array_len; ++i) {
         if(array[i].GetType() == 0) {
           out[i] = NA_LOGICAL;
@@ -193,7 +200,7 @@ namespace from_json {
       
     // string
     case 5: {
-      Rcpp::CharacterVector out(array_len);
+      Rcpp::CharacterVector out( array_len );
       for(int i = 0; i < array_len; ++i) {
         if(array[i].GetType() == 0) {
           out[i] = NA_STRING;
@@ -206,7 +213,7 @@ namespace from_json {
       
     // double
     case 8: {
-      Rcpp::NumericVector out(array_len);
+      Rcpp::NumericVector out( array_len );
       for(int i = 0; i < array_len; ++i) {
         if(array[i].GetType() == 0) {
           out[i] = NA_REAL;
@@ -219,7 +226,7 @@ namespace from_json {
       
     // int
     case 9: {
-      Rcpp::IntegerVector out(array_len);
+      Rcpp::IntegerVector out( array_len );
       for(int i = 0; i < array_len; ++i) {
         if(array[i].GetType() == 0) {
           out[i] = NA_INTEGER;
@@ -232,19 +239,44 @@ namespace from_json {
       
     // null
     case 0: {
-      Rcpp::LogicalVector out(array_len, NA_LOGICAL);
+      Rcpp::LogicalVector out( array_len, NA_LOGICAL );
       return out;
     }
     
     // JSON object
     case 3: {
-      Rcpp::List out(array_len);
+      Rcpp::List out( array_len );
+      
+      //list_lengths.insert( array_len );
+      
       for(int i = 0; i < array_len; ++i) {
         const rapidjson::Value& curr_val = array[i];
+
+        //Rcpp::Rcout << "curr_val_size: " << curr_val_size << std::endl;
+        list_lengths.insert( curr_val.Size() );
+        
         Rcpp::Rcout << "parse_array :: parse_value" << std::endl;
-        out[i] = parse_value( curr_val );
+        pv_list = parse_value( curr_val, simplify, by );
+        out[i] = pv_list;
+        //out[i] = parse_value( curr_val, simplify, by );
+        
+        list_types.insert( TYPEOF( out[i] ) );
       }
       Rcpp::Rcout << "leaving parse_array :: parse_value() recursion" << std::endl;
+      if( simplify ) {
+        
+        //if(simplify && i == 0) {
+        pv_len = pv_list.size();
+        names = pv_list.attr("names");
+        Rcpp::Rcout << "pv_list names: " << names << std::endl;
+        for(unsigned int n = 0; n < names.size(); ++n) {
+          temp_name = Rcpp::as<std::string>(names[n]);
+          names_map[temp_name] = TYPEOF(pv_list[n]);
+        }
+        //}
+        
+        return simplify_list( out, array_len, list_types, list_lengths, iv_dtypes, by );
+      }
       return out;
     }
       
@@ -253,10 +285,33 @@ namespace from_json {
       Rcpp::List out( array_len );
       for( int i = 0; i < array_len; ++i ) {
         T curr_array = array[i].GetArray();
+        
+        list_lengths.insert( curr_array.Size() );
+        
         Rcpp::Rcout << "parse_array :: parse_array()" << std::endl;
-        out[i] = parse_array<T>( curr_array );
+        //pv_list = parse_array<T>( curr_array, simplify, by );
+        //out[i] = pv_list;
+        out[i] = parse_array<T>( curr_array, simplify, by );
+        
+        list_types.insert( TYPEOF( out[i] ) );
+        
       }
       Rcpp::Rcout << "leaving parse_array :: parse_array() recursion" << std::endl;
+      if( simplify ) {
+        
+        // //if(simplify && i == 0) {
+        //   pv_len = pv_list.size();
+        //   names = pv_list.attr("names");
+        //   Rcpp::Rcout << "pv_list names: " << names << std::endl;
+        //   for(unsigned int n = 0; n < names.size(); ++n) {
+        //     temp_name = Rcpp::as<std::string>(names[n]);
+        //     names_map[temp_name] = TYPEOF(pv_list[n]);
+        //   }
+        //   break;
+        // //}
+        // 
+        return simplify_list( out, array_len, list_types, list_lengths, iv_dtypes, by );
+      }
       return out;
     }
     }
@@ -266,7 +321,7 @@ namespace from_json {
   
   
   // Parse rapidjson::Value object.
-  inline Rcpp::List parse_value(const rapidjson::Value& val) {
+  inline Rcpp::List parse_value (const rapidjson::Value& val, bool& simplify, std::string by = "row" ) {
     
     Rcpp::Rcout << "parse_value" << std::endl;
     
@@ -328,7 +383,7 @@ namespace from_json {
       case 4: {
         rapidjson::Value::ConstArray curr_array = itr->value.GetArray();
         Rcpp::Rcout << "parse_value :: parse_array()" << std::endl;
-        out[i] = parse_array<rapidjson::Value::ConstArray>(curr_array);
+        out[i] = parse_array<rapidjson::Value::ConstArray>( curr_array, simplify, by );
         break;
       }
         
@@ -336,7 +391,7 @@ namespace from_json {
       case 3: {
         const rapidjson::Value& curr_val = itr->value;
         Rcpp::Rcout << "going back through parse_value() " << std::endl;
-        out[i] = parse_value(curr_val);
+        out[i] = parse_value( curr_val, simplify, by );
         break;
       }
         
@@ -394,40 +449,40 @@ namespace from_json {
       // bool - false/ true
       case 1: {}
       case 2: {
-        out[i] = itr->value.GetBool();
         list_lengths.insert(1);
         list_types.insert( LGLSXP );
+        out[i] = itr->value.GetBool();
         break;
       }
 
       // string
       case 5: {
-        out[i] = itr->value.GetString();
         list_lengths.insert(1);
         list_types.insert( STRSXP );
+        out[i] = itr->value.GetString();
         break;
       }
 
       // numeric
       case 6: {
+        list_lengths.insert(1);
         if(itr->value.IsDouble()) {
           // double
-          out[i] = itr->value.GetDouble();
           list_types.insert( REALSXP );
+          out[i] = itr->value.GetDouble();
         } else {
           // int
-          out[i] = itr->value.GetInt();
           list_types.insert( INTSXP );
+          out[i] = itr->value.GetInt();
         }
-        list_lengths.insert(1);
         break;
       }
 
       // null
       case 0: {
-        out[i] = R_NA_VAL;
         list_lengths.insert(1);
         list_types.insert( LGLSXP );
+        out[i] = R_NA_VAL;
         break;
       }
 
@@ -435,18 +490,21 @@ namespace from_json {
       case 4: {
         rapidjson::Value::ConstArray curr_array = itr->value.GetArray();
         Rcpp::Rcout << "parse_document :: parse_array()" << std::endl;
-        out[i] = parse_array<rapidjson::Value::ConstArray>( curr_array );
         list_lengths.insert( curr_array.Size() );
         list_types.insert( TYPEOF( out[i] ) );
+        
+        out[i] = parse_array<rapidjson::Value::ConstArray>( curr_array, simplify, by );
+        //Rcpp::Rcout << "simplify here?" << std::endl;  // will already be a vector here
         break;
       }
 
       // JSON object
       case 3: {
         const rapidjson::Value& temp_val = itr->value;
-        out[i] = parse_value(temp_val);
         list_lengths.insert( temp_val.Size() );
         list_types.insert( TYPEOF( out[i] ) );
+        
+        out[i] = parse_value( temp_val, simplify, by );
         break;
       }
 
@@ -464,7 +522,7 @@ namespace from_json {
     //   return simplify_list( out, doc_len, list_types, list_lengths, iv_dtypes, by );
     // }
     
-    Rcpp::Rcout << "names: " << names << std::endl;
+    Rcpp::Rcout << "parse_document names: " << names << std::endl;
     
     out.attr("names") = names;
     return out;
@@ -625,9 +683,11 @@ namespace from_json {
         rapidjson::Value::Array curr_array = doc[i].GetArray();
         //iv_lengths[i] = curr_array.Size();
         Rcpp::Rcout << "doc_to_list :: parse_array()" << std::endl;
-        out[i] = parse_array<rapidjson::Value::Array>( curr_array );
+        
         list_lengths.insert( curr_array.Size() );
         list_types.insert( TYPEOF( out[i] ) );
+        
+        out[i] = parse_array<rapidjson::Value::Array>( curr_array, simplify, by );
         return_df = false;
         break;
       }
@@ -637,10 +697,12 @@ namespace from_json {
         const rapidjson::Value& temp_val = doc[i];
         //iv_lengths[i] = temp_val.Size();
         Rcpp::Rcout << "doc_to_list :: parse_value()" << std::endl;
-        pv_list = parse_value( temp_val );
-        out[i] = pv_list;
+        
         list_lengths.insert( temp_val.Size() );
         list_types.insert( TYPEOF( out[i] ) );
+        
+        pv_list = parse_value( temp_val, simplify, by );
+        out[i] = pv_list;
         
         // If simplify is true and i is 0, record the data types of
         // each named element of doc[i] in unordered_map names_map.
@@ -759,30 +821,30 @@ namespace from_json {
     // If dtype_len is greater than 2, return an R list of values.
     if(dtype_len > 2) {
       Rcpp::Rcout << "doc_to_list 1" << std::endl;
-      return doc_to_list( doc, simplify );
+      return doc_to_list( doc, simplify, by );
     }
 
     // If dtype_len is 2 and 0 does not appear in dtypes, return an
     // R list of values.
     if(dtype_len == 2 && dtypes.find(0) == dtypes.end()) {
       Rcpp::Rcout << "doc_to_list 2" << std::endl;
-      return doc_to_list( doc, simplify );
+      return doc_to_list( doc, simplify, by );
     }
 
     // If 3 or 4 is in dtypes, return an R list of values.
     if(dtypes.find(3) != dtypes.end() ||
        dtypes.find(4) != dtypes.end()) {
       Rcpp::Rcout << "doc_to_list 3" << std::endl;
-      return doc_to_list( doc, simplify );
+      return doc_to_list( doc, simplify, by );
     }
 
     // Dump ints from dtypes to an std vector.
-    std::vector<int> dtype_vect(dtypes.begin(), dtypes.end());
+    std::vector<int> dtype_vect( dtypes.begin(), dtypes.end() );
     int dt = dtype_vect[0];
 
     // If dtype_len is 1, return an R vector.
     if(dtype_len == 1) {
-      return doc_to_vector(doc, dt);
+      return doc_to_vector( doc, dt );
     }
 
     // Else if dtype_len is 2 and 0 is in dtypes, return an R vector.
@@ -792,7 +854,7 @@ namespace from_json {
       }
     }
 
-    return doc_to_vector(doc, dt);
+    return doc_to_vector( doc, dt );
   }
   
   // Test array types

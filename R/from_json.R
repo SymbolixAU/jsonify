@@ -3,7 +3,7 @@
 #' Converts a JSON string to an R list
 #' 
 #' @param x JSON string to convert to R list
-#' @param simplifyDataFrame logical, if \code{TRUE}, coerce JSON arrays 
+#' @param simplify logical, if \code{TRUE}, coerce JSON arrays 
 #' containing only records (JSON objects) into a data frame. Default value is 
 #' \code{TRUE}.
 #' 
@@ -21,10 +21,10 @@
 #' from_json("[{\"id\":1,\"val\":\"a\"},{\"id\":2,\"val\":\"b\"}]")
 #' 
 #' @export
-from_json <- function(x, simplifyDataFrame = TRUE) {
-  res <- rcpp_from_json(x, simplifyDataFrame)
+from_json <- function(x, simplify = TRUE) {
+  res <- rcpp_from_json(x, simplify)
   
-  # if (!simplifyDataFrame || !inherits(res, "list")) {
+  # if (!simplify || !inherits(res, "list")) {
     return(res)
   # }
   # 

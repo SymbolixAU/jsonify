@@ -72,8 +72,8 @@
 # js
 # jsonify:::rcpp_get_dtypes( js )
 # res <- from_json( js )
-# ## type 4, length 3
-# ## - array == matrix( row = 3, col = ?? )
+## type 4, length 3
+## - array == matrix( row = 3, col = ?? )
 
 ## TODO
 ## - the second element isn't named, so don't return a name?
@@ -131,3 +131,9 @@
 # js <- to_json( l )
 # 
 # from_json( js )
+
+# l <- list( df = data.frame(id = 1:2, y = letters[1:2]), m = matrix(1:12, ncol = 3))
+# js <- to_json( l )
+# js; from_json( js )
+
+

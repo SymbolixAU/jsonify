@@ -4,12 +4,12 @@
 \alias{from_json}
 \title{From JSON}
 \usage{
-from_json(x, simplifyDataFrame = TRUE)
+from_json(x, simplify = TRUE)
 }
 \arguments{
 \item{x}{JSON string to convert to R list}
 
-\item{simplifyDataFrame}{logical, if \code{TRUE}, coerce JSON arrays 
+\item{simplify}{logical, if \code{TRUE}, coerce JSON arrays 
 containing only records (JSON objects) into a data frame. Default value is 
 \code{TRUE}.}
 }

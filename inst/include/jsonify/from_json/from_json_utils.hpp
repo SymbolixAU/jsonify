@@ -11,7 +11,7 @@
 namespace jsonify {
 namespace from_json {
 
-  Rcpp::List parse_value(const rapidjson::Value& val);
+  Rcpp::List parse_value( const rapidjson::Value& val, bool& simplify, std::string by );
 
   std::unordered_set<int> dtypes;
   std::unordered_map<std::string, int> names_map;
@@ -177,6 +177,8 @@ namespace from_json {
     int& doc_len
   ) {
     
+    Rcpp::Rcout << "simplify_dataframe()" << std::endl;
+    
     // If simplify and return_df are both true, compare the data
     // types of each named element of doc[i] with the elements in
     // names_map. If the names do not align, or the data types of the
@@ -253,6 +255,7 @@ namespace from_json {
   ) {
     
     Rcpp::Rcout << "out size: " << out.size() << std::endl;
+    Rcpp::Rcout << "list_lenghts.size(): " << list_lengths.size() << std::endl;
     
     if ( list_lengths.size() == 1 ) {
     
