@@ -518,9 +518,10 @@ namespace from_json {
       i++;
     }
     
-    // if( simplify ) { 
+    // TODO simplify here
+    //if( simplify ) { 
     //   return simplify_list( out, doc_len, list_types, list_lengths, iv_dtypes, by );
-    // }
+    //}
     
     Rcpp::Rcout << "parse_document names: " << names << std::endl;
     

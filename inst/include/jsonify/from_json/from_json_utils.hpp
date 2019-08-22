@@ -36,8 +36,13 @@ namespace from_json {
   // Extract all int values from each named element of a nested list.
   inline void extract_int_vector(Rcpp::List& x) {
     df_out_int.clear();
+    Rcpp::Rcout << "x.size(): " << x.size() << std::endl;
     for(unsigned int i = 0; i < x.size(); ++ i) {
       pv_list = x[i];
+      
+      Rcpp::Rcout << "TYPEOF( pv_list ) " << TYPEOF( pv_list ) << std::endl;
+      Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
+      
       df_out_int.push_back(pv_list[temp_name]);
     }
   }
@@ -59,6 +64,12 @@ namespace from_json {
       df_out_str.push_back(pv_list[temp_name]);
     }
   }
+  
+  // 
+  inline SEXP simplify_vector( Rcpp::List& x ) {
+    
+  }
+  
   
   SEXP simplify_matrix(
       Rcpp::List& out,
@@ -211,24 +222,32 @@ namespace from_json {
       }
     }
 
-    Rcpp::List df_out = Rcpp::List(pv_len);
+    Rcpp::Rcout << "constructing df_out" << std::endl;
+    Rcpp::Rcout << "pv_len " << pv_len << std::endl;
+    Rcpp::List df_out = Rcpp::List( pv_len );
     for(int i = 0; i < pv_len; ++i) {
       temp_name = names[i];
+      Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
+      int temp_name_map = names_map[ temp_name ];
+      Rcpp::Rcout << "temp_name_map: " << temp_name_map << std::endl;
       switch(names_map[temp_name]) {
-      case 10: {
+      case LGLSXP: {
         extract_lgl_vector(out);
         df_out[i] = df_out_lgl;
         break;
       }
-      case 13: {
+      case INTSXP: {
         extract_int_vector(out);
         df_out[i] = df_out_int;
         break;
       }
-      case 14: {
+      case REALSXP: {
         extract_dbl_vector(out);
         df_out[i] = df_out_dbl;
         break;
+      }
+      case VECSXP: {
+        Rcpp::stop("VECSXP needs simplifying??");
       }
       default: { // string, case 16
         extract_str_vector(out);
@@ -237,7 +256,7 @@ namespace from_json {
       }
       }
     }
-
+    
     df_out.attr("names") = names;
     df_out.attr("class") = "data.frame";
     df_out.attr("row.names") = Rcpp::seq(1, doc_len);
