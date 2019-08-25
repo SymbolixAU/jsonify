@@ -21,11 +21,16 @@
 #' from_json("[{\"id\":1,\"val\":\"a\"},{\"id\":2,\"val\":\"b\"}]")
 #' 
 #' @export
-from_json <- function(x, simplify = TRUE) {
-  res <- rcpp_from_json(x, simplify)
+from_json <- function(x, simplify = TRUE, by = "row" ) {
+  if( "col" %in% by ) by <- "column"
+  by <- match.arg( by, choices = c("row", "column") )
   
+  return( rcpp_from_json( x, simplify, by ) )
+  
+  # res <- rcpp_from_json(x, simplify, by)
+  # 
   # if (!simplify || !inherits(res, "list")) {
-    return(res)
+  #   return(res)
   # }
   # 
   # list_to_df(res)

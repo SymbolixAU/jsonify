@@ -12,8 +12,15 @@ test_that("simplify types",{
   # 4 - array
   # 5 - string
   # 6 - number 
-  #   - 8 - double
-  #   - 9 - int
+  #   - 8 - int
+  #   - 9 - double
+  
+  ## Simplification rules (oposite of 'to_json')
+  ## 1. array -> vector
+  ## 2. array of arrays (of arrays of arrays ... ) 
+  ##  - each array is a vector (as per 1.)
+  ##  - each vector becomes a list element
+  ##  - 
   
   x <- 1:4
   js <- to_json( x )
@@ -68,3 +75,63 @@ test_that("simplify types",{
 
   
 })
+
+
+test_that("arrays to vectors",{
+  
+  round_trip <- function(x) {
+    testthat::expect_equal( from_json( to_json( x ) ), x )
+  }
+  round_trip( 1L )
+  round_trip( 1L:3L )
+  round_trip( 1.1 )
+  round_trip( c(1.1, 1,3, 3,3 ) )
+  round_trip( letters )
+})
+
+test_that("arrays of mixed types to highest type" ,{
+  
+  js <- '[1,2,"a"]'
+  x <- from_json( js )
+  expect_equal(c(1,2,"a"), x)
+  
+})
+
+test_that("arrays of arrays of same length go to matrix",{
+  
+  js <- '[[1,2],[3,4],[5,6]]'
+  x <- from_json( js )
+  expect_equal(x, matrix(1:6, ncol = 2, byrow = T ) )
+  
+  # x <- from_json( js, by = "col" )
+  # expect_equal(x, matrix(1:6, ncol = 2, byrow = F ) )
+  
+  
+})
+
+test_that("array of arrays of different lenghts go to list",{
+  
+  js <- '[[1,2],[1,2,3]]'
+  x <- from_json( js )
+  expect_equal( x, list(1:2, 1:3))
+  
+  ## TODO
+  ## - 
+  js <- '[[1,2],[3,4],[5,[6,7]]]'
+  x <- from_json( js )
+  
+})
+
+test_that("array of various types converted to matrices",{
+  
+  js <- '[[1,2],[3,4]]'
+  x <- from_json( js )
+  expect_equal(x, matrix(1L:4L, ncol = 2, byrow = T ) )
+  
+  js <- '[[1.1,2],[3,4]]'
+  x <- from_json( js )
+  expect_equal(x, matrix(c(1.1,2,3,4), ncol = 2, byrow = T ) )
+})
+
+
+

@@ -18,6 +18,7 @@ namespace from_json {
     // Clear all values from dtypes
     dtypes.clear();
     
+    
     int doc_len = doc.Size();
     //Rcpp::Rcout << "doc_len: " << doc_len << std::endl;
     int curr_dtype;
@@ -32,12 +33,12 @@ namespace from_json {
       }
       
       // rapidjson uses the same int for types double and int...split them up,
-      // such that double is 8 and int is 9.
+      // such that double is 9 and int is 8.
       if(curr_dtype == 6) {
         if(doc[i].IsDouble()) {
-          curr_dtype = 8;
-        } else {
           curr_dtype = 9;
+        } else {
+          curr_dtype = 8;
         }
       }
       
@@ -65,9 +66,12 @@ namespace from_json {
   inline Rcpp::List array_to_list(T& array, int& array_len) {
     
     Rcpp::Rcout << "array_to_list" << std::endl;
+    Rcpp::Rcout << "array_len: " << array_len << std::endl;
     
     Rcpp::List out(array_len);
     for(int i = 0; i < array_len; ++i) {
+      
+      Rcpp::Rcout << "array.getType() " << array[i].GetType() << std::endl;
       
       switch(array[i].GetType()) {
       
@@ -109,8 +113,9 @@ namespace from_json {
         
       // array
       case 4: {
-        int curr_array_len = array[i].Size();
+        //int curr_array_len = array[i].Size();
         T curr_array = array[i].GetArray();
+        int curr_array_len = curr_array.Size();
         out[i] = array_to_list<T>( curr_array, curr_array_len );
         break;
       }
@@ -153,40 +158,70 @@ namespace from_json {
     // is made up a simple data type and nulls (simple being int, double,
     // string, bool), then return an R vector. Otherwise, return an R list.
     
-    if(dtypes.size() > 2) {
-      return array_to_list<T>( array, array_len );
+    // if(dtypes.size() > 2) {
+    //   return array_to_list<T>( array, array_len );
+    // }
+    
+    // if an object or an array is in the array, reutrn a list
+    if( dtypes.find(3) != dtypes.end() || dtypes.find(4) != dtypes.end() ) {
+      return array_to_list< T >( array, array_len );
     }
     
-    int data_type;
-    if(dtypes.size() == 1) {
-      data_type = *dtypes.begin();
-    } else {
-      // Dump dtypes values to a vector.
-      std::vector<int> dtype_vect( dtypes.begin(), dtypes.end() );
-      
-      // Check to see if 0 is in dtypes.
-      if(dtypes.find(0) != dtypes.end()) {
-        // If 0 is in dtypes and dtypes size is two, get the int in dtypes
-        // that is not 0.
-        data_type = dtype_vect[0];
-        if(data_type == 0) {
-          data_type = dtype_vect[1];
-        }
-        if(data_type == 3 || data_type == 4) {
-          // If dtype_vect is [0, 3] or [0, 4], return R list.
-          return array_to_list<T>(array, array_len);
-        }
-      } else {
-        // If dtype_vect size is 2 and 0 is not one of the values, return R list.
-        return array_to_list<T>(array, array_len);
-      }
+    // otherwise, the array can be simplified to a vector
+
+    if( dtypes.find( 5 ) != dtypes.end() ) {
+      // we need a string vector
+    } else if ( dtypes.find( 8 ) != dtypes.end() && dtypes.find( 9 ) != dtypes.end() ) {
+      // numeric vector
     }
     
+    
+    int max_dtype = Rcpp::max( iv_dtypes );
+    Rcpp::Rcout << "max_dtype: " << max_dtype << std::endl;
+    
+    // int data_type;
+    // Rcpp::Rcout << "dtypes.size " << dtypes.size() << std::endl;
+    // if( dtypes.size() == 1 ) {
+    //   data_type = *dtypes.begin();
+    // } else {
+    //   // Dump dtypes values to a vector.
+    //   std::vector<int> dtype_vect( dtypes.begin(), dtypes.end() );
+    //   
+    //   // Check to see if 0 is in dtypes.
+    //   if( dtypes.find(0) != dtypes.end() ) {
+    //     // If 0 is in dtypes and dtypes size is two, get the int in dtypes
+    //     // that is not 0.
+    //     data_type = dtype_vect[0];
+    //     if(data_type == 0) {
+    //       data_type = dtype_vect[1];
+    //     }
+    //     if(data_type == 3 || data_type == 4) {
+    //       // If dtype_vect is [0, 3] or [0, 4], return R list.
+    //       return array_to_list<T>(array, array_len);
+    //     }
+    //   } else {
+    //     // If dtype_vect size is 2 and 0 is not one of the values, return R list.
+    //     return array_to_list<T>(array, array_len);
+    //   }
+    // }
+    
+    // max_dtype gives us the R SEXP type we need to store the values
+    // but we still need to get teh right value tyep from the JSON object
+  
     // Get current value
-    switch( data_type ) {
+    switch( max_dtype ) {
     
+    // null
+    // - if null is the max_dtype, there can be no others
+    case 0: {
+      Rcpp::LogicalVector out( array_len, NA_LOGICAL );
+      return out;
+    }
+      
     // bool
-    case 1: {
+    // - can be bool OR null
+    case 1: {}
+    case 2: {
       Rcpp::LogicalVector out( array_len );
       for(int i = 0; i < array_len; ++i) {
         if(array[i].GetType() == 0) {
@@ -199,11 +234,24 @@ namespace from_json {
     }
       
     // string
+    // - can be null, bool, in, double
     case 5: {
       Rcpp::CharacterVector out( array_len );
       for(int i = 0; i < array_len; ++i) {
-        if(array[i].GetType() == 0) {
+        int this_type = array[i].GetType();
+        
+        if( this_type == 0) {
           out[i] = NA_STRING;
+        } else if( this_type == 1 || this_type == 2 ) {
+          out[i] = array[i].GetBool();
+        } else if ( this_type == 6 ) {
+          
+          if( array[i].IsDouble() ) {
+            out[i] = array[i].GetDouble();
+          } else {
+            out[i] = array[i].GetInt();
+          } 
+          
         } else {
           out[i] = array[i].GetString();
         }
@@ -211,38 +259,44 @@ namespace from_json {
       return out;
     }
       
-    // double
-    case 8: {
-      Rcpp::NumericVector out( array_len );
-      for(int i = 0; i < array_len; ++i) {
-        if(array[i].GetType() == 0) {
-          out[i] = NA_REAL;
-        } else {
-          out[i] = array[i].GetDouble();
-        }
-      }
-      return out;
-    }
-      
     // int
-    case 9: {
+    case 8: {
       Rcpp::IntegerVector out( array_len );
       for(int i = 0; i < array_len; ++i) {
-        if(array[i].GetType() == 0) {
+        int this_type = array[i].GetType();
+        
+        if( this_type == 0) {
           out[i] = NA_INTEGER;
-        } else {
+        } else if( this_type == 1 || this_type == 2 ) {
+          out[i] = array[i].GetBool();
+        } else { // type 6
           out[i] = array[i].GetInt();
         }
       }
       return out;
     }
       
-    // null
-    case 0: {
-      Rcpp::LogicalVector out( array_len, NA_LOGICAL );
+    // double
+    case 9: {
+      Rcpp::NumericVector out( array_len );
+      for(int i = 0; i < array_len; ++i) {
+        int this_type = array[i].GetType();
+        
+        if( this_type == 0) {
+          out[i] = NA_REAL;
+        } else if( this_type == 1 || this_type == 2 ) {
+          out[i] = array[i].GetBool();
+        } else { // type 6
+          if( array[i].IsDouble() ) {
+            out[i] = array[i].GetDouble();
+          } else {
+            out[i] = array[i].GetInt();
+          } 
+        }
+      }
       return out;
     }
-    
+
     // JSON object
     case 3: {
       Rcpp::List out( array_len );
@@ -491,9 +545,9 @@ namespace from_json {
         rapidjson::Value::ConstArray curr_array = itr->value.GetArray();
         Rcpp::Rcout << "parse_document :: parse_array()" << std::endl;
         list_lengths.insert( curr_array.Size() );
-        list_types.insert( TYPEOF( out[i] ) );
         
         out[i] = parse_array<rapidjson::Value::ConstArray>( curr_array, simplify, by );
+        list_types.insert( TYPEOF( out[i] ) );
         //Rcpp::Rcout << "simplify here?" << std::endl;  // will already be a vector here
         break;
       }
@@ -502,9 +556,9 @@ namespace from_json {
       case 3: {
         const rapidjson::Value& temp_val = itr->value;
         list_lengths.insert( temp_val.Size() );
-        list_types.insert( TYPEOF( out[i] ) );
         
         out[i] = parse_value( temp_val, simplify, by );
+        list_types.insert( TYPEOF( out[i] ) );
         break;
       }
 
@@ -540,7 +594,7 @@ namespace from_json {
     int doc_len = doc.Size();
     
     // Get current value
-    switch(dtype) {
+    switch( dtype ) {
     
     // bool
     case 1: {
@@ -567,28 +621,28 @@ namespace from_json {
       }
       return out;
     }
-      
-    // double
-    case 8: {
-      Rcpp::NumericVector out(doc_len);
-      for(int i = 0; i < doc_len; ++i) {
-        if(doc[i].GetType() == 0) {
-          out[i] = NA_REAL;
-        } else {
-          out[i] = doc[i].GetDouble();
-        }
-      }
-      return out;
-    }
-      
+    
     // int
-    case 9: {
+    case 8: {
       Rcpp::IntegerVector out(doc_len);
       for(int i = 0; i < doc_len; ++i) {
         if(doc[i].GetType() == 0) {
           out[i] = NA_INTEGER;
         } else {
           out[i] = doc[i].GetInt();
+        }
+      }
+      return out;
+    }
+      
+    // double
+    case 9: {
+      Rcpp::NumericVector out(doc_len);
+      for(int i = 0; i < doc_len; ++i) {
+        if(doc[i].GetType() == 0) {
+          out[i] = NA_REAL;
+        } else {
+          out[i] = doc[i].GetDouble();
         }
       }
       return out;
@@ -686,9 +740,9 @@ namespace from_json {
         Rcpp::Rcout << "doc_to_list :: parse_array()" << std::endl;
         
         list_lengths.insert( curr_array.Size() );
-        list_types.insert( TYPEOF( out[i] ) );
-        
         out[i] = parse_array<rapidjson::Value::Array>( curr_array, simplify, by );
+        
+        list_types.insert( TYPEOF( out[i] ) );
         return_df = false;
         break;
       }
@@ -700,11 +754,11 @@ namespace from_json {
         Rcpp::Rcout << "doc_to_list :: parse_value()" << std::endl;
         
         list_lengths.insert( temp_val.Size() );
-        list_types.insert( TYPEOF( out[i] ) );
         
         pv_list = parse_value( temp_val, simplify, by );
         out[i] = pv_list;
         
+        list_types.insert( TYPEOF( out[i] ) );
         // If simplify is true and i is 0, record the data types of
         // each named element of doc[i] in unordered_map names_map.
         if(simplify && i == 0) {

@@ -6,14 +6,15 @@
 using namespace Rcpp;
 
 // rcpp_from_json
-SEXP rcpp_from_json(const char * json, bool& simplify);
-RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP, SEXP simplifySEXP) {
+SEXP rcpp_from_json(const char * json, bool& simplify, std::string by);
+RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP, SEXP simplifySEXP, SEXP bySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char * >::type json(jsonSEXP);
     Rcpp::traits::input_parameter< bool& >::type simplify(simplifySEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json, simplify));
+    Rcpp::traits::input_parameter< std::string >::type by(bySEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json, simplify, by));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -131,7 +132,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_jsonify_rcpp_from_json", (DL_FUNC) &_jsonify_rcpp_from_json, 2},
+    {"_jsonify_rcpp_from_json", (DL_FUNC) &_jsonify_rcpp_from_json, 3},
     {"_jsonify_rcpp_get_col_headers", (DL_FUNC) &_jsonify_rcpp_get_col_headers, 1},
     {"_jsonify_rcpp_transpose_list", (DL_FUNC) &_jsonify_rcpp_transpose_list, 2},
     {"_jsonify_rcpp_null_to_na", (DL_FUNC) &_jsonify_rcpp_null_to_na, 1},

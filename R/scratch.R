@@ -122,17 +122,18 @@
 # 
 # l <- list( 1:4, v = 5:8, df = data.frame(id = 1:2, y = 3:4), m = matrix(1:12, ncol = 3), l = list( 1:4, v = 5:8, df = data.frame( id = 1:2, y = 3:4), m = matrix(1:12, ncol = 3)))
 # js <- to_json( l )
-# 
-# from_json( js )
+# js; from_json( js )
 #
 # l <- list( df = data.frame(id = 1:2, y = letters[1:2]), m = matrix(1:12, ncol = 3))
 # js <- to_json( l )
 # js; from_json( js )
-#
 # 
+
 # x <- data.frame(x = 1:2, y = I(matrix(1:4, ncol = 2)))
 # js <- to_json( x, by = "col" )
-# js
-# jsonify:::rcpp_get_dtypes( js )
-# res <- from_json( js )
-# 
+# js; from_json( js )
+
+# x <- data.frame( x = 1:2, y = list(1:2, 3:4) )
+# js <- to_json( x )
+# js; from_json( js )
+

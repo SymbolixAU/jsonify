@@ -204,7 +204,7 @@ namespace from_json {
     for(unsigned int n = 0; n < names.size(); ++n) {
       temp_name = Rcpp::as<std::string>( names[n] );
       Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
-      Rcpp::Rcout << "tyep pv_list " << TYPEOF( pv_list[n] ) << std::endl;
+      Rcpp::Rcout << "type pv_list " << TYPEOF( pv_list[n] ) << std::endl;
       if(names_map.count(temp_name) == 0) {
         // return_df = false;
         // break;
@@ -276,17 +276,21 @@ namespace from_json {
     Rcpp::Rcout << "out size: " << out.size() << std::endl;
     Rcpp::Rcout << "list_lenghts.size(): " << list_lengths.size() << std::endl;
     
+    Rcpp::IntegerVector iv_list_types( list_types.begin(), list_types.end() );
+
     if ( list_lengths.size() == 1 ) {
     
       // one length means a tablular structure / all list items are the same length
-      std::unordered_set<int>::iterator it_types = list_types.begin();
-      int r_type = *(it_types);
+      // if there is more than one list_types (r-type), make them the 'highest' value
+      int r_type = Rcpp::max( iv_list_types );
+      Rcpp::Rcout << "r_types: " << iv_list_types << std::endl;
       Rcpp::Rcout << "r_type: " << r_type << std::endl;
+      
       
       // if dtype_len == 1 (only 1 data type)
       Rcpp::Rcout << "simplify table" << std::endl;
       
-      if( dtypes.size() == 1 ) {   // one object
+      if( dtypes.size() == 1 ) {   // one data type
         
         Rcpp::Rcout << "single type of object to simplify" << std::endl;
         
@@ -295,11 +299,11 @@ namespace from_json {
         
         Rcpp::Rcout << "this_type: " << this_type << std::endl;
         
-        if( this_type == 4 && r_type != VECSXP ) {
+        if( this_type == 4 && r_type != VECSXP ) { // array
           Rcpp::Rcout << "matrix (or list) needed here" << std::endl;
           return jsonify::from_json::simplify_matrix( out, doc_len, list_lengths, r_type, by );
           
-        } else if ( this_type == 3 ) {
+        } else if ( this_type == 3 ) { // object
           Rcpp::Rcout << "object needs simplifying" << std::endl;
           return jsonify::from_json::simplify_dataframe( out, doc_len );
           
@@ -310,6 +314,7 @@ namespace from_json {
         }
       } else {
         Rcpp::Rcout << "multiple types of objects to simplify " << std::endl;
+        // 
       }
     } else {
       Rcpp::Rcout << "list_lengths.size() != 1 " << std::endl;
