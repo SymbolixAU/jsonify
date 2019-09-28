@@ -62,6 +62,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_simplify_vector
+SEXP rcpp_simplify_vector(Rcpp::List& lst, int& r_type, R_xlen_t n);
+RcppExport SEXP _jsonify_rcpp_simplify_vector(SEXP lstSEXP, SEXP r_typeSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List& >::type lst(lstSEXP);
+    Rcpp::traits::input_parameter< int& >::type r_type(r_typeSEXP);
+    Rcpp::traits::input_parameter< R_xlen_t >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_simplify_vector(lst, r_type, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_pretty_json
 Rcpp::StringVector rcpp_pretty_json(const char* json);
 RcppExport SEXP _jsonify_rcpp_pretty_json(SEXP jsonSEXP) {
@@ -137,6 +150,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_transpose_list", (DL_FUNC) &_jsonify_rcpp_transpose_list, 2},
     {"_jsonify_rcpp_null_to_na", (DL_FUNC) &_jsonify_rcpp_null_to_na, 1},
     {"_jsonify_rcpp_get_dtypes", (DL_FUNC) &_jsonify_rcpp_get_dtypes, 1},
+    {"_jsonify_rcpp_simplify_vector", (DL_FUNC) &_jsonify_rcpp_simplify_vector, 3},
     {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
     {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
     {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},

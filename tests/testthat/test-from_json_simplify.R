@@ -1,5 +1,39 @@
 context("simplify")
 
+test_that("R Lists simplified to vectors",{
+  
+  l <- list(1,2,3)
+  res <- jsonify:::rcpp_simplify_vector( l, 13, 1)
+  expect_equal( res, 1:3 )
+  
+  l <- list(1,2,3:4)
+  expect_error(
+    jsonify:::rcpp_simplify_vector( l, 13, 2)
+    , "jsonify - list elements different sizes"
+  )
+  
+  l <- list( 1:2, 3:4, 5:6 )
+  res <- jsonify:::rcpp_simplify_vector( l, 13, 2 )
+  expect_equal( res, 1:6 )
+  
+  l <- list( 1.1, 2.2, 3.3 )
+  res <- jsonify:::rcpp_simplify_vector( l, 14, 1 )
+  expect_equal( res, unlist( l ) )
+  
+  
+  l <- list( letters, letters, letters )
+  res <- jsonify:::rcpp_simplify_vector( l, 16, 26 )
+  expect_equal( res, rep( letters, 3 ) )
+  
+  ## mix of types
+  l <- list(1,2,"a")
+  res <- jsonify:::rcpp_simplify_vector( l, 16, 1)
+  expect_equal( res, c("1","2","a") )
+  
+  
+})
+
+
 test_that("simplify types",{
   
   ## tests function only works for arrays
@@ -26,8 +60,8 @@ test_that("simplify types",{
   js <- to_json( x )
   #js
   types <- jsonify:::rcpp_get_dtypes( js )
-  expect_equal( types, 9 )
-  ## type 9, length 4
+  expect_equal( types, 8 )
+  ## type 8, length 4
   ## - int(4)
   
   x <- matrix(1:9, ncol = 3)
@@ -117,6 +151,15 @@ test_that("array of arrays of different lenghts go to list",{
   
   ## TODO
   ## - 
+  js <- '[[5,[6,7]]]'
+  x <- from_json( js )
+  
+  js <- '[[5,[6,"a"]]]'
+  x <- from_json( js )
+  
+  ## compare with 
+  jsonlite::fromJSON( js )
+  
   js <- '[[1,2],[3,4],[5,[6,7]]]'
   x <- from_json( js )
   

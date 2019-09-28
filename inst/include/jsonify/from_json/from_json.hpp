@@ -68,7 +68,16 @@ namespace from_json {
     Rcpp::Rcout << "array_to_list" << std::endl;
     Rcpp::Rcout << "array_len: " << array_len << std::endl;
     
-    Rcpp::List out(array_len);
+    
+    // keep track of list_lengths && list_types
+    // if list_types are all the same, it can be a vector?
+    //std::unordered_set<int> list_lengths;
+    std::unordered_set<int> list_types;
+    bool is_recursive = false;
+    
+    Rcpp::List out( array_len );
+    
+    
     for(int i = 0; i < array_len; ++i) {
       
       Rcpp::Rcout << "array.getType() " << array[i].GetType() << std::endl;
@@ -78,18 +87,21 @@ namespace from_json {
       // bool - false
       case 1: {
         out[i] = array[i].GetBool();
+        list_types.insert( TYPEOF( out[i] ) );
         break;
       }
         
       // bool - true
       case 2: {
         out[i] = array[i].GetBool();
+        list_types.insert( TYPEOF( out[i] ) );
         break;
       }
         
       // string
       case 5: {
         out[i] = array[i].GetString();
+        list_types.insert( TYPEOF( out[i] ) );
         break;
       }
         
@@ -98,9 +110,11 @@ namespace from_json {
         if(array[i].IsDouble()) {
           // double
           out[i] = array[i].GetDouble();
+          list_types.insert( TYPEOF( out[i] ) );
         } else {
           // int
           out[i] = array[i].GetInt();
+          list_types.insert( TYPEOF( out[i] ) );
         }
         break;
       }
@@ -108,6 +122,7 @@ namespace from_json {
       // null
       case 0: {
         out[i] = R_NA_VAL;
+        list_types.insert( TYPEOF( out[i] ) );
         break;
       }
         
@@ -116,7 +131,10 @@ namespace from_json {
         //int curr_array_len = array[i].Size();
         T curr_array = array[i].GetArray();
         int curr_array_len = curr_array.Size();
+        is_recursive = true;
+        Rcpp::Rcout << "array_to_list :: array_to_list() " << std::endl;
         out[i] = array_to_list<T>( curr_array, curr_array_len );
+        list_types.insert( TYPEOF( out[i] ) );
         break;
       }
         
@@ -126,7 +144,25 @@ namespace from_json {
       }
         
       }
+      Rcpp::Rcout << "is_recursive : " << is_recursive << std::endl;
+      if( is_recursive ) {
+        int list_r_type = 0;
+        Rcpp::List out2 = out[i];
+        R_xlen_t n;
+        for( unsigned int i = 0; i < out2.size(); i++ ) {
+          int this_type = TYPEOF( out2[i] );
+          n = n + Rf_length( out2[i] );
+          Rcpp::Rcout << "this_type: " << this_type << std::endl;
+          list_r_type = this_type > list_r_type ? this_type : list_r_type;
+        }
+        out[i] = jsonify::from_json::simplify_vector( out2, list_r_type, n);
+      }
     }
+
+    // //if it's a non-recurisve array then it should be a vector
+    // if( !is_recursive ) {
+    //   return jsonify::from_json::simplify_vector( out );
+    // }
     
     return out;
   }

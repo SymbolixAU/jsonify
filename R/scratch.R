@@ -137,3 +137,11 @@
 # js <- to_json( x )
 # js; from_json( js )
 
+# 
+# js <- '[[1,2],[3,4],[5,[6,7]]]'
+# x <- from_json( js )
+# 
+# js <- '[[5,[6,7]]]'
+# x <- from_json( js )
+
+

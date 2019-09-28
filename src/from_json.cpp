@@ -28,6 +28,11 @@ Rcpp::IntegerVector rcpp_get_dtypes( const char * json ) {
   return jsonify::from_json::test_dtypes( json );
 }
 
+// [[Rcpp::export]]
+SEXP rcpp_simplify_vector( Rcpp::List& lst, int& r_type, R_xlen_t n ) {
+  return jsonify::from_json::simplify_vector( lst, r_type, n );
+}
+
 // given the dtype, and the length we can work out the type of object to simplify to
 
 

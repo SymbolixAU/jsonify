@@ -65,9 +65,68 @@ namespace from_json {
     }
   }
   
-  // 
-  inline SEXP simplify_vector( Rcpp::List& x ) {
+  // takes a list, where each element is the same TYPE and SIZE and simplifies to
+  // a vector
+  // requires each list element ot be the same size
+  // param n is the lenght of each list element
+  inline SEXP simplify_vector( Rcpp::List& x, int& r_type, R_xlen_t n ) {
+    Rcpp::Rcout << "simplify_vector" << std::endl;
+    //R_xlen_t vec_length = n * r_type;
+    R_xlen_t i;
+    R_xlen_t x_size = x.size();
+    R_xlen_t counter = 0;
     
+    R_xlen_t vec_length = x_size* n;
+    
+    // each list element MUST be length n
+    for( i = 0; i < x_size; i++ ) {
+      if( Rf_length( x[i] ) != n ) {
+        Rcpp::stop("jsonify - list elements different sizes");
+      }
+    }
+    
+    switch( r_type ) {
+    case LGLSXP: {
+      Rcpp::LogicalVector lv( vec_length );
+      // iterate each list element and populate vector
+      for( i = 0; i < vec_length; counter++, i+= n ) {
+        Rcpp::LogicalVector this_vec = x[ counter ];
+        std::copy( this_vec.begin(), this_vec.end(), lv.begin() + i );
+      }
+      return lv;
+    }
+    case INTSXP: {
+      Rcpp::IntegerVector iv( vec_length );
+
+      for( i = 0; i < vec_length; counter++, i+= n ) {
+        Rcpp::IntegerVector this_vec = x[ counter ];
+        std::copy( this_vec.begin(), this_vec.end(), iv.begin() + i );
+      }
+      return iv;
+    }
+    case REALSXP: {
+      Rcpp::NumericVector nv( vec_length );
+      for( i = 0; i < vec_length; counter++, i+= n ) {
+        Rcpp::NumericVector this_vec = x[ counter ];
+        std::copy( this_vec.begin(), this_vec.end(), nv.begin() + i );
+      }
+      return nv;
+    }
+    case VECSXP: {
+      // list...
+      
+    }
+    default: {
+      Rcpp::StringVector sv( vec_length );
+      for( i = 0; i < vec_length; counter++, i+= n ) {
+        Rcpp::StringVector this_vec = x[ counter ];
+        std::copy( this_vec.begin(), this_vec.end(), sv.begin() + i );
+      }
+      return sv;
+    }
+    }
+    
+    return x; // never reaches
   }
   
   
@@ -275,6 +334,7 @@ namespace from_json {
     
     Rcpp::Rcout << "out size: " << out.size() << std::endl;
     Rcpp::Rcout << "list_lenghts.size(): " << list_lengths.size() << std::endl;
+    Rcpp::Rcout << "doc_len: " << doc_len << std::endl;
     
     Rcpp::IntegerVector iv_list_types( list_types.begin(), list_types.end() );
 
@@ -285,12 +345,13 @@ namespace from_json {
       int r_type = Rcpp::max( iv_list_types );
       Rcpp::Rcout << "r_types: " << iv_list_types << std::endl;
       Rcpp::Rcout << "r_type: " << r_type << std::endl;
+      Rcpp::Rcout << "d_types: " << iv_dtypes << std::endl;
       
       
       // if dtype_len == 1 (only 1 data type)
       Rcpp::Rcout << "simplify table" << std::endl;
       
-      if( dtypes.size() == 1 ) {   // one data type
+      if( iv_dtypes.size() == 1 ) {   // one data type  (( dtyeps or iv_dtypes ?? ))
         
         Rcpp::Rcout << "single type of object to simplify" << std::endl;
         
@@ -299,13 +360,29 @@ namespace from_json {
         
         Rcpp::Rcout << "this_type: " << this_type << std::endl;
         
-        if( this_type == 4 && r_type != VECSXP ) { // array
+        if( this_type == 4 && r_type != VECSXP ) { // array && not List -> goes to matrix
           Rcpp::Rcout << "matrix (or list) needed here" << std::endl;
           return jsonify::from_json::simplify_matrix( out, doc_len, list_lengths, r_type, by );
           
         } else if ( this_type == 3 ) { // object
           Rcpp::Rcout << "object needs simplifying" << std::endl;
           return jsonify::from_json::simplify_dataframe( out, doc_len );
+          
+        //} else if (this_type == 4 && r_type == VECSXP ) {  // array && List
+          // lst_lengths == 1 means each list element is the same length
+          // and it's a list object
+          
+          //Rcpp::Rcout << "simplify list" << std::endl;
+          //return jsonify::from_json::simplify_vector( out );
+          // the the size of each element, and the max r_type;
+          // int list_r_type = 0;
+          // R_xlen_t n = Rf_length( out[0] );  // only need one element; all the same size
+          // for( unsigned int i = 0; i < out.size(); i++ ) {
+          //   int this_type = TYPEOF( out[i] );
+          //   Rcpp::Rcout << "this_type: " << this_type << std::endl;
+          //   list_r_type = this_type > list_r_type ? this_type : list_r_type;
+          // }
+          // return jsonify::from_json::simplify_vector( out, list_r_type, n);
           
         } else {
           Rcpp::Rcout << "not simplifying " << std::endl;
@@ -314,8 +391,10 @@ namespace from_json {
         }
       } else {
         Rcpp::Rcout << "multiple types of objects to simplify " << std::endl;
+        // each element is the same length.
         // 
       }
+      
     } else {
       Rcpp::Rcout << "list_lengths.size() != 1 " << std::endl;
     }

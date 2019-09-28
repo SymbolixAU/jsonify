@@ -21,6 +21,10 @@ rcpp_get_dtypes <- function(json) {
     .Call(`_jsonify_rcpp_get_dtypes`, json)
 }
 
+rcpp_simplify_vector <- function(lst, r_type, n) {
+    .Call(`_jsonify_rcpp_simplify_vector`, lst, r_type, n)
+}
+
 rcpp_pretty_json <- function(json) {
     .Call(`_jsonify_rcpp_pretty_json`, json)
 }
