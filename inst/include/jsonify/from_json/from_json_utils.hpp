@@ -17,52 +17,111 @@ namespace from_json {
   std::unordered_map<std::string, int> names_map;
   int pv_len;
   std::string temp_name;
-  std::vector<bool> df_out_lgl;
-  std::vector<int> df_out_int;
-  std::vector<double> df_out_dbl;
-  std::vector<std::string> df_out_str;
+  // std::vector<bool> df_out_lgl;
+  // std::vector<int> df_out_int;
+  // std::vector<double> df_out_dbl;
+  // std::vector<std::string> df_out_str;
   Rcpp::CharacterVector names;
   Rcpp::List pv_list;
   
-  // Extract all logical values from each named element of a nested list.
-  inline void extract_lgl_vector(Rcpp::List& x) {
-    df_out_lgl.clear();
-    for(unsigned int i = 0; i < x.size(); ++ i) {
-      pv_list = x[i];
-      df_out_lgl.push_back(pv_list[temp_name]);
+  inline bool name_exists(
+    Rcpp::String& to_find,
+    Rcpp::StringVector& sv ) {
+    int n = sv.size();
+    int i;
+    for( i = 0; i < n; i++ ) {
+      if ( to_find == sv[i] ) {
+        return true;
+      }
     }
+    return false;
+  }
+  
+  // Extract all logical values from each named element of a nested list.
+  inline Rcpp::LogicalVector extract_lgl_vector(Rcpp::List& x) {
+    // df_out_lgl.clear();
+    // for(unsigned int i = 0; i < x.size(); ++ i) {
+    //   pv_list = x[i];
+    //   df_out_lgl.push_back(pv_list[temp_name]);
+    // }
+    R_xlen_t i;
+    R_xlen_t n = x.size();
+    Rcpp::LogicalVector lv( n );
+    for( i = 0; i < n; i++ ) {
+      pv_list = x[i];
+      Rcpp::LogicalVector this_lv = Rcpp::as< Rcpp::LogicalVector >( pv_list[ temp_name ] );
+      lv[i] = this_lv[0];
+    }
+    return lv;
   }
   
   // Extract all int values from each named element of a nested list.
-  inline void extract_int_vector(Rcpp::List& x) {
-    df_out_int.clear();
-    Rcpp::Rcout << "x.size(): " << x.size() << std::endl;
-    for(unsigned int i = 0; i < x.size(); ++ i) {
+  inline Rcpp::IntegerVector extract_int_vector(Rcpp::List& x) {
+    // df_out_int.clear();
+    // Rcpp::Rcout << "x.size(): " << x.size() << std::endl;
+    // for(unsigned int i = 0; i < x.size(); ++ i) {
+    //   pv_list = x[i];
+    //   df_out_int.push_back(pv_list[temp_name]);
+    // }
+    
+    R_xlen_t i;
+    R_xlen_t n = x.size();
+    Rcpp::IntegerVector iv( n );
+    for( i = 0; i < n; i++ ) {
       pv_list = x[i];
-      
-      Rcpp::Rcout << "TYPEOF( pv_list ) " << TYPEOF( pv_list ) << std::endl;
-      Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
-      
-      df_out_int.push_back(pv_list[temp_name]);
+      Rcpp::IntegerVector this_iv = Rcpp::as< Rcpp::IntegerVector >( pv_list[ temp_name ] );
+      iv[i] = this_iv[0];
     }
+    return iv;
   }
   
   // Extract all double values from each named element of a nested list.
-  inline void extract_dbl_vector(Rcpp::List& x) {
-    df_out_dbl.clear();
-    for(unsigned int i = 0; i < x.size(); ++ i) {
+  inline Rcpp::NumericVector extract_dbl_vector(Rcpp::List& x) {
+    // df_out_dbl.clear();
+    // for(unsigned int i = 0; i < x.size(); ++ i) {
+    //   pv_list = x[i];
+    //   df_out_dbl.push_back(pv_list[temp_name]);
+    // }
+    
+    R_xlen_t i;
+    R_xlen_t n = x.size();
+    Rcpp::NumericVector nv( n );
+    for( i = 0; i < n; i++ ) {
       pv_list = x[i];
-      df_out_dbl.push_back(pv_list[temp_name]);
+      Rcpp::NumericVector this_nv = Rcpp::as< Rcpp::NumericVector >( pv_list[ temp_name ] );
+      nv[i] = this_nv[0];
     }
+    return nv;
   }
   
   // Extract all string values from each named element of a nested list.
-  inline void extract_str_vector(Rcpp::List& x) {
-    df_out_str.clear();
-    for(unsigned int i = 0; i < x.size(); ++ i) {
+  inline Rcpp::StringVector extract_str_vector(Rcpp::List& x) {
+    // df_out_str.clear();
+    // for(unsigned int i = 0; i < x.size(); ++ i) {
+    //   pv_list = x[i];
+    //   df_out_str.push_back(pv_list[temp_name]);
+    // }
+    // Rcpp::StringVector x_names = x.names();
+    // // bool name_exists = x_names.find( temp_name ) != x_names.end();
+    // Rcpp::StringVector r_str(1);
+    // r_str[0] = temp_name;
+    // Rcpp::String rs = r_str[0];
+    // Rcpp::Rcout << "name_exists " << name_exists( rs, x_names ) << std::endl;
+    
+    R_xlen_t i;
+    R_xlen_t n = x.size();
+    Rcpp::StringVector sv( n );
+    for( i = 0; i < n; i++ ) {
       pv_list = x[i];
-      df_out_str.push_back(pv_list[temp_name]);
+      if( temp_name.empty() ) {
+        sv[i] = NA_STRING;
+      } else {
+        Rcpp::StringVector this_sv = Rcpp::as< Rcpp::StringVector >( pv_list[ temp_name ] );
+        sv[i] = this_sv[0];
+      }
     }
+    Rcpp::Rcout << "sv " << sv << std::endl;
+    return sv;
   }
   
   // takes a list, where each element is the same TYPE and SIZE and simplifies to
@@ -242,6 +301,13 @@ namespace from_json {
     return Rcpp::LogicalMatrix(0); // never reaches?
   }
   
+  
+  // TODO
+  // new simplify_dataframe()
+  // which takes a list and works out on-the-fly the data types and column names?
+  // where it iterates over the list; 
+  // if it finds a column it hasn't seen before
+  // it fills the previous values with NA, then inserts the correct value
   SEXP simplify_dataframe(
     Rcpp::List& out,
     int& doc_len
@@ -260,57 +326,64 @@ namespace from_json {
       return out; // cant' simplify
     }
     names = pv_list.attr("names");
+    
     for(unsigned int n = 0; n < names.size(); ++n) {
-      temp_name = Rcpp::as<std::string>( names[n] );
+      temp_name = Rcpp::as< std::string >( names[n] );
       Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
       Rcpp::Rcout << "type pv_list " << TYPEOF( pv_list[n] ) << std::endl;
-      if(names_map.count(temp_name) == 0) {
-        // return_df = false;
-        // break;
-        Rcpp::Rcout << "names_map.count(temp_name) == 0 " << std::endl;
-        return out; // can't simplify
-      }
+      // if(names_map.count(temp_name) == 0) {
+      //   // return_df = false;
+      //   // break;
+      //   Rcpp::Rcout << "names_map.count(temp_name) == 0 " << std::endl;
+      //   return out; // can't simplify
+      // }
       // TODO
       // is this check (TYPEOF( pv_list[n] ) != LGLSXP ) correct? 
       // if it's logical && is NULL value it can be coerced to numeric NA?
-      if(names_map[temp_name] != TYPEOF( pv_list[n] ) && TYPEOF( pv_list[n] ) != LGLSXP  ) {
-        // return_df = false;
-        // break;
-        Rcpp::Rcout << "names_map[temp_name] != TYPEOF(pv_list[n])" << std::endl;
-        return out; // can't simplify
-      }
+      // if(names_map[temp_name] != TYPEOF( pv_list[n] ) && TYPEOF( pv_list[n] ) != LGLSXP  ) {
+      //   // return_df = false;
+      //   // break;
+      //   Rcpp::Rcout << "names_map[temp_name] != TYPEOF(pv_list[n])" << std::endl;
+      //   return out; // can't simplify
+      // }
     }
 
     Rcpp::Rcout << "constructing df_out" << std::endl;
     Rcpp::Rcout << "pv_len " << pv_len << std::endl;
     Rcpp::List df_out = Rcpp::List( pv_len );
+    
     for(int i = 0; i < pv_len; ++i) {
       temp_name = names[i];
       Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
       int temp_name_map = names_map[ temp_name ];
       Rcpp::Rcout << "temp_name_map: " << temp_name_map << std::endl;
-      switch(names_map[temp_name]) {
+      
+      switch( names_map[temp_name] ) {
       case LGLSXP: {
-        extract_lgl_vector(out);
-        df_out[i] = df_out_lgl;
+        Rcpp::Rcout << "getting lgl vector " << std::endl;
+        df_out[i] = extract_lgl_vector(out);
+        //df_out[i] = df_out_lgl;
         break;
       }
       case INTSXP: {
-        extract_int_vector(out);
-        df_out[i] = df_out_int;
+        Rcpp::Rcout << "getting int vector " << std::endl;
+        df_out[i] = extract_int_vector(out);
+        //df_out[i] = df_out_int;
         break;
       }
       case REALSXP: {
-        extract_dbl_vector(out);
-        df_out[i] = df_out_dbl;
+        Rcpp::Rcout << "getting dbl vector " << std::endl;
+        df_out[i] = extract_dbl_vector(out);
+        //df_out[i] = df_out_dbl;
         break;
       }
       case VECSXP: {
         Rcpp::stop("VECSXP needs simplifying??");
       }
       default: { // string, case 16
-        extract_str_vector(out);
-        df_out[i] = df_out_str;
+        Rcpp::Rcout << "getting str vector" << std::endl;
+        df_out[i] = extract_str_vector(out);
+        //df_out[i] = df_out_str;
         break;
       }
       }
