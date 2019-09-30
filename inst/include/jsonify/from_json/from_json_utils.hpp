@@ -339,6 +339,8 @@ namespace from_json {
     Rcpp::IntegerVector iv_list_types( list_types.begin(), list_types.end() );
 
     if ( list_lengths.size() == 1 ) {
+      
+      int list_length = *list_lengths.begin();
     
       // one length means a tablular structure / all list items are the same length
       // if there is more than one list_types (r-type), make them the 'highest' value
@@ -393,6 +395,7 @@ namespace from_json {
         Rcpp::Rcout << "multiple types of objects to simplify " << std::endl;
         // each element is the same length.
         // 
+        return jsonify::from_json::simplify_vector( out, r_type, list_length );
       }
       
     } else {

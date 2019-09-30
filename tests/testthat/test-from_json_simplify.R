@@ -153,16 +153,18 @@ test_that("array of arrays of different lenghts go to list",{
   ## - 
   js <- '[[5,[6,7]]]'
   x <- from_json( js )
+  expect_equal( x, list( list( 5, 6:7 )  ) ) 
   
   js <- '[[5,[6,"a"]]]'
   x <- from_json( js )
+  expect_equal( x, list( list( 5, c("6","a") )  ) )
   
   ## compare with 
-  jsonlite::fromJSON( js )
+  # jsonlite::fromJSON( js )
   
   js <- '[[1,2],[3,4],[5,[6,7]]]'
   x <- from_json( js )
-  
+  expect_equal( x, list( c(1,2), c(3,4), list(5, 6:7) ) )
 })
 
 test_that("array of various types converted to matrices",{
