@@ -104,14 +104,6 @@
 # js <- to_json( x )
 # from_json( js )
 
-# x <- list(1:4)
-# js <- to_json( x )
-# js
-# jsonify:::rcpp_get_dtypes( js )
-# res <- from_json( js )
-# ## type 4, length 1
-# ## - array == vector, matrix or list??
-# 
 # x <- data.frame(x = 1:2, y = I(matrix(1:4, ncol = 2)))
 # js <- to_json( x )
 # js
@@ -137,11 +129,5 @@
 # js <- to_json( x )
 # js; from_json( js )
 
-# 
-# js <- '[[1,2],[3,4],[5,[6,7]]]'
-# x <- from_json( js )
-# 
-# js <- '[[5,[6,7]]]'
-# x <- from_json( js )
 
 

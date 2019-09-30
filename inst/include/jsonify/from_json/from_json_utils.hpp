@@ -319,81 +319,97 @@ namespace from_json {
     // types of each named element of doc[i] with the elements in
     // names_map. If the names do not align, or the data types of the
     // names do not align, set return_df to false.
-    if(pv_list.size() != pv_len) {
-      //return_df = false;
-      //break;
-      Rcpp::Rcout << "pv_list.size != pv_len " << std::endl;
-      return out; // cant' simplify
-    }
-    names = pv_list.attr("names");
+    // if(pv_list.size() != pv_len) {
+    //   //return_df = false;
+    //   //break;
+    //   Rcpp::Rcout << "pv_list.size != pv_len " << std::endl;
+    //   return out; // cant' simplify
+    // }
+    // names = pv_list.attr("names");
     
-    for(unsigned int n = 0; n < names.size(); ++n) {
-      temp_name = Rcpp::as< std::string >( names[n] );
-      Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
-      Rcpp::Rcout << "type pv_list " << TYPEOF( pv_list[n] ) << std::endl;
-      // if(names_map.count(temp_name) == 0) {
-      //   // return_df = false;
-      //   // break;
-      //   Rcpp::Rcout << "names_map.count(temp_name) == 0 " << std::endl;
-      //   return out; // can't simplify
-      // }
-      // TODO
-      // is this check (TYPEOF( pv_list[n] ) != LGLSXP ) correct? 
-      // if it's logical && is NULL value it can be coerced to numeric NA?
-      // if(names_map[temp_name] != TYPEOF( pv_list[n] ) && TYPEOF( pv_list[n] ) != LGLSXP  ) {
-      //   // return_df = false;
-      //   // break;
-      //   Rcpp::Rcout << "names_map[temp_name] != TYPEOF(pv_list[n])" << std::endl;
-      //   return out; // can't simplify
-      // }
-    }
+    // for(unsigned int n = 0; n < names.size(); ++n) {
+    //   temp_name = Rcpp::as< std::string >( names[n] );
+    //   Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
+    //   Rcpp::Rcout << "type pv_list " << TYPEOF( pv_list[n] ) << std::endl;
+    //   // if(names_map.count(temp_name) == 0) {
+    //   //   // return_df = false;
+    //   //   // break;
+    //   //   Rcpp::Rcout << "names_map.count(temp_name) == 0 " << std::endl;
+    //   //   return out; // can't simplify
+    //   // }
+    //   // TODO
+    //   // is this check (TYPEOF( pv_list[n] ) != LGLSXP ) correct? 
+    //   // if it's logical && is NULL value it can be coerced to numeric NA?
+    //   // if(names_map[temp_name] != TYPEOF( pv_list[n] ) && TYPEOF( pv_list[n] ) != LGLSXP  ) {
+    //   //   // return_df = false;
+    //   //   // break;
+    //   //   Rcpp::Rcout << "names_map[temp_name] != TYPEOF(pv_list[n])" << std::endl;
+    //   //   return out; // can't simplify
+    //   // }
+    // }
 
     Rcpp::Rcout << "constructing df_out" << std::endl;
-    Rcpp::Rcout << "pv_len " << pv_len << std::endl;
-    Rcpp::List df_out = Rcpp::List( pv_len );
     
-    for(int i = 0; i < pv_len; ++i) {
-      temp_name = names[i];
-      Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
-      int temp_name_map = names_map[ temp_name ];
-      Rcpp::Rcout << "temp_name_map: " << temp_name_map << std::endl;
-      
-      switch( names_map[temp_name] ) {
-      case LGLSXP: {
-        Rcpp::Rcout << "getting lgl vector " << std::endl;
-        df_out[i] = extract_lgl_vector(out);
-        //df_out[i] = df_out_lgl;
-        break;
-      }
-      case INTSXP: {
-        Rcpp::Rcout << "getting int vector " << std::endl;
-        df_out[i] = extract_int_vector(out);
-        //df_out[i] = df_out_int;
-        break;
-      }
-      case REALSXP: {
-        Rcpp::Rcout << "getting dbl vector " << std::endl;
-        df_out[i] = extract_dbl_vector(out);
-        //df_out[i] = df_out_dbl;
-        break;
-      }
-      case VECSXP: {
-        Rcpp::stop("VECSXP needs simplifying??");
-      }
-      default: { // string, case 16
-        Rcpp::Rcout << "getting str vector" << std::endl;
-        df_out[i] = extract_str_vector(out);
-        //df_out[i] = df_out_str;
-        break;
-      }
-      }
+    std::unordered_set< std::string > df_names;
+    R_xlen_t n = out.size();
+    R_xlen_t i;
+    for( i = 0; i < n; i++ ) {
+      SEXP this_elem = out[i];
+      Rcpp::Rcout << "this_elem type :" << TYPEOF( this_elem ) << std::endl;
+      // std::string this_name = 
+      // df_names.insert( )
     }
     
-    df_out.attr("names") = names;
-    df_out.attr("class") = "data.frame";
-    df_out.attr("row.names") = Rcpp::seq(1, doc_len);
-
-    return df_out;
+    // Rcpp::StringVector list_names = out.attr("names");
+    // Rcpp::Rcout << "list_names " << list_names << std::endl;
+    
+    //Rcpp::Rcout << "pv_len " << pv_len << std::endl;
+    //Rcpp::List df_out = Rcpp::List( pv_len );
+    
+    return out;
+    
+    // for(i = 0; i < pv_len; ++i) {
+    //   temp_name = names[i];
+    //   Rcpp::Rcout << "temp_name: " << temp_name << std::endl;
+    //   int temp_name_map = names_map[ temp_name ];
+    //   Rcpp::Rcout << "temp_name_map: " << temp_name_map << std::endl;
+    //   
+    //   switch( names_map[temp_name] ) {
+    //   case LGLSXP: {
+    //     Rcpp::Rcout << "getting lgl vector " << std::endl;
+    //     df_out[i] = extract_lgl_vector(out);
+    //     //df_out[i] = df_out_lgl;
+    //     break;
+    //   }
+    //   case INTSXP: {
+    //     Rcpp::Rcout << "getting int vector " << std::endl;
+    //     df_out[i] = extract_int_vector(out);
+    //     //df_out[i] = df_out_int;
+    //     break;
+    //   }
+    //   case REALSXP: {
+    //     Rcpp::Rcout << "getting dbl vector " << std::endl;
+    //     df_out[i] = extract_dbl_vector(out);
+    //     //df_out[i] = df_out_dbl;
+    //     break;
+    //   }
+    //   case VECSXP: {
+    //     Rcpp::stop("VECSXP needs simplifying??");
+    //   }
+    //   default: { // string, case 16
+    //     Rcpp::Rcout << "getting str vector" << std::endl;
+    //     df_out[i] = extract_str_vector(out);
+    //     //df_out[i] = df_out_str;
+    //     break;
+    //   }
+    //   }
+    // }
+    // 
+    // df_out.attr("names") = names;
+    // df_out.attr("class") = "data.frame";
+    // df_out.attr("row.names") = Rcpp::seq(1, doc_len);
+    // 
+    // return df_out;
   }
   
   SEXP simplify_list(

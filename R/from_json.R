@@ -25,15 +25,20 @@ from_json <- function(x, simplify = TRUE, by = "row" ) {
   if( "col" %in% by ) by <- "column"
   by <- match.arg( by, choices = c("row", "column") )
   
-  return( rcpp_from_json( x, simplify, by ) )
+  res <- rcpp_from_json( x, simplify, by )
   
+  # if( simplify ) {
+  #   return( list_to_df( res ) )
+  # }
+  
+  return( res )
   # res <- rcpp_from_json(x, simplify, by)
   # 
   # if (!simplify || !inherits(res, "list")) {
   #   return(res)
   # }
   # 
-  # list_to_df(res)
+  #list_to_df(res)
 }
 
 # Helper function to convert a "from_json()" list to a data frame.
@@ -72,8 +77,7 @@ list_to_df <- function(res) {
   
   if (unlist_values) {
     # Unlist each element.
-    columnlist <- lapply(columnlist, unlist, recursive = FALSE, 
-                         use.names = FALSE)
+    columnlist <- lapply(columnlist, unlist, recursive = FALSE, use.names = FALSE)
   }
 
   # Convert columnlist to a data frame, then return.

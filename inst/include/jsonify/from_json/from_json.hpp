@@ -910,17 +910,17 @@ namespace from_json {
         list_types.insert( TYPEOF( out[i] ) );
         // If simplify is true and i is 0, record the data types of
         // each named element of doc[i] in unordered_map names_map.
-        if( simplify && i == 0 ) {
-        //if( simplify ) {
-          pv_len = pv_list.size();
-          names = pv_list.attr("names");
-          for(unsigned int n = 0; n < names.size(); ++n) {
-            temp_name = Rcpp::as< std::string >( names[n] );
-            Rcpp::Rcout << "adding name to list: " << temp_name << std::endl;
-            names_map[temp_name] = TYPEOF(pv_list[n]);
-          }
-          break;
-        }
+        // if( simplify && i == 0 ) {
+        // //if( simplify ) {
+        //   pv_len = pv_list.size();
+        //   names = pv_list.attr("names");
+        //   for(unsigned int n = 0; n < names.size(); ++n) {
+        //     temp_name = Rcpp::as< std::string >( names[n] );
+        //     Rcpp::Rcout << "adding name to list: " << temp_name << std::endl;
+        //     names_map[temp_name] = TYPEOF(pv_list[n]);
+        //   }
+        //   break;
+        // }
         
         // // If simplify and return_df are both true, compare the data 
         // // types of each named element of doc[i] with the elements in 

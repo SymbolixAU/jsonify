@@ -92,6 +92,21 @@ test_that("data frame returned properly", {
 
   js <- jsonify::to_json(target)
   expect_equal(from_json(js), target)
+  
+  js <- '[{"id":1,"val":"a","val2":1},{"id":2,"val":"b"}]'
+  x <- from_json( js )
+  expect_equal(x, target)
+  
+  js <- jsonify::to_json(target)
+  expect_equal(from_json(js), target)
+  
+  ## two entries with same key
+  js <- '[{"id":1,"val":"a","val":1},{"id":2,"val":"b"}]'
+  x <- from_json( js )
+  expect_equal(x, target)
+  
+  js <- jsonify::to_json(target)
+  expect_equal(from_json(js), target)
 
   # Return data frame in which the values in each name are NOT of the same data type.
   target <- data.frame("id" = c("cats", 2L), "val" = c("a", "b"), stringsAsFactors = FALSE)
@@ -112,6 +127,32 @@ test_that("data frame returned properly", {
 
   js <- jsonify::to_json(target)
   expect_equal(from_json(js), target)
+  
+  
+  
+  js <- '[{"id":"1","val":"a"},{"id":"2","blah":[1,2]}]'
+  x <- from_json(js)
+  expect_equal(x, target)
+  
+  js <- jsonify::to_json(target)
+  expect_equal(from_json(js), target)
+  
+  
+  ## now loads of complex stuff
+  df1 <- data.frame(
+    x = 1:2
+    , y = 3:4
+  )
+  df2 <- data.frame(
+    z = c("a","b")
+    , stringsAsFactors = F
+  )
+  
+  df1$z <- df2
+  
+  js <- to_json( df1 )
+  from_json( js )
+  
   # 
   # # Return data frame in which the lengths of the input values are different.
   # target <- data.frame(matrix(nrow = 2, ncol = 2), stringsAsFactors = FALSE)
