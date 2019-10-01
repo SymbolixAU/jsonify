@@ -137,6 +137,9 @@ test_that("data frame returned properly", {
   js <- jsonify::to_json(target)
   expect_equal(from_json(js), target)
   
+  ## 'val' changes type
+  js <- '[{"id":"1","val":"a"},{"id":"2","val":[1,2]}]'
+  x <- from_json(js)
   
   ## now loads of complex stuff
   df1 <- data.frame(
@@ -148,10 +151,50 @@ test_that("data frame returned properly", {
     , stringsAsFactors = F
   )
   
+  l <- list( df1, df2 )
+  js <- to_json( l )
+  x <- from_json( js )
+  
   df1$z <- df2
   
   js <- to_json( df1 )
+  x <- from_json( js )
+  
+  df <- data.frame(id = 1, val = 2)
+  to_json( df )
+  
+  ## shouldn't be a data.frame
+  js <- '{"id":1,"val":2}'
   from_json( js )
+  
+  ## should be a data.frame
+  js <- '[{"id":1,"val":2}]'
+  from_json( js )
+  
+  l <- list(1,2,df)
+  ## should be a list
+  js <- '[1,2,{"id":1,"val":2}]'
+  from_json( js )
+  
+  ## should be a list with a data.frame element
+  js <- '[1,2,[{"id":1,"val":2}]]'
+  from_json( js )
+  
+  
+  df <- data.frame( id = 1:2, mat = I(matrix(1:4, ncol = 2)))
+  js <- to_json( df )
+  from_json( js )
+  
+  ## Issue 42
+  df <- structure(list(fill_colour = structure(c(68, 49, 53, 253, 1, 
+  104, 183, 231, 84, 142, 121, 37, 255, 255, 255, 255), .Dim = c(4L, 
+  4L)), geometry = c(1, 2, -5, 0.3), lat = 1:4, lon = c(1, 2, -5, 
+  0.3)), class = "data.frame", row.names = c(NA, 4L))
+  
+  js <- to_json( df, by = "row" )
+  
+  from_json( js )
+  
   
   # 
   # # Return data frame in which the lengths of the input values are different.

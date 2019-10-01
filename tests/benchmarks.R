@@ -26,6 +26,10 @@ microbenchmark(
   },
   times = 5
 )
+# Unit: seconds
+#     expr      min       lq     mean   median       uq      max neval
+# jsonlite 1.793552 1.833454 2.267699 1.988986 2.270455 3.452051     5
+#  jsonify 1.385660 1.418404 1.766797 1.540941 1.964592 2.524389     5
 
 ## numeric vector
 n <- 1e7
@@ -58,7 +62,7 @@ microbenchmark(
   times = 5
 )
 # Unit: milliseconds
-#   expr       min        lq      mean    median        uq       max neval
+#     expr       min        lq      mean    median        uq       max neval
 # jsonlite 9531.6450 9757.0702 9826.4883 9854.7296 9880.0933 10108.903     5
 #  jsonify  895.7495  908.3581  932.9345  910.2298  934.1805  1016.155     5
 
