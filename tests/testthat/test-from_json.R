@@ -47,9 +47,40 @@ test_that("nested JSON handled properly", {
 
 test_that("nested JSON within an array handled properly", {
   
+  js <- '[{"f":"cats"}]'
+  target <- data.frame(f = "cats", stringsAsFactors = F)
+  x <- from_json( js )
+  expect_equal( x, target )
+  to_json(x, unbox = T)
+  
+  js <- '{"e":[{"f":"cats"}]}'
+  target <- list( e = data.frame(f = "cats", stringsAsFactors = F) )
+  x <- from_json( js )
+  expect_equal(x, target)
+  to_json(x, unbox = T)
+  
+  ## not valid for jsonify
+  # js <- '[{"c":123,"d":456},{"f":"cats"}]'
+  # target <- data.frame( c = c(123,NA), d = c(456, NA), f = c(NA, "cats"), stringsAsFactors = F)
+  # x <- from_json( js )
+  # df <- jsonlite::fromJSON( js )
+  # to_json( df ) ## produced different js
+  # '[{"c":123,"d":456,"f":null},{"c":null,"d":null,"f":"cats"}]'
+  ## because 'c' and 'd' dont' exist in the 2nd object; I don't want to introduce extra key/values
+  ## to replicate the js
+  # to_json( list( list( c = 123, d = 456), list( e = data.frame(f = "cats") ) ), unbox = T) 
+  ## and 
+  
+  
+  js <- '[{"c":123,"d":456},{"e":[{"f":"cats"}]}]'
+  target <- list(list(c = c(123), d = c(456)), list( e = data.frame(f = "cats", stringsAsFactors = F) ) )
+  x <- from_json( js )
+  expect_equal( x, target )
+  to_json(x, unbox = T)
+  
+  
   target <- list(a = 8L, b = list(list(c = 123L, d = 456L), list(e = data.frame(f = "cats", stringsAsFactors = F))))
-
-  js <- "{\"a\":8, \"b\":[{\"c\":123, \"d\":456}, {\"e\":[{\"f\":\"cats\"}]}]}"
+  js <- '{"a":8, "b":[{"c":123,"d":456},{"e":[{"f":"cats"}]}]}'
   x <- from_json(js)
   expect_equal(x, target)
 
@@ -93,6 +124,8 @@ test_that("data frame returned properly", {
   js <- jsonify::to_json(target)
   expect_equal(from_json(js), target)
   
+  ## missing val2 in 2nd objet
+  target <- list(list(id = c(1), val = c("a"), val2 = c(1)), list(id = c(2), val = c("b")))
   js <- '[{"id":1,"val":"a","val2":1},{"id":2,"val":"b"}]'
   x <- from_json( js )
   expect_equal(x, target)
@@ -101,6 +134,7 @@ test_that("data frame returned properly", {
   expect_equal(from_json(js), target)
   
   ## two entries with same key
+  target <- list( list(id = 1, val = "a", val = 1), list(id = 2, val = "b"))
   js <- '[{"id":1,"val":"a","val":1},{"id":2,"val":"b"}]'
   x <- from_json( js )
   expect_equal(x, target)
@@ -110,7 +144,6 @@ test_that("data frame returned properly", {
 
   # Return data frame in which the values in each name are NOT of the same data type.
   target <- data.frame("id" = c("cats", 2L), "val" = c("a", "b"), stringsAsFactors = FALSE)
-
   js <- '[{"id":"cats","val":"a"},{"id":2,"val":"b"}]'
   x <- from_json( js )
   expect_equal(x, target)
@@ -119,81 +152,83 @@ test_that("data frame returned properly", {
   expect_equal(from_json(js), target)
 
   # Return data frame in which the names do not align across JSON objects.
-  target <- data.frame("id" = c(1L, 2L), "val" = c("a", NA), "blah" = c(NA, "b"), stringsAsFactors = FALSE)
-
-  js <- '[{"id":"1","val":"a"},{"id":"2","blah":"b"}]'
+  target <- list( list(id = c(1L), val = c("a")), list(id = c(2L), blah = c("b")) )
+  ## - don't simplify to a data.frame if the names in objects after the first one
+  ## are different.
+  js <- '[{"id":1,"val":"a"},{"id":2,"blah":"b"}]'
   x <- from_json(js)
   expect_equal(x, target)
 
   js <- jsonify::to_json(target)
   expect_equal(from_json(js), target)
   
-  
-  
-  js <- '[{"id":"1","val":"a"},{"id":"2","blah":[1,2]}]'
+  target <- list( list(id = c(1L), val = c("a")), list(id = c(2L), blah = c(1L,2L)) )
+  js <- '[{"id":1,"val":"a"},{"id":2,"blah":[1,2]}]'
   x <- from_json(js)
   expect_equal(x, target)
   
   js <- jsonify::to_json(target)
   expect_equal(from_json(js), target)
   
-  ## 'val' changes type
+  ## 'val' changes type and length
   js <- '[{"id":"1","val":"a"},{"id":"2","val":[1,2]}]'
   x <- from_json(js)
   
-  ## now loads of complex stuff
-  df1 <- data.frame(
-    x = 1:2
-    , y = 3:4
-  )
-  df2 <- data.frame(
-    z = c("a","b")
-    , stringsAsFactors = F
-  )
+  to_json( x ) ## not quite right. Maybe need to change this behaviour?
   
-  l <- list( df1, df2 )
-  js <- to_json( l )
-  x <- from_json( js )
-  
-  df1$z <- df2
-  
-  js <- to_json( df1 )
-  x <- from_json( js )
-  
-  df <- data.frame(id = 1, val = 2)
-  to_json( df )
-  
-  ## shouldn't be a data.frame
-  js <- '{"id":1,"val":2}'
-  from_json( js )
-  
-  ## should be a data.frame
-  js <- '[{"id":1,"val":2}]'
-  from_json( js )
-  
-  l <- list(1,2,df)
-  ## should be a list
-  js <- '[1,2,{"id":1,"val":2}]'
-  from_json( js )
-  
-  ## should be a list with a data.frame element
-  js <- '[1,2,[{"id":1,"val":2}]]'
-  from_json( js )
-  
-  
-  df <- data.frame( id = 1:2, mat = I(matrix(1:4, ncol = 2)))
-  js <- to_json( df )
-  from_json( js )
-  
-  ## Issue 42
-  df <- structure(list(fill_colour = structure(c(68, 49, 53, 253, 1, 
-  104, 183, 231, 84, 142, 121, 37, 255, 255, 255, 255), .Dim = c(4L, 
-  4L)), geometry = c(1, 2, -5, 0.3), lat = 1:4, lon = c(1, 2, -5, 
-  0.3)), class = "data.frame", row.names = c(NA, 4L))
-  
-  js <- to_json( df, by = "row" )
-  
-  from_json( js )
+  # ## now loads of complex stuff
+  # df1 <- data.frame(
+  #   x = 1:2
+  #   , y = 3:4
+  # )
+  # df2 <- data.frame(
+  #   z = c("a","b")
+  #   , stringsAsFactors = F
+  # )
+  # 
+  # l <- list( df1, df2 )
+  # js <- to_json( l )
+  # x <- from_json( js )
+  # 
+  # df1$z <- df2
+  # 
+  # js <- to_json( df1 )
+  # x <- from_json( js )
+  # 
+  # df <- data.frame(id = 1, val = 2)
+  # to_json( df )
+  # 
+  # ## shouldn't be a data.frame
+  # js <- '{"id":1,"val":2}'
+  # from_json( js )
+  # 
+  # ## should be a data.frame
+  # js <- '[{"id":1,"val":2}]'
+  # from_json( js )
+  # 
+  # l <- list(1,2,df)
+  # ## should be a list
+  # js <- '[1,2,{"id":1,"val":2}]'
+  # from_json( js )
+  # 
+  # ## should be a list with a data.frame element
+  # js <- '[1,2,[{"id":1,"val":2}]]'
+  # from_json( js )
+  # 
+  # 
+  # df <- data.frame( id = 1:2, mat = I(matrix(1:4, ncol = 2)))
+  # js <- to_json( df )
+  # from_json( js )
+  # 
+  # ## Issue 42
+  # df <- structure(list(fill_colour = structure(c(68, 49, 53, 253, 1, 
+  # 104, 183, 231, 84, 142, 121, 37, 255, 255, 255, 255), .Dim = c(4L, 
+  # 4L)), geometry = c(1, 2, -5, 0.3), lat = 1:4, lon = c(1, 2, -5, 
+  # 0.3)), class = "data.frame", row.names = c(NA, 4L))
+  # 
+  # js <- to_json( df, by = "row" )
+  # 
+  # from_json( js )
   
   
   # 

@@ -414,6 +414,21 @@ namespace from_json {
     return -1;
   }
   
+  inline int column_struct(
+      std::unordered_map< std::string, int >& column_structs,
+      const char* to_find
+  ) {
+    std::string str( to_find );
+    std::unordered_map< std::string, int >::iterator it;
+    it = column_structs.find( str );
+    
+    if( it != column_structs.end() ) {
+      int res = it->second;
+      return res;
+    }
+    return -1;
+  }
+  
   inline void insert_column_value(
     Rcpp::List& columns,
     const char* this_column,
@@ -465,50 +480,61 @@ namespace from_json {
   // only works with single-elements (vectors)
   inline void list_to_vector(
     Rcpp::List& columns,
-    const char* this_name,
-    int& r_type
+    std::string& this_name,
+    int& r_type,
+    int& struct_type // 1 vector, 2 matrix, 3 list
   ) {
-    Rcpp::List lst = columns[ this_name ];
+    
+    Rcpp::List lst = columns[ this_name.c_str() ];
     R_xlen_t n_rows = lst.size();
     R_xlen_t i;
     
-    switch( r_type ) {
-    case LGLSXP: {
-      Rcpp::LogicalVector lv( n_rows );
-      for( i = 0; i < n_rows; i++ ) {
-        lv[i] = lst[i];
+    // if struct_type == 2; the result is a matrix
+    // need the dimensions...
+    if( struct_type == 2 ) {
+      Rcpp::stop("need to implement matrix column");
+    }
+    
+    if( struct_type == 1 ) {
+    
+      switch( r_type ) {
+      case LGLSXP: {
+        Rcpp::LogicalVector lv( n_rows );
+        for( i = 0; i < n_rows; i++ ) {
+          lv[i] = lst[i];
+        }
+        columns[ this_name ] = lv;
+        break;
       }
-      columns[ this_name ] = lv;
-      break;
-    }
-    case INTSXP: {
-      Rcpp::IntegerVector iv( n_rows );
-      for( i = 0; i < n_rows; i++ ) {
-        iv[i] = lst[i];
+      case INTSXP: {
+        Rcpp::IntegerVector iv( n_rows );
+        for( i = 0; i < n_rows; i++ ) {
+          iv[i] = lst[i];
+        }
+        columns[ this_name ] = iv;
+        break;
       }
-      columns[ this_name ] = iv;
-      break;
-    }
-    case REALSXP: {
-      Rcpp::NumericVector nv( n_rows );
-      for( i = 0; i < n_rows; i++ ) {
-        nv[i] = lst[i];
+      case REALSXP: {
+        Rcpp::NumericVector nv( n_rows );
+        for( i = 0; i < n_rows; i++ ) {
+          nv[i] = lst[i];
+        }
+        columns[ this_name ] = nv;
+        break;
       }
-      columns[ this_name ] = nv;
-      break;
-    }
-    case STRSXP: {
-      Rcpp::StringVector sv( n_rows );
-      for( i = 0; i < n_rows; i++ ) {
-        Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( lst[i] );
-        sv[i] = x[0];
+      case STRSXP: {
+        Rcpp::StringVector sv( n_rows );
+        for( i = 0; i < n_rows; i++ ) {
+          Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( lst[i] );
+          sv[i] = x[0];
+        }
+        columns[ this_name ] = sv;
+        break;
       }
-      columns[ this_name ] = sv;
-      break;
-    }
-    default: {
-      Rcpp::stop("case not handled");
-    }
+      default: {
+        Rcpp::stop("case not handled");
+      }
+      }
     }
   }
   
@@ -522,7 +548,6 @@ namespace from_json {
     Rcpp::List& out,
     int& doc_len
   ) {
-    
     Rcpp::Rcout << "simplify_dataframe()" << std::endl;
     
     // the number of rows is equal to the number of list elements?
@@ -546,6 +571,11 @@ namespace from_json {
     // then keep track of how simple they can go
     // 
     std::unordered_map< std::string, int > column_types;
+    std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
+    
+    int struct_type;
+    int tp;
+    int st;
     
     Rcpp::Rcout << "n_rows : " << n_rows << std::endl;
     
@@ -557,6 +587,8 @@ namespace from_json {
       Rcpp::StringVector list_names = this_list.names();
       Rcpp::Rcout << "names: " << list_names << std::endl;
 
+
+      
       if( list_names.size() != list_size ) {
         Rcpp::stop("invalid data.frame names");
       }
@@ -571,43 +603,71 @@ namespace from_json {
         int this_type = TYPEOF( this_elem );
         Rcpp::Rcout << "this_type: " << this_type << std::endl;
         Rcpp::Rcout << "sexp length: " << sexp_length << std::endl;
+        
+        struct_type = sexp_length == 1 ? 1 : 2;   // start of with vector or matrix
+        Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
+        
         // iff sexp_length == 1 it can be a vector element
         // otherwise, if it's the same as all the others and > 1, matrix
         // otherwise list element
         
-        int tp = column_type( column_types, this_name );
+        tp = column_type( column_types, this_name );
+        st = column_struct( column_structs, this_name );
         Rcpp::Rcout << "column_type: " << tp << std::endl;
-        if( tp == -1 ) {
-          // it doesn't exist in our list yet
-          // so we need to make it and add it to 'columns'
-          // std::unordered_map< std::string, int >::iterator it;
-          // std::pair< it, bool > insert_result;
-          
-          //insert_result = column_types.insert( std::make_pair< std::string, int >( this_name, this_type));
-          //if( insert_result.second == true ) {
-            // elememt was inserted; need a new column
-            column_types.insert({ this_name, this_type });
-            append_new_column( columns, this_name, n_rows );
-          //}
+        Rcpp::Rcout << "column_struct: " << st << std::endl;
+        
+        // only add column types if we're on the first 'row'
+        if( i == 0 && tp >= 0 ) {
+          // on the first row, but the column already exists
+          return out;
+        }
+        
+        if( i == 0 ) {
+          column_types[ this_name ] = this_type;
+          column_structs[ this_name ] = struct_type;
+          //column_types.insert({ this_name, this_type });
+          //column_structs.insert({ this_name, struct_type });
+          append_new_column( columns, this_name, n_rows );
+        }
+        
+        if( tp == -1 && i > 0 ) {
+          Rcpp::Rcout << "can't simplify because new column names" << std::endl;
+          return out;
         }
         // TODO
         // if tp > this_type 
         // then the type is different.
+        Rcpp::Rcout << "i: " << i << " & st: " << st << " & struct_type " << struct_type << std::endl;
+        if( i > 0 && st >= 0 ) {
+          // onto the second row
+          // if sexp_length 
+          
+          if( struct_type != st ) {
+            // needs to be a list
+            column_structs[ this_name ] = 3;
+          }
+        }
         
         // put the element in the correct column slot
         insert_column_value( columns, this_name, this_elem, i );
-        
       }
     }
     
-    return columns;
     
-   for( auto& it: column_types ) {
-     std::string this_name = it.first;
-     int r_type = it.second;
-     list_to_vector( columns, this_name.c_str(), r_type );
-    }
+    for( auto& it: column_types ) {
+      std::string this_name = it.first;
+      int r_type = it.second;
+      struct_type = column_struct( column_structs, this_name.c_str() );
+      list_to_vector( columns, this_name, r_type, struct_type );
+     }
     
+    
+     Rcpp::Rcout << "constructing data.frame" << std::endl;
+     //columns.attr("names") = names;
+     columns.attr("class") = "data.frame";
+     columns.attr("row.names") = Rcpp::seq(1, n_rows);
+     
+     return columns;
     
     
     // If simplify and return_df are both true, compare the data
