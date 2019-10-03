@@ -24,7 +24,8 @@ namespace from_json {
     case REALSXP:
       return sexp_length< REALSXP >( s );
     case VECSXP:
-      return sexp_length< VECSXP >( s );
+      return 2; // number bigger than 1 (vector)
+      //return sexp_length< VECSXP >( s );
     case INTSXP:
       return sexp_length< INTSXP >( s );
     case STRSXP:
@@ -495,6 +496,30 @@ namespace from_json {
       Rcpp::stop("need to implement matrix column");
     }
     
+    if( struct_type == 3 ) {
+      //Rcpp::Rcout << "NOT HANDLED YET" << std::endl;
+      // each element is it's own list element
+      //Rcpp::Rcout << "r_type " << r_type << std::endl;
+      // iterate through lst, extract each element (based on its type)
+      // then insert into a result list
+      Rcpp::List res( n_rows );
+      for( i = 0; i < n_rows; i++ ) {
+        Rcpp::Rcout << "type of list elem: " << TYPEOF( lst[i] ) << std::endl;
+        switch( TYPEOF( lst[i] ) ) {
+        case VECSXP: {
+          Rcpp::List tmp = lst[i];
+          res[i] = tmp[0];
+          break;
+        }
+        default: {
+          res[i] = lst[i];
+          break;
+        }
+        }
+      }
+      columns[ this_name ] = res;
+    }
+    
     if( struct_type == 1 ) {
     
       switch( r_type ) {
@@ -525,9 +550,13 @@ namespace from_json {
       case STRSXP: {
         Rcpp::StringVector sv( n_rows );
         for( i = 0; i < n_rows; i++ ) {
-          Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( lst[i] );
+          SEXP s = lst[i];
+          Rcpp::Rcout << "TYPEOF(s) " << TYPEOF( s ) << std::endl;
+          Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( s );
+          //Rcpp::Rcout << "sv: " << sv << std::endl;
           sv[i] = x[0];
         }
+        Rcpp::Rcout << "setting as a stringVector " << std::endl;
         columns[ this_name ] = sv;
         break;
       }
@@ -604,6 +633,9 @@ namespace from_json {
         Rcpp::Rcout << "this_type: " << this_type << std::endl;
         Rcpp::Rcout << "sexp length: " << sexp_length << std::endl;
         
+        // struct_type probably can't use sexp_length because
+        // js <- '[{"id":"1","val":["a"]},{"id":"2","val":[[1,2]]}]'
+        // from_json( to_json( from_json( js ) ) )
         struct_type = sexp_length == 1 ? 1 : 2;   // start of with vector or matrix
         Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
         
@@ -643,6 +675,7 @@ namespace from_json {
           // if sexp_length 
           
           if( struct_type != st ) {
+            Rcpp::Rcout << "needs to be a list " << std::endl;
             // needs to be a list
             column_structs[ this_name ] = 3;
           }
@@ -653,11 +686,12 @@ namespace from_json {
       }
     }
     
-    
+    Rcpp::Rcout << "list_to_vector " << std::endl;
     for( auto& it: column_types ) {
       std::string this_name = it.first;
       int r_type = it.second;
       struct_type = column_struct( column_structs, this_name.c_str() );
+      Rcpp::Rcout << "this_name " << this_name << " r_type " << r_type << " struct_type " << struct_type << std::endl;
       list_to_vector( columns, this_name, r_type, struct_type );
      }
     

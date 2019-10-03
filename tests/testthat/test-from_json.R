@@ -176,6 +176,11 @@ test_that("data frame returned properly", {
   
   to_json( x ) ## not quite right. Maybe need to change this behaviour?
   
+  js <- '[{"id":"1","val":["a"]},{"id":"2","val":[[1,2]]}]'
+  x <- from_json(js)
+  
+  to_json( x )
+  
   # ## now loads of complex stuff
   # df1 <- data.frame(
   #   x = 1:2
