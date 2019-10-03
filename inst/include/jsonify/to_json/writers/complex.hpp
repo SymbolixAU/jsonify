@@ -14,9 +14,14 @@ namespace writers {
 namespace complex {
 
   template < typename Writer >
-  inline void switch_vector( Writer& writer, SEXP this_vec, bool unbox, 
-                             int digits, bool numeric_dates, 
-                             bool factors_as_string ) {
+  inline void switch_vector(
+      Writer& writer, 
+      SEXP this_vec, 
+      bool unbox, 
+      int digits, 
+      bool numeric_dates, 
+      bool factors_as_string
+    ) {
     // Rcpp::Rcout << "switch_vector  " << std::endl;
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
@@ -79,9 +84,15 @@ namespace complex {
   
   // working by-row, so we only use a single element of each vector
   template < typename Writer >
-  inline void switch_vector( Writer& writer, SEXP this_vec, bool unbox, 
-                             int digits, bool numeric_dates, 
-                             bool factors_as_string, int row) {
+  inline void switch_vector(
+      Writer& writer, 
+      SEXP this_vec, 
+      bool unbox, 
+      int digits, 
+      bool numeric_dates, 
+      bool factors_as_string, 
+      int row
+    ) {
     
     // Rcpp::Rcout << "switch_vector by row " << row << std::endl;
     switch( TYPEOF( this_vec ) ) {
@@ -149,12 +160,18 @@ namespace complex {
   }
 
   template< typename Writer >
-  inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, 
-                           int digits = -1, bool numeric_dates = true,
-                           bool factors_as_string = true, std::string by = "row", 
-                           int row = -1   // for when we are recursing into a row of a data.frame
-                          ) {
+  inline void write_value(
+      Writer& writer, 
+      SEXP list_element, 
+      bool unbox = false, 
+      int digits = -1, 
+      bool numeric_dates = true,
+      bool factors_as_string = true, 
+      std::string by = "row", 
+      int row = -1   // for when we are recursing into a row of a data.frame
+      ) {
     
+    Rcpp::Rcout << "write_value row: " << row << std::endl;
     int i, df_col, df_row;
     
     if( Rf_isNull( list_element ) ) {
@@ -188,7 +205,7 @@ namespace complex {
       }
       }
     } else if ( Rf_inherits( list_element, "data.frame" ) ) {
-      // Rcpp::Rcout << "is data.frame" << std::endl;
+      Rcpp::Rcout << "is data.frame" << std::endl;
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
       int n_cols = df.ncol();
       int n_rows = df.nrows();
@@ -218,7 +235,7 @@ namespace complex {
         writer.EndObject();
         
       } else { // by == "row"
-        // Rcpp::Rcout << "by row " << std::endl;
+        Rcpp::Rcout << "by row " << std::endl;
         if ( row >= 0 ) {
           
           writer.StartObject();
@@ -230,7 +247,7 @@ namespace complex {
             SEXP this_vec = df[ h ];
             
             switch( TYPEOF( this_vec ) ) {
-            // Rcpp::Rcout << "this_vec column type 1 : " << TYPEOF( this_vec ) << std::endl;
+            Rcpp::Rcout << "this_vec column type 1 : " << TYPEOF( this_vec ) << std::endl;
             case VECSXP: {
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
               write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row );
@@ -256,7 +273,8 @@ namespace complex {
               const char *h = column_names[ df_col ];
               writer.String( h );
               SEXP this_vec = df[ h ];
-              // Rcpp::Rcout << "this_vec column type 2 : " << TYPEOF( this_vec ) << std::endl;
+              Rcpp::Rcout << "this_vec column type 2 : " << TYPEOF( this_vec ) << std::endl;
+              Rcpp::Rcout << "df_row " << df_row << std::endl;
               switch( TYPEOF( this_vec ) ) {
               case VECSXP: {
                 Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
@@ -279,7 +297,7 @@ namespace complex {
       switch( TYPEOF( list_element ) ) {
       
       case VECSXP: {
-        // Rcpp::Rcout << "data.frame row is VECSXP" << std::endl;
+        Rcpp::Rcout << "list element is a VECSXP" << std::endl;
         // the case where the list item is a row of a data.frame
         // ISSUE #32
         Rcpp::List temp_lst = Rcpp::as< Rcpp::List >( list_element );
@@ -304,6 +322,7 @@ namespace complex {
           lst = temp_lst;
 
           int n = lst.size();
+          Rcpp::Rcout << "lst.size() n " << n << std::endl;
           
           if ( n == 0 ) {
             writer.StartArray();
@@ -324,6 +343,11 @@ namespace complex {
           }
           // END LIST NAMES
           
+          // issue 44
+          // list-column in a data.frame shouldn't be nested in another array??
+          Rcpp::Rcout << " row: " << row << std::endl;
+          Rcpp::Rcout << "has_names " << has_names << std::endl;
+          Rcpp::Rcout << "starting array" << std::endl;
           jsonify::utils::writer_starter( writer, has_names );
           
           for ( i = 0; i < n; i++ ) {
@@ -335,7 +359,9 @@ namespace complex {
             }
             write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by );
           }
-        jsonify::utils::writer_ender( writer, has_names );
+          
+          jsonify::utils::writer_ender( writer, has_names );
+          
         } // end if (by row)
         break;
       }
