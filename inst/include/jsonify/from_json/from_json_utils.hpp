@@ -24,15 +24,36 @@ namespace from_json {
     case REALSXP:
       return sexp_length< REALSXP >( s );
     case VECSXP:
-      return 2; // number bigger than 1 (vector)
-      //return sexp_length< VECSXP >( s );
+      //return 2; // number bigger than 1 (vector)
+      return sexp_length< VECSXP >( s );
     case INTSXP:
       return sexp_length< INTSXP >( s );
     case STRSXP:
       return sexp_length< STRSXP >( s );
-    default: Rcpp::stop("sfheaders - unknown vector type");
+    default: Rcpp::stop("jsonify - unknown vector type");
     }
     return 0;
+  }
+  
+  inline int get_sexp_column_type( SEXP s ) {
+    
+    switch( TYPEOF(s) ) {
+    case LGLSXP: {}
+    case REALSXP: {}
+    case INTSXP: {}
+    case STRSXP: {
+      if( Rf_isMatrix( s ) ) {
+        return 2;
+      } else {
+        return 1;
+      }
+    }
+    case VECSXP:
+      // TODO: if a single element, make it a vector??
+      return 3;
+    default: Rcpp::stop("jsonify - unknown vector type");
+    }
+    return -1;
   }
   
   
@@ -603,6 +624,7 @@ namespace from_json {
     std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
     
     int struct_type;
+    int sexp_length;
     int tp;
     int st;
     
@@ -628,18 +650,24 @@ namespace from_json {
         Rcpp::Rcout << "this_name: " << this_name << std::endl;
         SEXP this_elem = this_list[ this_name ]; 
         
-        R_xlen_t sexp_length = get_sexp_length( this_elem );
+        sexp_length = get_sexp_length( this_elem );
+        Rcpp::Rcout << "sexp_length: " << sexp_length << std::endl;
+        struct_type = get_sexp_column_type( this_elem );
+        if( sexp_length > 1 && struct_type == 1 ) {
+          // the object is not a single-elemnt vector
+          struct_type = 3; 
+        }
+          
         int this_type = TYPEOF( this_elem );
         Rcpp::Rcout << "this_type: " << this_type << std::endl;
-        Rcpp::Rcout << "sexp length: " << sexp_length << std::endl;
-        
-        // struct_type probably can't use sexp_length because
-        // js <- '[{"id":"1","val":["a"]},{"id":"2","val":[[1,2]]}]'
-        // from_json( to_json( from_json( js ) ) )
-        struct_type = sexp_length == 1 ? 1 : 2;   // start of with vector or matrix
         Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
         
-        // iff sexp_length == 1 it can be a vector element
+        // struct_type probably can't use sexp_column_type because
+        // js <- '[{"id":"1","val":["a"]},{"id":"2","val":[[1,2]]}]'
+        // from_json( to_json( from_json( js ) ) )
+        //struct_type = sexp_column_type == 1 ? 1 : 2;   // start of with vector or matrix
+        
+        // iff sexp_column_type == 1 it can be a vector element
         // otherwise, if it's the same as all the others and > 1, matrix
         // otherwise list element
         

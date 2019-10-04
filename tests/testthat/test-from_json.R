@@ -175,11 +175,21 @@ test_that("data frame returned properly", {
   x <- from_json(js)
   
   to_json( x ) ## not quite right. Maybe need to change this behaviour?
+  to_json( x, unbox = T )
   
   js <- '[{"id":"1","val":["a"]},{"id":"2","val":[[1,2]]}]'
   x <- from_json(js)
   
   to_json( x )
+  to_json( x, unbox = T )
+  
+  js <- '[{"val":["a"]},{"val":[1,2]}]'
+  df <- from_json( js )
+  expect_equal( as.character( to_json(df, unbox = T) ), js )
+  
+  js <- '[{"val":["a"]},{"val":[[1,2]]}]'
+  df <- from_json( js )
+  expect_equal( as.character( to_json(df, unbox = T) ), js )
   
   # ## now loads of complex stuff
   # df1 <- data.frame(
