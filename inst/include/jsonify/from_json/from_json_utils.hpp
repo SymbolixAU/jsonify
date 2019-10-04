@@ -18,6 +18,12 @@ namespace from_json {
   
   inline R_xlen_t get_sexp_length( SEXP s ) {
     
+    Rcpp::Rcout << "get_sexp_length TYPEOF( s ) " << TYPEOF( s ) << std::endl;
+    
+    if( Rf_isMatrix( s ) ) {
+      Rcpp::Rcout << "length of matrix needed" << std::endl;
+    }
+    
     switch( TYPEOF(s) ) {
     case LGLSXP:
       return sexp_length< LGLSXP >( s );
@@ -37,16 +43,16 @@ namespace from_json {
   
   inline int get_sexp_column_type( SEXP s ) {
     
+    if( Rf_isMatrix( s ) ) {
+      return 2;
+    }
+    
     switch( TYPEOF(s) ) {
     case LGLSXP: {}
     case REALSXP: {}
     case INTSXP: {}
     case STRSXP: {
-      if( Rf_isMatrix( s ) ) {
-        return 2;
-      } else {
-        return 1;
-      }
+      return 1;
     }
     case VECSXP:
       // TODO: if a single element, make it a vector??
@@ -498,6 +504,12 @@ namespace from_json {
     // }
   }
   
+  inline void list_to_matrix(
+    Rcpp::List& lst
+  ) {
+    
+  }
+  
   // takes a list element and converts it to the correct type
   // only works with single-elements (vectors)
   inline void list_to_vector(
@@ -518,27 +530,65 @@ namespace from_json {
     }
     
     if( struct_type == 3 ) {
-      //Rcpp::Rcout << "NOT HANDLED YET" << std::endl;
+      Rcpp::Rcout << "NOT HANDLED YET" << std::endl;
       // each element is it's own list element
       //Rcpp::Rcout << "r_type " << r_type << std::endl;
       // iterate through lst, extract each element (based on its type)
       // then insert into a result list
-      Rcpp::List res( n_rows );
-      for( i = 0; i < n_rows; i++ ) {
-        Rcpp::Rcout << "type of list elem: " << TYPEOF( lst[i] ) << std::endl;
-        switch( TYPEOF( lst[i] ) ) {
-        case VECSXP: {
-          Rcpp::List tmp = lst[i];
-          res[i] = tmp[0];
-          break;
-        }
-        default: {
-          res[i] = lst[i];
-          break;
-        }
-        }
-      }
-      columns[ this_name ] = res;
+      // Rcpp::List res( n_rows );
+      // Rcpp::Rcout << "n_rows" << std::endl;
+      // for( i = 0; i < n_rows; i++ ) {
+      //   Rcpp::Rcout << "type of list elem: " << TYPEOF( lst[i] ) << std::endl;
+      //   switch( TYPEOF( lst[i] ) ) {
+      //   case VECSXP: {
+      //     Rcpp::List tmp = lst[i];
+      //     // iff all elements of tmp are the same size; it can be a matrix.
+      //     if( tmp.size() == 0 ) {
+      //       res[i] = tmp;
+      //     } else {
+      //       SEXP first_elem = tmp[0];
+      //       if( TYPEOF( first_elem ) == VECSXP ) {
+      //         // it's a list..back into this function?
+      //         Rcpp::stop("TODO");
+      //       } else if ( !Rf_isMatrix( first_elem ) ) {
+      //         // it's not a list or matrxi
+      //         // is it a fector
+      //         R_xlen_t first_size = get_sexp_length( first_elem );
+      //         int first_type = TYPEOF( first_elem );
+      //         
+      //         Rcpp::Rcout << "first_size: " << first_size << ", first_type: " << first_type << std::endl;
+      //         R_xlen_t j;
+      //         bool is_matrix = true;
+      //         for( j = 0; j < tmp.size(); j++ ) {
+      //           // TODO
+      //           // iff different type || different size; it's a list
+      //           // else, matrix
+      //           SEXP other_elem = tmp[j];
+      //           R_xlen_t other_size = get_sexp_length( other_elem );
+      //           if( other_size != first_size ){
+      //             is_matrix = false;
+      //             break;
+      //           }
+      //         }
+      //         
+      //         if( is_matrix ) {
+      //           // convert to matrix
+      //           Rcpp::Rcout << "Need to make a matrix" << std::endl;
+      //         }
+      //         
+      //       } else {
+      //         Rcpp::stop("it's a matrix!");
+      //       }
+      //     }
+      //     res[i] = tmp;
+      //     break;
+      //   }
+      //   default: {
+      //     res[i] = lst[i];
+      //     break;
+      //   }
+      //   }
+      // }
     }
     
     if( struct_type == 1 ) {

@@ -191,6 +191,26 @@ test_that("data frame returned properly", {
   df <- from_json( js )
   expect_equal( as.character( to_json(df, unbox = T) ), js )
   
+  ## matrices
+  
+  js <- '[{"val":[[1,2]]},{"val":[[1,2]]}]'
+  res <- from_json( js )
+  
+  ## different type
+  js <- '[{"val":[[1,2]]},{"val":[["a","b"]]}]'
+  
+  
+  js <- '[{"val":[[1,2],[3,4]]},{"val":[["a","b"]]}]'
+  from_json( js )
+  
+  
+  ## something more complex
+  js <- '[{"val":{"inner_val":[[1,2],[3,4]]}},{"val":[["a","b"]]}]'
+  from_json( js )
+  
+  js <- '[{"val":{"inner_val":[[1,2],[3,4]]}},{"val":{"inner_val":[["a","b"]]}}]'
+  from_json( js )
+  
   # ## now loads of complex stuff
   # df1 <- data.frame(
   #   x = 1:2
@@ -235,15 +255,15 @@ test_that("data frame returned properly", {
   # js <- to_json( df )
   # from_json( js )
   # 
-  # ## Issue 42
-  # df <- structure(list(fill_colour = structure(c(68, 49, 53, 253, 1, 
-  # 104, 183, 231, 84, 142, 121, 37, 255, 255, 255, 255), .Dim = c(4L, 
-  # 4L)), geometry = c(1, 2, -5, 0.3), lat = 1:4, lon = c(1, 2, -5, 
-  # 0.3)), class = "data.frame", row.names = c(NA, 4L))
-  # 
-  # js <- to_json( df, by = "row" )
-  # 
-  # from_json( js )
+  ## Issue 42
+  df <- structure(list(fill_colour = structure(c(68, 49, 53, 253, 1,
+  104, 183, 231, 84, 142, 121, 37, 255, 255, 255, 255), .Dim = c(4L,
+  4L)), geometry = c(1, 2, -5, 0.3), lat = 1:4, lon = c(1, 2, -5,
+  0.3)), class = "data.frame", row.names = c(NA, 4L))
+
+  js <- to_json( df, by = "row" )
+
+  from_json( js )
   
   
   # 
@@ -259,11 +279,11 @@ test_that("data frame returned properly", {
   # js <- jsonify::to_json(target)
   # expect_equal(from_json(js), target)
 })
-# 
-# test_that("empty inputs return NULL", {
-#   expect_null(from_json("{}"))
-#   expect_null(from_json("[]"))
-# })
+
+test_that("empty inputs return NULL", {
+  expect_null(from_json("{}"))
+  expect_null(from_json("[]"))
+})
 # 
 # test_that("round trips work", {
 #   
