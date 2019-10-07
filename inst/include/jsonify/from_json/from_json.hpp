@@ -1077,6 +1077,19 @@ namespace from_json {
     Rcpp::IntegerVector iv(dtypes.begin(), dtypes.end());
     return iv;
   }
+  
+  
+  // redesign thoughts
+  // - json_to_sexp() {} 
+  // -- to-level function, will work on array and obj
+  // -- recursive
+  // -- gets d_types for the current JSON object level
+  // -- iff only types 3 or 4 are in, recuse back into json_to_sexp()
+  // -- every recursive level keeps track of the d_types, and the object sizes?
+  // -- so when it comes back up a level, out of recursion, we can read what type it can be simplified to
+  
+  
+  
 
 } // namespace from_json
 } // namespace jsonify

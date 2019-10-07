@@ -196,6 +196,11 @@ test_that("data frame returned properly", {
   js <- '[{"val":[[1,2]]},{"val":[[1,2]]}]'
   res <- from_json( js )
   
+  ## complex df columns
+  js <- '[{"val":[[1,{"a":1,"b":2}]]},{"val":[[1,2]]}]'
+  res <- from_json( js )
+  
+  
   ## different type
   js <- '[{"val":[[1,2]]},{"val":[["a","b"]]}]'
   
