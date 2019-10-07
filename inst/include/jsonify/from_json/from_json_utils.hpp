@@ -252,6 +252,9 @@ namespace from_json {
       int& r_type,
       std::string by = "row"
       ) {
+    
+    Rcpp::Rcout << "simplify_matrix()" << std::endl;
+    
     int n_col = doc_len;
     //int n_row = iv_lengths[0]; // not happy wiht this
     std::unordered_set<int>::iterator it_lengths = list_lengths.begin();

@@ -52,11 +52,6 @@ namespace from_json {
         }
       }
     }
-    //Rcpp::Rcout << "dtypes: " << dtypes << std::endl;
-    //Rcpp::Rcout << "dtypes: " << std::endl;
-    // for( auto itr = dtypes.begin(); itr != dtypes.end(); itr++ ) {
-    //   Rcpp::Rcout << (*itr) << std::endl;
-    // }
   }
   
   template< typename T >
