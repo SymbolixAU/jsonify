@@ -18,29 +18,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_get_col_headers
-SEXP rcpp_get_col_headers(Rcpp::List& x);
-RcppExport SEXP _jsonify_rcpp_get_col_headers(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_get_col_headers(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_transpose_list
-Rcpp::List rcpp_transpose_list(Rcpp::List& x, Rcpp::CharacterVector& names);
-RcppExport SEXP _jsonify_rcpp_transpose_list(SEXP xSEXP, SEXP namesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector& >::type names(namesSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_transpose_list(x, names));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rcpp_null_to_na
 void rcpp_null_to_na(Rcpp::List& x);
 RcppExport SEXP _jsonify_rcpp_null_to_na(SEXP xSEXP) {
@@ -146,8 +123,6 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_from_json", (DL_FUNC) &_jsonify_rcpp_from_json, 3},
-    {"_jsonify_rcpp_get_col_headers", (DL_FUNC) &_jsonify_rcpp_get_col_headers, 1},
-    {"_jsonify_rcpp_transpose_list", (DL_FUNC) &_jsonify_rcpp_transpose_list, 2},
     {"_jsonify_rcpp_null_to_na", (DL_FUNC) &_jsonify_rcpp_null_to_na, 1},
     {"_jsonify_rcpp_get_dtypes", (DL_FUNC) &_jsonify_rcpp_get_dtypes, 1},
     {"_jsonify_rcpp_simplify_vector", (DL_FUNC) &_jsonify_rcpp_simplify_vector, 3},

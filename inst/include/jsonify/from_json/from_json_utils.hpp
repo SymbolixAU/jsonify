@@ -11,6 +11,19 @@
 namespace jsonify {
 namespace from_json {
 
+  inline int where_is(
+      Rcpp::String to_find,
+      Rcpp::StringVector& sv ) {
+    int n = sv.size();
+    int i;
+    for( i = 0; i < n; i++ ) {
+      if ( to_find == sv[i] ) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   template <int RTYPE>
   inline R_xlen_t sexp_length(Rcpp::Vector<RTYPE> v) {
     return v.length();
@@ -18,13 +31,16 @@ namespace from_json {
   
   inline R_xlen_t get_sexp_length( SEXP s ) {
     
-    Rcpp::Rcout << "get_sexp_length TYPEOF( s ) " << TYPEOF( s ) << std::endl;
+    //Rcpp::Rcout << "get_sexp_length TYPEOF( s ) " << TYPEOF( s ) << std::endl;
     
-    if( Rf_isMatrix( s ) ) {
-      Rcpp::Rcout << "length of matrix needed" << std::endl;
-    }
+    // if( Rf_isMatrix( s ) ) {
+    //   Rcpp::stop("length of matrix needed");
+    //   
+    // }
     
     switch( TYPEOF(s) ) {
+    case NILSXP: 
+      return 0;
     case LGLSXP:
       return sexp_length< LGLSXP >( s );
     case REALSXP:
@@ -42,11 +58,11 @@ namespace from_json {
   }
   
   inline int get_sexp_column_type( SEXP s ) {
-    
+
     if( Rf_isMatrix( s ) ) {
       return 2;
     }
-    
+
     switch( TYPEOF(s) ) {
     case LGLSXP: {}
     case REALSXP: {}
@@ -62,120 +78,33 @@ namespace from_json {
     return -1;
   }
   
-  
+  // Rcpp::List parse_value( const rapidjson::Value& val, bool& simplify, std::string by );
 
-  Rcpp::List parse_value( const rapidjson::Value& val, bool& simplify, std::string by );
-
-  std::unordered_set<int> dtypes;
-  std::unordered_map<std::string, int> names_map;
-  int pv_len;
-  std::string temp_name;
+  // std::unordered_set<int> dtypes;
+  // std::unordered_map<std::string, int> names_map;
+  // int pv_len;
+  // std::string temp_name;
   // std::vector<bool> df_out_lgl;
   // std::vector<int> df_out_int;
   // std::vector<double> df_out_dbl;
   // std::vector<std::string> df_out_str;
-  Rcpp::CharacterVector names;
-  Rcpp::List pv_list;
+  // Rcpp::CharacterVector names;
+  // Rcpp::List pv_list;
   
-  inline bool name_exists(
-    Rcpp::String& to_find,
-    Rcpp::StringVector& sv ) {
-    int n = sv.size();
-    int i;
-    for( i = 0; i < n; i++ ) {
-      if ( to_find == sv[i] ) {
-        return true;
-      }
-    }
-    return false;
-  }
+  // inline bool name_exists(
+  //   Rcpp::String& to_find,
+  //   Rcpp::StringVector& sv ) {
+  //   int n = sv.size();
+  //   int i;
+  //   for( i = 0; i < n; i++ ) {
+  //     if ( to_find == sv[i] ) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
   
-  // Extract all logical values from each named element of a nested list.
-  inline Rcpp::LogicalVector extract_lgl_vector(Rcpp::List& x) {
-    // df_out_lgl.clear();
-    // for(unsigned int i = 0; i < x.size(); ++ i) {
-    //   pv_list = x[i];
-    //   df_out_lgl.push_back(pv_list[temp_name]);
-    // }
-    R_xlen_t i;
-    R_xlen_t n = x.size();
-    Rcpp::LogicalVector lv( n );
-    for( i = 0; i < n; i++ ) {
-      pv_list = x[i];
-      Rcpp::LogicalVector this_lv = Rcpp::as< Rcpp::LogicalVector >( pv_list[ temp_name ] );
-      lv[i] = this_lv[0];
-    }
-    return lv;
-  }
-  
-  // Extract all int values from each named element of a nested list.
-  inline Rcpp::IntegerVector extract_int_vector(Rcpp::List& x) {
-    // df_out_int.clear();
-    // Rcpp::Rcout << "x.size(): " << x.size() << std::endl;
-    // for(unsigned int i = 0; i < x.size(); ++ i) {
-    //   pv_list = x[i];
-    //   df_out_int.push_back(pv_list[temp_name]);
-    // }
-    
-    R_xlen_t i;
-    R_xlen_t n = x.size();
-    Rcpp::IntegerVector iv( n );
-    for( i = 0; i < n; i++ ) {
-      pv_list = x[i];
-      Rcpp::IntegerVector this_iv = Rcpp::as< Rcpp::IntegerVector >( pv_list[ temp_name ] );
-      iv[i] = this_iv[0];
-    }
-    return iv;
-  }
-  
-  // Extract all double values from each named element of a nested list.
-  inline Rcpp::NumericVector extract_dbl_vector(Rcpp::List& x) {
-    // df_out_dbl.clear();
-    // for(unsigned int i = 0; i < x.size(); ++ i) {
-    //   pv_list = x[i];
-    //   df_out_dbl.push_back(pv_list[temp_name]);
-    // }
-    
-    R_xlen_t i;
-    R_xlen_t n = x.size();
-    Rcpp::NumericVector nv( n );
-    for( i = 0; i < n; i++ ) {
-      pv_list = x[i];
-      Rcpp::NumericVector this_nv = Rcpp::as< Rcpp::NumericVector >( pv_list[ temp_name ] );
-      nv[i] = this_nv[0];
-    }
-    return nv;
-  }
-  
-  // Extract all string values from each named element of a nested list.
-  inline Rcpp::StringVector extract_str_vector(Rcpp::List& x) {
-    // df_out_str.clear();
-    // for(unsigned int i = 0; i < x.size(); ++ i) {
-    //   pv_list = x[i];
-    //   df_out_str.push_back(pv_list[temp_name]);
-    // }
-    // Rcpp::StringVector x_names = x.names();
-    // // bool name_exists = x_names.find( temp_name ) != x_names.end();
-    // Rcpp::StringVector r_str(1);
-    // r_str[0] = temp_name;
-    // Rcpp::String rs = r_str[0];
-    // Rcpp::Rcout << "name_exists " << name_exists( rs, x_names ) << std::endl;
-    
-    R_xlen_t i;
-    R_xlen_t n = x.size();
-    Rcpp::StringVector sv( n );
-    for( i = 0; i < n; i++ ) {
-      pv_list = x[i];
-      if( temp_name.empty() ) {
-        sv[i] = NA_STRING;
-      } else {
-        Rcpp::StringVector this_sv = Rcpp::as< Rcpp::StringVector >( pv_list[ temp_name ] );
-        sv[i] = this_sv[0];
-      }
-    }
-    Rcpp::Rcout << "sv " << sv << std::endl;
-    return sv;
-  }
+
   
   // takes a list, where each element is the same TYPE and SIZE and simplifies to
   // a vector
@@ -214,6 +143,7 @@ namespace from_json {
         Rcpp::IntegerVector this_vec = x[ counter ];
         std::copy( this_vec.begin(), this_vec.end(), iv.begin() + i );
       }
+      // Rcpp::Rcout << "iv: " << iv << std::endl;
       return iv;
     }
     case REALSXP: {
@@ -222,6 +152,7 @@ namespace from_json {
         Rcpp::NumericVector this_vec = x[ counter ];
         std::copy( this_vec.begin(), this_vec.end(), nv.begin() + i );
       }
+      // Rcpp::Rcout << "nv: " << nv << std::endl;
       return nv;
     }
     case VECSXP: {
@@ -247,25 +178,18 @@ namespace from_json {
   
   SEXP simplify_matrix(
       Rcpp::List& out,
-      int& doc_len, 
-      std::unordered_set<int>& list_lengths,
+      int& n_col,  // n_columns
+      int& n_row,
       int& r_type,
       std::string by = "row"
       ) {
-    
-    Rcpp::Rcout << "simplify_matrix()" << std::endl;
-    
-    int n_col = doc_len;
-    //int n_row = iv_lengths[0]; // not happy wiht this
-    std::unordered_set<int>::iterator it_lengths = list_lengths.begin();
-    int n_row = *(it_lengths);
-    
+
     switch( r_type ) {
     case INTSXP: {
       
-      if( by == "col") {
-      Rcpp::IntegerMatrix mat( n_row, n_col );
-      
+    if( by == "col") {
+      Rcpp::IntegerMatrix mat( n_col, n_row ); // swapped
+
       for(int i = 0; i < n_col; i++ ) {
         Rcpp::IntegerVector this_vec = out[i];
         mat( Rcpp::_, i ) = this_vec;
@@ -273,60 +197,60 @@ namespace from_json {
       return mat;
     } else {
       
-      Rcpp::IntegerMatrix mat( n_col, n_row );
-      for( int i = 0; i < n_col; i++ ) {
+      Rcpp::IntegerMatrix mat( n_row, n_col );
+      for( int i = 0; i < n_row; i++ ) {
         Rcpp::IntegerVector this_vec = out[i];
-        for( int j = 0; j < n_row; j++ ) {
+        for( int j = 0; j < n_col; j++ ) {
           int this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
       }
       return mat;
-    }
+     }
     }
     case REALSXP: {
-      if( by == "col" ) {
-      Rcpp::NumericMatrix mat( n_row, n_col );
-      //if by == col
-      for(int i = 0; i < n_col; i++ ) {
-        Rcpp::NumericVector this_vec = out[i];
-        mat( Rcpp::_, i ) = this_vec;
-      }
-      return mat;
-    } else {
+    // if( by == "col" ) {
+    //   Rcpp::NumericMatrix mat( n_row, n_col );
+    //   //if by == col
+    //   for(int i = 0; i < n_col; i++ ) {
+    //     Rcpp::NumericVector this_vec = out[i];
+    //     mat( Rcpp::_, i ) = this_vec;
+    //   }
+    //   return mat;
+    // } else {
       
-      Rcpp::NumericMatrix mat( n_col, n_row );
-      for( int i = 0; i < n_col; i++ ) {
+      Rcpp::NumericMatrix mat( n_row, n_col );
+      for( int i = 0; i < n_row; i++ ) {
         Rcpp::NumericVector this_vec = out[i];
-        for( int j = 0; j < n_row; j++ ) {
+        for( int j = 0; j < n_col; j++ ) {
           double this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
       }
       return mat;
-    }
+    // }
     }
     case LGLSXP: {
-      if( by == "col" ) {
-      Rcpp::LogicalMatrix mat( n_row, n_col );
-      //if by == col
-      for(int i = 0; i < n_col; i++ ) {
-        Rcpp::LogicalVector this_vec = out[i];
-        mat( Rcpp::_, i ) = this_vec;
-      }
-      return mat;
-    } else {
+    // if( by == "col" ) {
+    //   Rcpp::LogicalMatrix mat( n_row, n_col );
+    //   //if by == col
+    //   for(int i = 0; i < n_col; i++ ) {
+    //     Rcpp::LogicalVector this_vec = out[i];
+    //     mat( Rcpp::_, i ) = this_vec;
+    //   }
+    //   return mat;
+    // } else {
       
-      Rcpp::LogicalMatrix mat( n_col, n_row );
-      for( int i = 0; i < n_col; i++ ) {
+      Rcpp::LogicalMatrix mat( n_row, n_col );
+      for( int i = 0; i < n_row; i++ ) {
         Rcpp::LogicalVector this_vec = out[i];
-        for( int j = 0; j < n_row; j++ ) {
+        for( int j = 0; j < n_col; j++ ) {
           bool this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
       }
       return mat;
-    }
+    // }
     }
     case VECSXP: {
       // list / data.frame
@@ -335,88 +259,67 @@ namespace from_json {
     }
     default: {
       // string
-      if( by == "col" ) {
-      Rcpp::StringMatrix mat( n_row, n_col );
-      //if by == col
-      for(int i = 0; i < n_col; i++ ) {
-        Rcpp::StringVector this_vec = out[i];
-        mat( Rcpp::_, i ) = this_vec;
-      }
-      return mat;
-    } else {
+    // if( by == "col" ) {
+    //   Rcpp::StringMatrix mat( n_row, n_col );
+    //   //if by == col
+    //   for(int i = 0; i < n_col; i++ ) {
+    //     Rcpp::StringVector this_vec = out[i];
+    //     mat( Rcpp::_, i ) = this_vec;
+    //   }
+    //   return mat;
+    // } else {
       
-      Rcpp::StringMatrix mat( n_col, n_row );
-      for( int i = 0; i < n_col; i++ ) {
+      Rcpp::StringMatrix mat( n_row, n_col );
+      for( int i = 0; i < n_row; i++ ) {
         Rcpp::StringVector this_vec = out[i];
-        for( int j = 0; j < n_row; j++ ) {
+        for( int j = 0; j < n_col; j++ ) {
           Rcpp::String this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
       }
       return mat;
-    }
+    // }
     }
     }
     return Rcpp::LogicalMatrix(0); // never reaches?
   }
   
-  // Get all unique names from a list object.
-  // Equivalent to the R command:
-  // unique(unlist(lapply(list_obj, names), recursive = FALSE, use.names = FALSE))
-  SEXP get_col_headers(Rcpp::List& list_obj) {
-    Rcpp::List curr_list;
-    Rcpp::CharacterVector curr_names;
-    std::string curr_str;
-    std::unordered_set<std::string> names_set;
-    std::vector<std::string> names;
-    for(unsigned int i = 0; i < list_obj.size(); ++i) {
-      if(TYPEOF(list_obj[i]) != VECSXP) {
-        return R_NilValue;
-      }
-      curr_list = list_obj[i];
-      curr_names = curr_list.attr("names");
-      for(unsigned int n = 0; n < curr_names.size(); ++n) {
-        curr_str = Rcpp::as<std::string>(curr_names[n]);
-        if(names_set.find(curr_str) == names_set.end()) {
-          names.push_back(curr_str);
-          names_set.insert(curr_str);
+  inline SEXP list_to_matrix(
+    Rcpp::List& array_of_array,
+    std::string by = "row"
+  ) {
+    R_xlen_t n = array_of_array.size();
+    R_xlen_t j;
+    std::unordered_set<int> array_lengths;
+    std::unordered_set<int> array_types;
+    bool can_be_matrix = true;
+    for( j = 0; j < n; j++ ) {
+      SEXP s = array_of_array[j];
+      int this_type = TYPEOF( s );
+      if( Rf_isMatrix( s ) || this_type == VECSXP ) {
+        // can't be simplified
+        can_be_matrix = false;
+        break;
+      } else {
+        // keep track of sizes and types
+        array_lengths.insert( get_sexp_length( s ) );
+        array_types.insert( this_type );
+        if( array_lengths.size() > 1 ) {
+          // can't be simplified to matrix
+          can_be_matrix = false;
+          break;
         }
       }
     }
-    
-    return Rcpp::wrap(names);
-  }
-  
-  // Tranpose a list.
-  // Equivalent to the R command:
-  // cols <- unique(unlist(lapply(list_obj, names)))
-  // lapply(cols, function(x) lapply(list_obj, "[[", x))
-  Rcpp::List transpose_list(Rcpp::List& x, Rcpp::CharacterVector& names) {
-    int x_len = x.size();
-    int names_len = names.size();
-    Rcpp::List out(names_len);
-    Rcpp::CharacterVector curr_names;
-    Rcpp::String curr_name;
-    Rcpp::List curr_list;
-    
-    for(int i = 0; i < names_len; ++i) {
-      curr_name = names[i];
-      Rcpp::List col(x_len);
-      for(int j = 0; j < x_len; ++j) {
-        curr_list = x[j];
-        curr_names = curr_list.attr("names");
-        for(unsigned int k = 0; k < curr_names.size(); ++k) {
-          if(curr_names[k] == curr_name) {
-            col[j] = curr_list[k];
-            break;
-          }
-        }
-      }
-      
-      out[i] = col;
+    if( can_be_matrix ) {
+      Rcpp::IntegerVector arr_types( array_types.begin(), array_types.end() );
+      int r_type = Rcpp::max( arr_types );
+      int n_col = *array_lengths.begin();  // only one sizez
+      int n_row = n;
+      return simplify_matrix( array_of_array, n_col, n_row, r_type, by );
+    } else {
+      return array_of_array;
     }
-    
-    return out;
   }
   
   // Convert all NULL elements in a list to NA.
@@ -466,7 +369,7 @@ namespace from_json {
     SEXP val,
     R_xlen_t& row_index
   ) {
-    Rcpp::Rcout << "updating " << this_column << " at row_index " << row_index << std::endl;
+    // Rcpp::Rcout << "updating " << this_column << " at row_index " << row_index << std::endl;
     Rcpp::List lst = columns[ this_column ];
     lst[ row_index ] = val;
     columns[ this_column ] = lst;
@@ -479,7 +382,7 @@ namespace from_json {
     const char* this_column,
     R_xlen_t n_rows
   ) {
-    Rcpp::Rcout << "creating new column " << this_column << " with " << n_rows << " rows" << std::endl;
+    // Rcpp::Rcout << "creating new column " << this_column << " with " << n_rows << " rows" << std::endl;
     Rcpp::List new_column( n_rows );
     columns[ this_column ] = new_column;
     
@@ -507,12 +410,6 @@ namespace from_json {
     // }
   }
   
-  inline void list_to_matrix(
-    Rcpp::List& lst
-  ) {
-    
-  }
-  
   // takes a list element and converts it to the correct type
   // only works with single-elements (vectors)
   inline void list_to_vector(
@@ -522,80 +419,44 @@ namespace from_json {
     int& struct_type // 1 vector, 2 matrix, 3 list
   ) {
     
-    Rcpp::List lst = columns[ this_name.c_str() ];
-    R_xlen_t n_rows = lst.size();
-    R_xlen_t i;
-    
     // if struct_type == 2; the result is a matrix
     // need the dimensions...
     if( struct_type == 2 ) {
-      Rcpp::stop("need to implement matrix column");
+      //Rcpp::stop("need to implement matrix column");
+      switch( r_type ) {
+      case LGLSXP: {
+
+        break;
+      }
+      case INTSXP: {
+
+        break;
+      }
+      case REALSXP: {
+
+        break;
+      }
+      case STRSXP: {
+
+        break;
+      }
+      default: {
+        Rcpp::stop("jsonify - invalid matrix-column");
+      }
+      }
     }
     
-    if( struct_type == 3 ) {
-      Rcpp::Rcout << "NOT HANDLED YET" << std::endl;
-      // each element is it's own list element
-      //Rcpp::Rcout << "r_type " << r_type << std::endl;
-      // iterate through lst, extract each element (based on its type)
-      // then insert into a result list
-      // Rcpp::List res( n_rows );
-      // Rcpp::Rcout << "n_rows" << std::endl;
-      // for( i = 0; i < n_rows; i++ ) {
-      //   Rcpp::Rcout << "type of list elem: " << TYPEOF( lst[i] ) << std::endl;
-      //   switch( TYPEOF( lst[i] ) ) {
-      //   case VECSXP: {
-      //     Rcpp::List tmp = lst[i];
-      //     // iff all elements of tmp are the same size; it can be a matrix.
-      //     if( tmp.size() == 0 ) {
-      //       res[i] = tmp;
-      //     } else {
-      //       SEXP first_elem = tmp[0];
-      //       if( TYPEOF( first_elem ) == VECSXP ) {
-      //         // it's a list..back into this function?
-      //         Rcpp::stop("TODO");
-      //       } else if ( !Rf_isMatrix( first_elem ) ) {
-      //         // it's not a list or matrxi
-      //         // is it a fector
-      //         R_xlen_t first_size = get_sexp_length( first_elem );
-      //         int first_type = TYPEOF( first_elem );
-      //         
-      //         Rcpp::Rcout << "first_size: " << first_size << ", first_type: " << first_type << std::endl;
-      //         R_xlen_t j;
-      //         bool is_matrix = true;
-      //         for( j = 0; j < tmp.size(); j++ ) {
-      //           // TODO
-      //           // iff different type || different size; it's a list
-      //           // else, matrix
-      //           SEXP other_elem = tmp[j];
-      //           R_xlen_t other_size = get_sexp_length( other_elem );
-      //           if( other_size != first_size ){
-      //             is_matrix = false;
-      //             break;
-      //           }
-      //         }
-      //         
-      //         if( is_matrix ) {
-      //           // convert to matrix
-      //           Rcpp::Rcout << "Need to make a matrix" << std::endl;
-      //         }
-      //         
-      //       } else {
-      //         Rcpp::stop("it's a matrix!");
-      //       }
-      //     }
-      //     res[i] = tmp;
-      //     break;
-      //   }
-      //   default: {
-      //     res[i] = lst[i];
-      //     break;
-      //   }
-      //   }
-      // }
-    }
+    // it's already a list when it enters this function
+    // if( struct_type == 3 ) {
+    //   Rcpp::stop("need to implement list column" );
+    // }
     
     if( struct_type == 1 ) {
-    
+      
+      Rcpp::List lst = columns[ this_name.c_str() ];
+      R_xlen_t n_rows = lst.size();
+      R_xlen_t i;
+      
       switch( r_type ) {
       case LGLSXP: {
         Rcpp::LogicalVector lv( n_rows );
@@ -625,17 +486,17 @@ namespace from_json {
         Rcpp::StringVector sv( n_rows );
         for( i = 0; i < n_rows; i++ ) {
           SEXP s = lst[i];
-          Rcpp::Rcout << "TYPEOF(s) " << TYPEOF( s ) << std::endl;
+          // Rcpp::Rcout << "TYPEOF(s) " << TYPEOF( s ) << std::endl;
           Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( s );
           //Rcpp::Rcout << "sv: " << sv << std::endl;
           sv[i] = x[0];
         }
-        Rcpp::Rcout << "setting as a stringVector " << std::endl;
+        // Rcpp::Rcout << "setting as a stringVector " << std::endl;
         columns[ this_name ] = sv;
         break;
       }
       default: {
-        Rcpp::stop("case not handled");
+        Rcpp::stop("jsonify - vector-column not found");
       }
       }
     }
@@ -651,7 +512,7 @@ namespace from_json {
     Rcpp::List& out,
     int& doc_len
   ) {
-    Rcpp::Rcout << "simplify_dataframe()" << std::endl;
+    // Rcpp::Rcout << "simplify_dataframe()" << std::endl;
     
     // the number of rows is equal to the number of list elements?
     // the number of columns is equal to the unique names
@@ -675,45 +536,59 @@ namespace from_json {
     // 
     std::unordered_map< std::string, int > column_types;
     std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
+    // std::unordered_map< std::string, int > column_lengths;
     
     int struct_type;
     int sexp_length;
     int tp;
     int st;
     
-    Rcpp::Rcout << "n_rows : " << n_rows << std::endl;
+    // Rcpp::Rcout << "n_rows : " << n_rows << std::endl;
+    Rcpp::StringVector list_names;
     
     for( i = 0; i < n_rows; i++ ) {
       // iterating list elements
       Rcpp::List this_list = out[i];
+      if( i == 0 ) {
+        list_names = this_list.names();
+      }
       R_xlen_t list_size = this_list.size();
-      Rcpp::Rcout << "n_cols: " << list_size << std::endl;
-      Rcpp::StringVector list_names = this_list.names();
-      Rcpp::Rcout << "names: " << list_names << std::endl;
+      // Rcpp::Rcout << "n_cols: " << list_size << std::endl;
+      //Rcpp::StringVector list_names = this_list.names();
+      // Rcpp::Rcout << "names: " << list_names << std::endl;
 
-
-      
       if( list_names.size() != list_size ) {
-        Rcpp::stop("invalid data.frame names");
+        return out;
       }
       
       // Iterate over names??
       for( j = 0; j < list_size; j++ ) { 
         const char* this_name = list_names[j];
-        Rcpp::Rcout << "this_name: " << this_name << std::endl;
+        // Rcpp::Rcout << "this_name: " << this_name << std::endl;
+        
+        //Rcpp::String temp_s = this_name;
+        Rcpp::StringVector these_names = this_list.names();
+        int found_name = where_is( this_name, these_names );
+        
+        if( found_name == -1 ) {
+          // can't simplify
+          return out;
+        }
+        
         SEXP this_elem = this_list[ this_name ]; 
         
         sexp_length = get_sexp_length( this_elem );
-        Rcpp::Rcout << "sexp_length: " << sexp_length << std::endl;
         struct_type = get_sexp_column_type( this_elem );
+        // Rcpp::Rcout << "sexp_length: " << sexp_length << std::endl;
+        
         if( sexp_length > 1 && struct_type == 1 ) {
           // the object is not a single-elemnt vector
           struct_type = 3; 
         }
           
         int this_type = TYPEOF( this_elem );
-        Rcpp::Rcout << "this_type: " << this_type << std::endl;
-        Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
+        // Rcpp::Rcout << "this_type: " << this_type << std::endl;
+        // Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
         
         // struct_type probably can't use sexp_column_type because
         // js <- '[{"id":"1","val":["a"]},{"id":"2","val":[[1,2]]}]'
@@ -726,8 +601,8 @@ namespace from_json {
         
         tp = column_type( column_types, this_name );
         st = column_struct( column_structs, this_name );
-        Rcpp::Rcout << "column_type: " << tp << std::endl;
-        Rcpp::Rcout << "column_struct: " << st << std::endl;
+        // Rcpp::Rcout << "column_type: " << tp << std::endl;
+        // Rcpp::Rcout << "column_struct: " << st << std::endl;
         
         // only add column types if we're on the first 'row'
         if( i == 0 && tp >= 0 ) {
@@ -738,6 +613,7 @@ namespace from_json {
         if( i == 0 ) {
           column_types[ this_name ] = this_type;
           column_structs[ this_name ] = struct_type;
+          // column_lengths[ this_name ] = sexp_length;
           //column_types.insert({ this_name, this_type });
           //column_structs.insert({ this_name, struct_type });
           append_new_column( columns, this_name, n_rows );
@@ -750,7 +626,7 @@ namespace from_json {
         // TODO
         // if tp > this_type 
         // then the type is different.
-        Rcpp::Rcout << "i: " << i << " & st: " << st << " & struct_type " << struct_type << std::endl;
+        // Rcpp::Rcout << "i: " << i << " & st: " << st << " & struct_type " << struct_type << std::endl;
         if( i > 0 && st >= 0 ) {
           // onto the second row
           // if sexp_length 
@@ -767,17 +643,15 @@ namespace from_json {
       }
     }
     
-    Rcpp::Rcout << "list_to_vector " << std::endl;
     for( auto& it: column_types ) {
+      // Rcpp::Rcout << "list_to_vector loop" << std::endl;
       std::string this_name = it.first;
       int r_type = it.second;
       struct_type = column_struct( column_structs, this_name.c_str() );
-      Rcpp::Rcout << "this_name " << this_name << " r_type " << r_type << " struct_type " << struct_type << std::endl;
+      // Rcpp::Rcout << "this_name " << this_name << " r_type " << r_type << " struct_type " << struct_type << std::endl;
       list_to_vector( columns, this_name, r_type, struct_type );
      }
     
-    
-     Rcpp::Rcout << "constructing data.frame" << std::endl;
      //columns.attr("names") = names;
      columns.attr("class") = "data.frame";
      columns.attr("row.names") = Rcpp::seq(1, n_rows);
@@ -882,86 +756,86 @@ namespace from_json {
     // return df_out;
   }
   
-  SEXP simplify_list(
-    Rcpp::List& out,
-    int& doc_len,
-    std::unordered_set< int >& list_types,
-    std::unordered_set< int >& list_lengths,
-    Rcpp::IntegerVector& iv_dtypes,
-    std::string by = "row"
-  ) {
-    
-    Rcpp::Rcout << "out size: " << out.size() << std::endl;
-    Rcpp::Rcout << "list_lenghts.size(): " << list_lengths.size() << std::endl;
-    Rcpp::Rcout << "doc_len: " << doc_len << std::endl;
-    
-    Rcpp::IntegerVector iv_list_types( list_types.begin(), list_types.end() );
-
-    if ( list_lengths.size() == 1 ) {
-      
-      int list_length = *list_lengths.begin();
-    
-      // one length means a tablular structure / all list items are the same length
-      // if there is more than one list_types (r-type), make them the 'highest' value
-      int r_type = Rcpp::max( iv_list_types );
-      Rcpp::Rcout << "r_types: " << iv_list_types << std::endl;
-      Rcpp::Rcout << "r_type: " << r_type << std::endl;
-      Rcpp::Rcout << "d_types: " << iv_dtypes << std::endl;
-      
-      
-      // if dtype_len == 1 (only 1 data type)
-      Rcpp::Rcout << "simplify table" << std::endl;
-      
-      if( iv_dtypes.size() == 1 ) {   // one data type  (( dtypes or iv_dtypes ?? ))
-        
-        Rcpp::Rcout << "single type of object to simplify" << std::endl;
-        
-        // if array, make a matrix (and all lengths are the same)
-        int this_type = iv_dtypes[0];
-        
-        Rcpp::Rcout << "this_type: " << this_type << std::endl;
-        
-        if( this_type == 4 && r_type != VECSXP ) { // array && not List -> goes to matrix
-          Rcpp::Rcout << "matrix (or list) needed here" << std::endl;
-          return jsonify::from_json::simplify_matrix( out, doc_len, list_lengths, r_type, by );
-          
-        } else if ( this_type == 3 ) { // object
-          Rcpp::Rcout << "object needs simplifying" << std::endl;
-          return jsonify::from_json::simplify_dataframe( out, doc_len );
-          
-        //} else if (this_type == 4 && r_type == VECSXP ) {  // array && List
-          // lst_lengths == 1 means each list element is the same length
-          // and it's a list object
-          
-          //Rcpp::Rcout << "simplify list" << std::endl;
-          //return jsonify::from_json::simplify_vector( out );
-          // the the size of each element, and the max r_type;
-          // int list_r_type = 0;
-          // R_xlen_t n = Rf_length( out[0] );  // only need one element; all the same size
-          // for( unsigned int i = 0; i < out.size(); i++ ) {
-          //   int this_type = TYPEOF( out[i] );
-          //   Rcpp::Rcout << "this_type: " << this_type << std::endl;
-          //   list_r_type = this_type > list_r_type ? this_type : list_r_type;
-          // }
-          // return jsonify::from_json::simplify_vector( out, list_r_type, n);
-          
-        } else {
-          Rcpp::Rcout << "not simplifying " << std::endl;
-          return out;
-          
-        }
-      } else {
-        Rcpp::Rcout << "multiple types of objects to simplify " << std::endl;
-        // each element is the same length.??
-        // 
-        return jsonify::from_json::simplify_vector( out, r_type, list_length );
-      }
-      
-    } else {
-      Rcpp::Rcout << "list_lengths.size() != 1 " << std::endl;
-    }
-    return out;
-  }
+  // SEXP simplify_list(
+  //   Rcpp::List& out,
+  //   int& doc_len,
+  //   std::unordered_set< int >& list_types,
+  //   std::unordered_set< int >& list_lengths,
+  //   Rcpp::IntegerVector& iv_dtypes,
+  //   std::string by = "row"
+  // ) {
+  //   
+  //   Rcpp::Rcout << "out size: " << out.size() << std::endl;
+  //   Rcpp::Rcout << "list_lenghts.size(): " << list_lengths.size() << std::endl;
+  //   Rcpp::Rcout << "doc_len: " << doc_len << std::endl;
+  //   
+  //   Rcpp::IntegerVector iv_list_types( list_types.begin(), list_types.end() );
+  // 
+  //   if ( list_lengths.size() == 1 ) {
+  //     
+  //     int list_length = *list_lengths.begin();
+  //   
+  //     // one length means a tablular structure / all list items are the same length
+  //     // if there is more than one list_types (r-type), make them the 'highest' value
+  //     int r_type = Rcpp::max( iv_list_types );
+  //     Rcpp::Rcout << "r_types: " << iv_list_types << std::endl;
+  //     Rcpp::Rcout << "r_type: " << r_type << std::endl;
+  //     Rcpp::Rcout << "d_types: " << iv_dtypes << std::endl;
+  //     
+  //     
+  //     // if dtype_len == 1 (only 1 data type)
+  //     Rcpp::Rcout << "simplify table" << std::endl;
+  //     
+  //     if( iv_dtypes.size() == 1 ) {   // one data type  (( dtypes or iv_dtypes ?? ))
+  //       
+  //       Rcpp::Rcout << "single type of object to simplify" << std::endl;
+  //       
+  //       // if array, make a matrix (and all lengths are the same)
+  //       int this_type = iv_dtypes[0];
+  //       
+  //       Rcpp::Rcout << "this_type: " << this_type << std::endl;
+  //       
+  //       if( this_type == 4 && r_type != VECSXP ) { // array && not List -> goes to matrix
+  //         Rcpp::Rcout << "matrix (or list) needed here" << std::endl;
+  //         return jsonify::from_json::simplify_matrix( out, doc_len, list_length, r_type, by );
+  //         
+  //       } else if ( this_type == 3 ) { // object
+  //         Rcpp::Rcout << "object needs simplifying" << std::endl;
+  //         return jsonify::from_json::simplify_dataframe( out, doc_len );
+  //         
+  //       //} else if (this_type == 4 && r_type == VECSXP ) {  // array && List
+  //         // lst_lengths == 1 means each list element is the same length
+  //         // and it's a list object
+  //         
+  //         //Rcpp::Rcout << "simplify list" << std::endl;
+  //         //return jsonify::from_json::simplify_vector( out );
+  //         // the the size of each element, and the max r_type;
+  //         // int list_r_type = 0;
+  //         // R_xlen_t n = Rf_length( out[0] );  // only need one element; all the same size
+  //         // for( unsigned int i = 0; i < out.size(); i++ ) {
+  //         //   int this_type = TYPEOF( out[i] );
+  //         //   Rcpp::Rcout << "this_type: " << this_type << std::endl;
+  //         //   list_r_type = this_type > list_r_type ? this_type : list_r_type;
+  //         // }
+  //         // return jsonify::from_json::simplify_vector( out, list_r_type, n);
+  //         
+  //       } else {
+  //         Rcpp::Rcout << "not simplifying " << std::endl;
+  //         return out;
+  //         
+  //       }
+  //     } else {
+  //       Rcpp::Rcout << "multiple types of objects to simplify " << std::endl;
+  //       // each element is the same length.??
+  //       // 
+  //       return jsonify::from_json::simplify_vector( out, r_type, list_length );
+  //     }
+  //     
+  //   } else {
+  //     Rcpp::Rcout << "list_lengths.size() != 1 " << std::endl;
+  //   }
+  //   return out;
+  // }
 
 } // namespace from_json
 } // namespace jsonify

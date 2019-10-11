@@ -5,14 +5,6 @@ rcpp_from_json <- function(json, simplify, by) {
     .Call(`_jsonify_rcpp_from_json`, json, simplify, by)
 }
 
-rcpp_get_col_headers <- function(x) {
-    .Call(`_jsonify_rcpp_get_col_headers`, x)
-}
-
-rcpp_transpose_list <- function(x, names) {
-    .Call(`_jsonify_rcpp_transpose_list`, x, names)
-}
-
 rcpp_null_to_na <- function(x) {
     invisible(.Call(`_jsonify_rcpp_null_to_na`, x))
 }

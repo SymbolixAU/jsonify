@@ -268,10 +268,8 @@ test_that("data frame returned properly", {
 
   js <- to_json( df, by = "row" )
 
-  from_json( js )
+  res <- from_json( js )
   
-  
-  # 
   # # Return data frame in which the lengths of the input values are different.
   # target <- data.frame(matrix(nrow = 2, ncol = 2), stringsAsFactors = FALSE)
   # colnames(target) <- c("id", "val")
@@ -287,7 +285,7 @@ test_that("data frame returned properly", {
 
 test_that("empty inputs return NULL", {
   expect_null(from_json("{}"))
-  expect_null(from_json("[]"))
+  expect_true(is.list( from_json("[]")) )
 })
 # 
 # test_that("round trips work", {
