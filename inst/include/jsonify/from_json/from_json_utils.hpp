@@ -57,26 +57,26 @@ namespace from_json {
     return 0;
   }
   
-  inline int get_sexp_column_type( SEXP s ) {
-
-    if( Rf_isMatrix( s ) ) {
-      return 2;
-    }
-
-    switch( TYPEOF(s) ) {
-    case LGLSXP: {}
-    case REALSXP: {}
-    case INTSXP: {}
-    case STRSXP: {
-      return 1;
-    }
-    case VECSXP:
-      // TODO: if a single element, make it a vector??
-      return 3;
-    default: Rcpp::stop("jsonify - unknown vector type");
-    }
-    return -1;
-  }
+  // inline int get_sexp_column_type( SEXP s ) {
+  // 
+  //   if( Rf_isMatrix( s ) ) {
+  //     return 2;
+  //   }
+  // 
+  //   switch( TYPEOF(s) ) {
+  //   case LGLSXP: {}
+  //   case REALSXP: {}
+  //   case INTSXP: {}
+  //   case STRSXP: {
+  //     return 1;
+  //   }
+  //   case VECSXP:
+  //     // TODO: if a single element, make it a vector??
+  //     return 3;
+  //   default: Rcpp::stop("jsonify - unknown vector type");
+  //   }
+  //   return -1;
+  // }
   
   // Rcpp::List parse_value( const rapidjson::Value& val, bool& simplify, std::string by );
 
@@ -333,36 +333,21 @@ namespace from_json {
   
   // returns -1 if doens't exist
   // else the stored r_type
-  inline int column_type(
-      std::unordered_map< std::string, int >& column_types,
+  inline int column_value(
+      std::unordered_map< std::string, int >& column_map,
       const char* to_find
     ) {
     std::string str( to_find );
     std::unordered_map< std::string, int >::iterator it;
-    it = column_types.find( str );
+    it = column_map.find( str );
     
-    if( it != column_types.end() ) {
+    if( it != column_map.end() ) {
       int res = it->second;
       return res;
     }
     return -1;
   }
-  
-  inline int column_struct(
-      std::unordered_map< std::string, int >& column_structs,
-      const char* to_find
-  ) {
-    std::string str( to_find );
-    std::unordered_map< std::string, int >::iterator it;
-    it = column_structs.find( str );
-    
-    if( it != column_structs.end() ) {
-      int res = it->second;
-      return res;
-    }
-    return -1;
-  }
-  
+
   inline void insert_column_value(
     Rcpp::List& columns,
     const char* this_column,
@@ -419,85 +404,108 @@ namespace from_json {
     int& struct_type // 1 vector, 2 matrix, 3 list
   ) {
     
-    // if struct_type == 2; the result is a matrix
-    // need the dimensions...
-    if( struct_type == 2 ) {
-      //Rcpp::stop("need to implement matrix column");
-      switch( r_type ) {
-      case LGLSXP: {
-
-        break;
-      }
-      case INTSXP: {
-
-        break;
-      }
-      case REALSXP: {
-
-        break;
-      }
-      case STRSXP: {
-
-        break;
-      }
-      default: {
-        Rcpp::stop("jsonify - invalid matrix-column");
-      }
-      }
-    }
+    Rcpp::List lst = columns[ this_name.c_str() ];
+    R_xlen_t n_rows = lst.size();
+    R_xlen_t i;
     
-    // it's already a list when it enters this function
-    // if( struct_type == 3 ) {
-    //   Rcpp::stop("need to implement list column" );
-    // }
+    // TODO; is this needed?
+    if( n_rows > 0 ) {
     
-    if( struct_type == 1 ) {
+      // if struct_type == 2; the result is a matrix
+      // need the dimensions...
+      if( struct_type == 2 ) {
+        Rcpp::Rcout << "need to implement matrix column" << std::endl;
+        // but only IFF n-row is 1 for each element, right?
+        
+        // i.e., the entire list element is one matrix.
+        // so n_rows remains
+        // n_cols is the length of the first list element
+        R_xlen_t n_cols = get_sexp_length( lst[0] );
+        
+        Rcpp::Rcout << "with n_cols : " << n_cols << std::endl;
+        
+        //Rcpp::Matrix mat( n_row, n_col );
+        
+        //Rcpp::stop("need to implement matrix column");
+        switch( r_type ) {
+        case LGLSXP: {
+  
+          break;
+        }
+        case INTSXP: {
+  
+          break;
+        }
+        case REALSXP: {
+  
+          break;
+        }
+        case STRSXP: {
+  
+          break;
+        }
+        default: {
+          Rcpp::stop("jsonify - invalid matrix-column");
+        }
+        }
+      }
       
-      Rcpp::List lst = columns[ this_name.c_str() ];
-      R_xlen_t n_rows = lst.size();
-      R_xlen_t i;
+      if( struct_type == 3 ) {
+        // Rcpp::Rcout << "need to implement list column" << std::endl;
+        // TODO:
+        // collapse each list element into a single list object
+        // Rcpp::List out( n_rows );
+        // for( i = 0; i < n_rows; i++ ) {
+        //   Rcpp::List inner_lst = lst[i];
+        //   out[i] = inner_lst[0];
+        // }
+        // columns[ this_name ] = out;
+      }
       
-      switch( r_type ) {
-      case LGLSXP: {
-        Rcpp::LogicalVector lv( n_rows );
-        for( i = 0; i < n_rows; i++ ) {
-          lv[i] = lst[i];
+      if( struct_type == 1 ) {
+        
+        switch( r_type ) {
+        case LGLSXP: {
+          Rcpp::LogicalVector lv( n_rows );
+          for( i = 0; i < n_rows; i++ ) {
+            lv[i] = lst[i];
+          }
+          columns[ this_name ] = lv;
+          break;
         }
-        columns[ this_name ] = lv;
-        break;
-      }
-      case INTSXP: {
-        Rcpp::IntegerVector iv( n_rows );
-        for( i = 0; i < n_rows; i++ ) {
-          iv[i] = lst[i];
+        case INTSXP: {
+          Rcpp::IntegerVector iv( n_rows );
+          for( i = 0; i < n_rows; i++ ) {
+            iv[i] = lst[i];
+          }
+          columns[ this_name ] = iv;
+          break;
         }
-        columns[ this_name ] = iv;
-        break;
-      }
-      case REALSXP: {
-        Rcpp::NumericVector nv( n_rows );
-        for( i = 0; i < n_rows; i++ ) {
-          nv[i] = lst[i];
+        case REALSXP: {
+          Rcpp::NumericVector nv( n_rows );
+          for( i = 0; i < n_rows; i++ ) {
+            nv[i] = lst[i];
+          }
+          columns[ this_name ] = nv;
+          break;
         }
-        columns[ this_name ] = nv;
-        break;
-      }
-      case STRSXP: {
-        Rcpp::StringVector sv( n_rows );
-        for( i = 0; i < n_rows; i++ ) {
-          SEXP s = lst[i];
-          // Rcpp::Rcout << "TYPEOF(s) " << TYPEOF( s ) << std::endl;
-          Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( s );
-          //Rcpp::Rcout << "sv: " << sv << std::endl;
-          sv[i] = x[0];
+        case STRSXP: {
+          Rcpp::StringVector sv( n_rows );
+          for( i = 0; i < n_rows; i++ ) {
+            SEXP s = lst[i];
+            // Rcpp::Rcout << "TYPEOF(s) " << TYPEOF( s ) << std::endl;
+            Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( s );
+            //Rcpp::Rcout << "sv: " << sv << std::endl;
+            sv[i] = x[0];
+          }
+          // Rcpp::Rcout << "setting as a stringVector " << std::endl;
+          columns[ this_name ] = sv;
+          break;
         }
-        // Rcpp::Rcout << "setting as a stringVector " << std::endl;
-        columns[ this_name ] = sv;
-        break;
-      }
-      default: {
-        Rcpp::stop("jsonify - vector-column not found");
-      }
+        default: {
+          Rcpp::stop("jsonify - vector-column not found");
+        }
+        }
       }
     }
   }
@@ -536,12 +544,13 @@ namespace from_json {
     // 
     std::unordered_map< std::string, int > column_types;
     std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
-    // std::unordered_map< std::string, int > column_lengths;
+    std::unordered_map< std::string, int > column_lengths;
     
     int struct_type;
     int sexp_length;
     int tp;
     int st;
+    int ln;
     
     // Rcpp::Rcout << "n_rows : " << n_rows << std::endl;
     Rcpp::StringVector list_names;
@@ -576,44 +585,43 @@ namespace from_json {
         }
         
         SEXP this_elem = this_list[ this_name ]; 
-        
         sexp_length = get_sexp_length( this_elem );
-        struct_type = get_sexp_column_type( this_elem );
-        // Rcpp::Rcout << "sexp_length: " << sexp_length << std::endl;
-        
-        if( sexp_length > 1 && struct_type == 1 ) {
-          // the object is not a single-elemnt vector
-          struct_type = 3; 
-        }
+        //struct_type = get_sexp_column_type( this_elem );
           
         int this_type = TYPEOF( this_elem );
+        bool is_matrix = Rf_isMatrix( this_elem );
         // Rcpp::Rcout << "this_type: " << this_type << std::endl;
+        // Rcpp::Rcout << "sexp_length: " << sexp_length << std::endl;
+        // Rcpp::Rcout << "is_matrix: " << is_matrix << std::endl;
+        
+        if( sexp_length > 1 && this_type != VECSXP && !is_matrix ) {
+          // the object is more than a scalar, but not a list or matrix
+          struct_type = 2; // matrix
+        } else if ( ( i == 0 && this_type == VECSXP ) || is_matrix) {
+          // the object is a list
+          struct_type = 3; // list
+        } else { 
+          struct_type = 1; // scalar-vector
+        }
+        
         // Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
         
-        // struct_type probably can't use sexp_column_type because
-        // js <- '[{"id":"1","val":["a"]},{"id":"2","val":[[1,2]]}]'
-        // from_json( to_json( from_json( js ) ) )
-        //struct_type = sexp_column_type == 1 ? 1 : 2;   // start of with vector or matrix
-        
-        // iff sexp_column_type == 1 it can be a vector element
-        // otherwise, if it's the same as all the others and > 1, matrix
-        // otherwise list element
-        
-        tp = column_type( column_types, this_name );
-        st = column_struct( column_structs, this_name );
+        tp = column_value( column_types, this_name );
+        st = column_value( column_structs, this_name );
+        ln = column_value( column_lengths, this_name );
         // Rcpp::Rcout << "column_type: " << tp << std::endl;
         // Rcpp::Rcout << "column_struct: " << st << std::endl;
         
-        // only add column types if we're on the first 'row'
         if( i == 0 && tp >= 0 ) {
           // on the first row, but the column already exists
           return out;
         }
         
+        // only add column types if we're on the first 'row'
         if( i == 0 ) {
           column_types[ this_name ] = this_type;
           column_structs[ this_name ] = struct_type;
-          // column_lengths[ this_name ] = sexp_length;
+          column_lengths[ this_name ] = sexp_length;
           //column_types.insert({ this_name, this_type });
           //column_structs.insert({ this_name, struct_type });
           append_new_column( columns, this_name, n_rows );
@@ -623,19 +631,19 @@ namespace from_json {
           Rcpp::Rcout << "can't simplify because new column names" << std::endl;
           return out;
         }
-        // TODO
-        // if tp > this_type 
-        // then the type is different.
-        // Rcpp::Rcout << "i: " << i << " & st: " << st << " & struct_type " << struct_type << std::endl;
+        
         if( i > 0 && st >= 0 ) {
           // onto the second row
-          // if sexp_length 
           
-          if( struct_type != st ) {
-            Rcpp::Rcout << "needs to be a list " << std::endl;
-            // needs to be a list
+          // if this struct_type is different to the previous one, make it a list;
+          if( struct_type != st || sexp_length != ln ) {
             column_structs[ this_name ] = 3;
           }
+          
+          if( this_type > tp ) {
+            column_types[ this_name ] = this_type;
+          }
+          
         }
         
         // put the element in the correct column slot
@@ -647,7 +655,7 @@ namespace from_json {
       // Rcpp::Rcout << "list_to_vector loop" << std::endl;
       std::string this_name = it.first;
       int r_type = it.second;
-      struct_type = column_struct( column_structs, this_name.c_str() );
+      struct_type = column_value( column_structs, this_name.c_str() );
       // Rcpp::Rcout << "this_name " << this_name << " r_type " << r_type << " struct_type " << struct_type << std::endl;
       list_to_vector( columns, this_name, r_type, struct_type );
      }

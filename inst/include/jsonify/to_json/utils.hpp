@@ -42,18 +42,18 @@ namespace utils {
   }
   
   template< typename Writer >
-  inline void writer_starter( Writer& writer, bool& has_names ) {
+  inline void writer_starter( Writer& writer, bool& has_names, bool& in_data_frame ) {
     if ( has_names ) {
       writer.StartObject();
-    } else {
+    } else if( !in_data_frame ) {
       writer.StartArray();
     }
   }
   template< typename Writer >
-  inline void writer_ender( Writer& writer, bool& has_names ) {
+  inline void writer_ender( Writer& writer, bool& has_names, bool& in_data_frame ) {
     if ( has_names ) {
       writer.EndObject();
-    } else {
+    } else if( !in_data_frame ) {
       writer.EndArray();
     }
   }

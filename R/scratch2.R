@@ -75,11 +75,12 @@
 # js <- '[[[1,1],3,[1,2]],[1,3],{},[{},{}]]'
 # res <- from_json( js ); res
 # 
-# js <- '{{}}'
-# from_json( js )
-# 
-# js <- '[{{}}]'
-# from_json( js )
+# # invlalid JSON
+# # js <- '{{}}'
+# # from_json( js )
+# # 
+# # js <- '[{{}}]'
+# # from_json( js )
 # 
 # js <- '[{"id":{"val":1}}]'
 # from_json( js )
@@ -99,10 +100,65 @@
 # 
 # df$geometry <- NULL
 # df$lat <- NULL
-# df$lon <- NULL 
+# df$lon <- NULL
 # 
 # js <- to_json( df )
 # from_json( js )
+# 
+# 
+# df <- data.frame(id = 1:2)
+# m <- matrix(1:6, ncol = 3)
+# df$m <- m
+# 
+# df$l <- list(m[1,], m[2,])
+# js <- to_json( df )
+# js
+# ## single-array should be a matrix
+# ## anything else is a list
+# res <- from_json( js )
+# str( res )
+# 
+# 
+# df$m <- NULL
+# 
+# to_json( df )
+# str( df )
+# str( from_json( to_json( df ) ) )
+# to_json( from_json( to_json( df ) ) )
+# 
+# str( from_json( to_json( df ) ) )
+# str( from_json( to_json( from_json( to_json( df ) ) ) ) )
+# 
+# res <- from_json( to_json( df ) )
+# res <- from_json( to_json( from_json( to_json( df ) ) ) )
+# 
+# js <- '[{"id":1,"l":[1,3,5]},{"id":2,"l":[2,4,6]}]'
+# str( from_json( js ) )
+# str( jsonlite::fromJSON( js ) )
+# 
+# to_json( from_json( js ) )
+# cat( js )
+# 
+# js <- '[{"id":1,"l":[[1,3,5]]},{"id":2,"l":[[2,4,6]]}]'
+# str( from_json( js ) )
+# str( jsonlite::fromJSON( js ) )
+# 
+# to_json( from_json( js ) )
+# cat( js )
+# 
+# js <- '[{"id":1,"l":[[1,3,5]]},{"id":2,"l":[[2,4,6],[7,8,9]]}]'
+# str( from_json( js ) )
+# str( jsonlite::fromJSON( js ) )
+# 
+# to_json( from_json( js ) )
+# cat( js )
+# 
+# js <- '[{"id":1,"l":[[1,3,5],[2,4,6]]},{"id":2,"l":[[2,4,6],[7,8,9]]}]'
+# str( from_json( js ) )
+# str( jsonlite::fromJSON( js ) )
+# 
+# to_json( from_json( js ) )
+# cat( js )
 # 
 # 
 # x <- rnorm(1e3)

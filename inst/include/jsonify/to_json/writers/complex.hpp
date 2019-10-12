@@ -149,11 +149,17 @@ namespace complex {
   }
 
   template< typename Writer >
-  inline void write_value( Writer& writer, SEXP list_element, bool unbox = false, 
-                           int digits = -1, bool numeric_dates = true,
-                           bool factors_as_string = true, std::string by = "row", 
-                           int row = -1   // for when we are recursing into a row of a data.frame
-                          ) {
+  inline void write_value(
+      Writer& writer, 
+      SEXP list_element, 
+      bool unbox = false, 
+      int digits = -1, 
+      bool numeric_dates = true,
+      bool factors_as_string = true, 
+      std::string by = "row", 
+      int row = -1,   // for when we are recursing into a row of a data.frame
+      bool in_data_frame = false  // for keeping track of when we're in a column of a data.frame
+      ) {
     
     int i, df_col, df_row;
     
@@ -189,6 +195,7 @@ namespace complex {
       }
     } else if ( Rf_inherits( list_element, "data.frame" ) ) {
       // Rcpp::Rcout << "is data.frame" << std::endl;
+      in_data_frame = true;
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
       int n_cols = df.ncol();
       int n_rows = df.nrows();
@@ -205,7 +212,7 @@ namespace complex {
           
           // switch( TYPEOF( this_vec ) ) {
           // case VECSXP: {
-            write_value( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, by );
+            write_value( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, by, -1, in_data_frame );
           //   break;
           // }
           // default: {
@@ -233,7 +240,7 @@ namespace complex {
             // Rcpp::Rcout << "this_vec column type 1 : " << TYPEOF( this_vec ) << std::endl;
             case VECSXP: {
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-              write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row );
+              write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row, in_data_frame );
               break;
             }
             default: {
@@ -260,7 +267,7 @@ namespace complex {
               switch( TYPEOF( this_vec ) ) {
               case VECSXP: {
                 Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-                write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, df_row );
+                write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, df_row, in_data_frame );
                 break;
               }
               default: {
@@ -298,7 +305,7 @@ namespace complex {
             lst.names() = this_name;
           }
 
-          write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );  
+          write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, -1, in_data_frame );  
           
         } else {
           lst = temp_lst;
@@ -324,7 +331,12 @@ namespace complex {
           }
           // END LIST NAMES
           
-          jsonify::utils::writer_starter( writer, has_names );
+          // issue 44
+          // list-column in a data.frame shouldn't be nested inside another array
+          
+          //Rcpp::Rcout << "in_data_frame: " << in_data_frame << std::endl;
+          
+          jsonify::utils::writer_starter( writer, has_names, in_data_frame );
           
           for ( i = 0; i < n; i++ ) {
             
@@ -333,9 +345,11 @@ namespace complex {
               const char *s = list_names[ i ];
               writer.String( s );
             }
-            write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by );
+            // setting in_data_frame to false becaseu we're no longer at the data.frame top-level
+            write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by, -1, false ); 
           }
-        jsonify::utils::writer_ender( writer, has_names );
+          
+          jsonify::utils::writer_ender( writer, has_names, in_data_frame );
         } // end if (by row)
         break;
       }

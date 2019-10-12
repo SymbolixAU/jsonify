@@ -351,6 +351,9 @@ namespace from_json {
       } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) ) {
         
         // Rcpp::Rcout << "simplify to data.frame? " << std::endl;
+        // iff all the column lengths are the same, and > 1, the whole column can become a matrix
+        // iff all the column lenghts are the same, and == 1, the whole column is a vector
+        // iff any column lenghts are different, it's a list
         res[0] = jsonify::from_json::simplify_dataframe( array_of_array, json_length );
         //res[0] = array_of_array;
       } else {
@@ -373,6 +376,7 @@ namespace from_json {
   //'  input should be a character vector of length 1.
   //' @export
   inline SEXP from_json(const char * json, bool& simplify, std::string by = "row" ) {
+    
     rapidjson::Document doc;
     doc.Parse(json);
     
@@ -413,60 +417,7 @@ namespace from_json {
     }
     
     return json_to_sexp( doc, sequential_array_count, by );
-    
-    // // If input is not an array, pass doc through parse_document(), and return
-    // // the result.
-    // if(!doc.IsArray()) {
-    //   return parse_document( doc, simplify, by );
-    // }
-    // 
-    // // If input is an empty array, return NULL.
-    // if(doc.Size() == 0) {
-    //   return R_NilValue;
-    // }
-    // 
-    // // Get set of unique data types in doc.
-    // dtypes = get_dtypes<rapidjson::Document>(doc, true);
-    // int dtype_len = dtypes.size();
-    // //Rcpp::Rcout << "dtype_len: " << dtype_len << std::endl;
-    // 
-    // // If dtype_len is greater than 2, return an R list of values.
-    // if(dtype_len > 2) {
-    //   Rcpp::Rcout << "doc_to_list 1" << std::endl;
-    //   return doc_to_list( doc, simplify, by );
-    // }
-    // 
-    // //If dtype_len is 2 and 0 does not appear in dtypes, return an
-    // //R list of values.
-    // if(dtype_len == 2 && dtypes.find(0) == dtypes.end()) {
-    //   Rcpp::Rcout << "doc_to_list 2" << std::endl;
-    //   return doc_to_list( doc, simplify, by );
-    // }
-    // 
-    // // If 3 or 4 is in dtypes, return an R list of values.
-    // if(dtypes.find(3) != dtypes.end() ||
-    //    dtypes.find(4) != dtypes.end()) {
-    //   Rcpp::Rcout << "doc_to_list 3" << std::endl;
-    //   return doc_to_list( doc, simplify, by );
-    // }
-    // 
-    // // Dump ints from dtypes to an std vector.
-    // std::vector<int> dtype_vect( dtypes.begin(), dtypes.end() );
-    // int dt = dtype_vect[0];
-    // 
-    // // If dtype_len is 1, return an R vector.
-    // if(dtype_len == 1) {
-    //   return doc_to_vector( doc, dt );
-    // }
-    // 
-    // // Else if dtype_len is 2 and 0 is in dtypes, return an R vector.
-    // if(dtype_len == 2) {
-    //   if(dt == 0) {
-    //     dt = dtype_vect[1];
-    //   }
-    // }
-    // 
-    // return doc_to_vector( doc, dt );
+
   }
   
   // Test array types
@@ -488,19 +439,6 @@ namespace from_json {
     return iv;
   }
   
-  
-  // redesign thoughts
-  // - json_to_sexp() {} 
-  // -- to-level function, will work on array and obj
-  // -- recursive
-  // -- gets d_types for the current JSON object level
-  // -- iff only types 3 or 4 are in, recuse back into json_to_sexp()
-  // -- every recursive level keeps track of the d_types, and the object sizes?
-  // -- so when it comes back up a level, out of recursion, we can read what type it can be simplified to
-  
-  
-  
-
 } // namespace from_json
 } // namespace jsonify
 
