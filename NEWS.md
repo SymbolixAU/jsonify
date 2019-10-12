@@ -1,3 +1,7 @@
+## v1.0
+
+* `from_json()` method from converting JSON to R objects
+
 ## v0.2.1
 
 * `as.json()` method
