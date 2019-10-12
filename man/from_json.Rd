@@ -4,7 +4,7 @@
 \alias{from_json}
 \title{From JSON}
 \usage{
-from_json(x, simplify = TRUE, by = "row")
+from_json(x, simplify = TRUE)
 }
 \arguments{
 \item{x}{JSON string to convert to R list}

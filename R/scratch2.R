@@ -78,7 +78,7 @@
 # # invlalid JSON
 # # js <- '{{}}'
 # # from_json( js )
-# # 
+# #
 # # js <- '[{{}}]'
 # # from_json( js )
 # 
@@ -133,6 +133,13 @@
 # res <- from_json( to_json( from_json( to_json( df ) ) ) )
 # 
 # js <- '[{"id":1,"l":[1,3,5]},{"id":2,"l":[2,4,6]}]'
+# str( from_json( js ) )
+# str( jsonlite::fromJSON( js ) )
+# 
+# to_json( from_json( js ) )
+# cat( js )
+# 
+# js <- '[{"id":1,"l":[1,3,5]},{"id":2,"l":[2,4,"a"]}]'
 # str( from_json( js ) )
 # str( jsonlite::fromJSON( js ) )
 # 

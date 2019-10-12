@@ -59,7 +59,7 @@ namespace from_json {
   }
   
   template< typename T >
-  inline SEXP array_to_vector( T& array ) {
+  inline SEXP array_to_vector( T& array, bool& simplify ) {
     // takes an array of scalars (any types) and returns
     // them in an R vector
     //Rcpp::Rcout << "array_to_vector" << std::endl;
@@ -68,7 +68,7 @@ namespace from_json {
     // Rcpp::Rcout << "max_dtype: " << max_dtype << std::endl;
     
     int r_type = 0;
-    
+    int first_r_type; // for keeping track if the vector has been coerced when simplified
     // every member of the array will be coerced to the max d-type sexp type
     // but first, get each element and put into a list
     R_xlen_t arr_len = array.Size();
@@ -129,13 +129,17 @@ namespace from_json {
       default: {
         Rcpp::stop("jsonify - array_to_vector only able to parse int, double, string and bool");
       }
-        
       }
-      
+      if( i == 0 ) {
+        first_r_type = r_type;
+      }
     }
     
     //Rcpp::Rcout << "final r_type " << r_type << std::endl;
-    return jsonify::from_json::simplify_vector( out, r_type, 1 );
+    if( simplify ) {
+      return jsonify::from_json::simplify_vector( out, r_type, 1 );
+    }
+    return out;
   }
   
   inline bool contains_array( std::unordered_set< int >& dtypes ) {
@@ -153,14 +157,17 @@ namespace from_json {
   template<typename T>
   inline SEXP json_to_sexp(
     T& json,
-    int sequential_array_counter,
-    std::string by = "row"
+    bool& simplify, 
+    int sequential_array_counter
   ) {
 
     Rcpp::List res(1);
     
     int json_type = json.GetType();
     int json_length = json.Size();
+    
+    // Rcpp::Rcout << "json_type: " << json_type << std::endl;
+    // Rcpp::Rcout << "json_length: " << json_length << std::endl;
     
     if(json_length == 0) {
       if( json_type == 4 ) {
@@ -171,8 +178,6 @@ namespace from_json {
       }
     }
     
-    // Rcpp::Rcout << "json_type: " << json_type << std::endl;
-    // Rcpp::Rcout << "json_length: " << json_length << std::endl;
     
     R_xlen_t i;
     
@@ -241,13 +246,13 @@ namespace from_json {
           //Rcpp::Rcout << "case 4, i: " << i << std::endl;
           rapidjson::Document temp_doc;
           temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
-          out[i] = json_to_sexp( temp_doc, sequential_array_counter, by );
+          out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
           break;
         }
         case 3: {
           rapidjson::Document temp_doc;
           temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
-          out[i] = json_to_sexp( temp_doc, sequential_array_counter, by );
+          out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
           break;
         }
           
@@ -275,7 +280,7 @@ namespace from_json {
       // array of scalars (no internal arrays or objects)
       // Rcpp::Rcout << "single array" << std::endl;
       rapidjson::Value::Array curr_array = json.GetArray();
-      res[0] = array_to_vector( curr_array );
+      res[0] = array_to_vector( curr_array, simplify );
       
     } else if ( json_type == 4 ) {
       // array with internal array
@@ -322,7 +327,7 @@ namespace from_json {
         case 4: {
           // consecutive inner-arrays *can* be simplified to a matrix
           rapidjson::Value::Array inner_array = json[i].GetArray();
-          array_of_array[i] = json_to_sexp( json[i], sequential_array_counter );
+          array_of_array[i] = json_to_sexp( json[i], simplify, sequential_array_counter );
           // Rcpp::Rcout << "simplify list to matrix? " << sequential_array_counter << std::endl;
           sequential_array_counter++;
           break;
@@ -330,11 +335,13 @@ namespace from_json {
           // object
         case 3: {
           sequential_array_counter = 0;
-          //Rcpp::Rcout << "case 3 " << std::endl;
+          // Rcpp::Rcout << "case 3 " << std::endl;
           //rapidjson::Value::Object inner_object = json[i].GetObject();
           // here need to iterate into the object
           rapidjson::Value& temp_val = json[i];
-          array_of_array[i] = json_to_sexp( temp_val, sequential_array_counter, by );
+          // Rcpp::Rcout << "going back in" << std::endl;
+          array_of_array[i] = json_to_sexp( temp_val, simplify, sequential_array_counter );
+          // Rcpp::Rcout << "coming out" << std::endl;
           break;
         }
         default: {
@@ -343,12 +350,12 @@ namespace from_json {
         } // switch
       }   // for
       
-      // Rcpp::Rcout << "simplify list to matrix (outside for)? " << sequential_array_counter << std::endl;
-      if( sequential_array_counter > 0 ) {
+      if( sequential_array_counter > 0  && simplify ) {
+        // Rcpp::Rcout << "simplify list to matrix (outside for)? " << sequential_array_counter << std::endl;
         
-        res[0] = jsonify::from_json::list_to_matrix( array_of_array, by );
+        res[0] = jsonify::from_json::list_to_matrix( array_of_array );
         
-      } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) ) {
+      } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) && simplify ) {
         
         // Rcpp::Rcout << "simplify to data.frame? " << std::endl;
         // iff all the column lengths are the same, and > 1, the whole column can become a matrix
@@ -375,7 +382,7 @@ namespace from_json {
   //' @param json const char, JSON string to be parsed. Coming from R, this
   //'  input should be a character vector of length 1.
   //' @export
-  inline SEXP from_json(const char * json, bool& simplify, std::string by = "row" ) {
+  inline SEXP from_json(const char * json, bool& simplify ) {
     
     rapidjson::Document doc;
     doc.Parse(json);
@@ -416,7 +423,7 @@ namespace from_json {
       return x;
     }
     
-    return json_to_sexp( doc, sequential_array_count, by );
+    return json_to_sexp( doc, simplify, sequential_array_count );
 
   }
   

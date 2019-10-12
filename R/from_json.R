@@ -21,11 +21,11 @@
 #' from_json("[{\"id\":1,\"val\":\"a\"},{\"id\":2,\"val\":\"b\"}]")
 #' 
 #' @export
-from_json <- function(x, simplify = TRUE, by = "row" ) {
-  if( "col" %in% by ) by <- "column"
-  by <- match.arg( by, choices = c("row", "column") )
+from_json <- function(x, simplify = TRUE ) {
+  # if( "col" %in% by ) by <- "column"
+  # by <- match.arg( by, choices = c("row", "column") )
   
-  res <- rcpp_from_json( x, simplify, by )
+  res <- rcpp_from_json( x, simplify )
   
   # if( simplify ) {
   #   return( list_to_df( res ) )
@@ -41,48 +41,48 @@ from_json <- function(x, simplify = TRUE, by = "row" ) {
   #list_to_df(res)
 }
 
-# Helper function to convert a "from_json()" list to a data frame.
-list_to_df <- function(res) {
-  # Get all unique names from a list object.
-  cols <- rcpp_get_col_headers(res)
-  
-  # If column headers are NULL, return res.
-  if (is.null(cols)) {
-    return(res)
-  }
-  
-  # Convert row lists to column lists.
-  columnlist <- rcpp_transpose_list(res, cols)
-  
-  # Convert all NULL values in each nested list to NA.
-  for (i in columnlist) {
-    rcpp_null_to_na(i)
-  }
-  
-  # If the value of each inner list is length one, unlist each element, which 
-  # will naturally convert data types and NA values within each "list column" 
-  # to be the same, and thus data frame friendly.
-  unlist_values <- TRUE
-  for (i in columnlist) {
-    for (j in i) {
-      if (length(j) > 1) {
-        unlist_values <- FALSE
-        break
-      }
-      if (!unlist_values) {
-        break
-      }
-    }
-  }
-  
-  if (unlist_values) {
-    # Unlist each element.
-    columnlist <- lapply(columnlist, unlist, recursive = FALSE, use.names = FALSE)
-  }
-
-  # Convert columnlist to a data frame, then return.
-  class(columnlist) <- "data.frame"
-  row.names(columnlist) <- seq_len(length(res))
-  colnames(columnlist) <- cols
-  columnlist
-}
+# # Helper function to convert a "from_json()" list to a data frame.
+# list_to_df <- function(res) {
+#   # Get all unique names from a list object.
+#   cols <- rcpp_get_col_headers(res)
+#   
+#   # If column headers are NULL, return res.
+#   if (is.null(cols)) {
+#     return(res)
+#   }
+#   
+#   # Convert row lists to column lists.
+#   columnlist <- rcpp_transpose_list(res, cols)
+#   
+#   # Convert all NULL values in each nested list to NA.
+#   for (i in columnlist) {
+#     rcpp_null_to_na(i)
+#   }
+#   
+#   # If the value of each inner list is length one, unlist each element, which 
+#   # will naturally convert data types and NA values within each "list column" 
+#   # to be the same, and thus data frame friendly.
+#   unlist_values <- TRUE
+#   for (i in columnlist) {
+#     for (j in i) {
+#       if (length(j) > 1) {
+#         unlist_values <- FALSE
+#         break
+#       }
+#       if (!unlist_values) {
+#         break
+#       }
+#     }
+#   }
+#   
+#   if (unlist_values) {
+#     # Unlist each element.
+#     columnlist <- lapply(columnlist, unlist, recursive = FALSE, use.names = FALSE)
+#   }
+# 
+#   # Convert columnlist to a data frame, then return.
+#   class(columnlist) <- "data.frame"
+#   row.names(columnlist) <- seq_len(length(res))
+#   colnames(columnlist) <- cols
+#   columnlist
+# }
