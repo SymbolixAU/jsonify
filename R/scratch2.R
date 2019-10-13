@@ -168,12 +168,13 @@
 # cat( js )
 # 
 # 
-# x <- rnorm(1e3)
-# y <- rnorm(1e3)
-# z <- rnorm(1e3)
-# m <- matrix(rnorm(1e3), ncol = 2)
-# l <- list(x, m, list(y, list(z)))
-# #l <- list(m)
+# x <- rnorm(1e6)
+# y <- rnorm(1e6)
+# z <- rnorm(1e6)
+# m <- matrix(rnorm(1e6), ncol = 2)
+# l <- sample(letters, 1e6, replace = T)
+# l <- list(x, m, list(y, list(z)), l)
+# 
 # js <- to_json( l )
 # 
 # jfy <- from_json( js )
@@ -193,3 +194,8 @@
 #   },
 #   times = 2
 # )
+# 
+# # Unit: milliseconds
+# # expr       min        lq     mean   median       uq      max neval
+# #  jfy  882.9696  882.9696 1013.968 1013.968 1144.966 1144.966     2
+# #  jlt 2499.3025 2499.3025 2763.644 2763.644 3027.985 3027.985     2

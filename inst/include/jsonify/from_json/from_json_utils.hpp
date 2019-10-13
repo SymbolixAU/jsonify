@@ -381,6 +381,8 @@ namespace from_json {
       }
       
       // if( struct_type == 3 ) {
+      // // it's a list; can it be simplified to a data.frame?
+      //   
       // }
       
       if( struct_type == 1 ) {
@@ -491,6 +493,9 @@ namespace from_json {
           
         int this_type = TYPEOF( this_elem );
         bool is_matrix = Rf_isMatrix( this_elem );
+        // bool is_data_frame = Rf_inherits( this_elem, "data.frame" );
+        
+        // Rcpp::Rcout << "is_data_frame: " << is_data_frame << std::endl;
         
         if( sexp_length > 1 && this_type != VECSXP && !is_matrix ) {
           // the object is more than a scalar, but not a list or matrix
@@ -550,8 +555,14 @@ namespace from_json {
       std::string this_name = it.first;
       int r_type = it.second;
       struct_type = column_value( column_structs, this_name.c_str() );
-      list_to_vector( columns, this_name, r_type, struct_type );
-     }
+      if( struct_type == 3 ) {
+        // can it be a data.frame?
+        Rcpp::List lst = columns[ this_name ];
+        columns[ this_name ] = simplify_dataframe( lst, doc_len );
+      } else {
+        list_to_vector( columns, this_name, r_type, struct_type );
+      }
+    }
     
      //columns.attr("names") = names;
      columns.attr("class") = "data.frame";
