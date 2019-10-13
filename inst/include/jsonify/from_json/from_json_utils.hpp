@@ -443,7 +443,6 @@ namespace from_json {
     // the number of rows is equal to the number of list elements?
     // the number of columns is equal to the unique names
     R_xlen_t n_rows = out.size();
-    R_xlen_t n_col;
     R_xlen_t i, j;
     
     // initialise a new list for each column
