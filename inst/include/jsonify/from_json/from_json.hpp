@@ -163,7 +163,7 @@ namespace from_json {
     std::unordered_set< int > dtypes;
     dtypes = get_dtypes< T >( json );
     
-    if( json_type == 3 ) {
+    if( json_type == rapidjson::kObjectType ) {
       // object {}
 
       Rcpp::List out( json_length );
@@ -179,20 +179,20 @@ namespace from_json {
         switch(itr->value.GetType()) {
         
         // bool - false/ true
-        case 1: {}
-        case 2: {
+        case rapidjson::kFalseType: {}
+        case rapidjson::kTrueType: {
           out[i] = itr->value.GetBool();
           break;
         }
           
           // string
-        case 5: {
+        case rapidjson::kStringType: {
           out[i] = itr->value.GetString();
           break;
         }
           
           // numeric
-        case 6: {
+        case rapidjson::kNumberType: {
           if(itr->value.IsDouble()) {
             // double
             out[i] = itr->value.GetDouble();
@@ -204,13 +204,13 @@ namespace from_json {
         }
         
         // array
-        case 4: {
+        case rapidjson::kArrayType: {
           rapidjson::Document temp_doc;
           temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
           out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
           break;
         }
-        case 3: {
+        case rapidjson::kObjectType: {
           rapidjson::Document temp_doc;
           temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
           out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
@@ -218,7 +218,7 @@ namespace from_json {
         }
           
           // null
-        case 0: {
+        case rapidjson::kNullType: {
           out[i] = R_NA_VAL;
           break;
         }
@@ -230,17 +230,17 @@ namespace from_json {
         
         // Bump i
         i++;
-      }
+      } // for
       
       out.attr("names") = names;
       res[0] = out;
       
-    } else if( json_type == 4 && !contains_object_or_array( dtypes ) ) {
+    } else if( json_type == rapidjson::kArrayType && !contains_object_or_array( dtypes ) ) {
       // array of scalars (no internal arrays or objects)
       rapidjson::Value::Array curr_array = json.GetArray();
       res[0] = array_to_vector( curr_array, simplify );
       
-    } else if ( json_type == 4 ) {
+    } else if ( json_type == rapidjson::kArrayType ) {
       // array with internal array
       // possibly simplified to matrix
 
@@ -250,24 +250,24 @@ namespace from_json {
   
         switch( json[i].GetType() ) {
         
-        case 0: {
+        case rapidjson::kNullType: {
           sequential_array_counter = 0;
           array_of_array[i] = R_NA_VAL;
           break;
         }
-        case 1: {}
-        case 2: {
+        case rapidjson::kFalseType: {}
+        case rapidjson::kTrueType: {
           sequential_array_counter = 0;
           array_of_array[i] = json[i].GetBool();
           break;
         }
-        case 5: {
+        case rapidjson::kStringType: {
           sequential_array_counter = 0;
           array_of_array[i] = json[i].GetString();
           break;
         }
         // numeric
-        case 6: {
+        case rapidjson::kNumberType: {
           sequential_array_counter = 0;
           if(json[i].IsDouble()) {
           // double
@@ -279,7 +279,7 @@ namespace from_json {
         break;
         }
         // array
-        case 4: {
+        case rapidjson::kArrayType: {
           // consecutive inner-arrays *can* be simplified to a matrix
           rapidjson::Value::Array inner_array = json[i].GetArray();
           array_of_array[i] = json_to_sexp( json[i], simplify, sequential_array_counter );
@@ -287,7 +287,7 @@ namespace from_json {
           break;
         }
           // object
-        case 3: {
+        case rapidjson::kObjectType: {
           sequential_array_counter = 0;
           rapidjson::Value& temp_val = json[i];
           array_of_array[i] = json_to_sexp( temp_val, simplify, sequential_array_counter );
