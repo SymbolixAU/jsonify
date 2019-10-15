@@ -10,7 +10,7 @@ status](https://codecov.io/gh/SymbolixAU/jsonify/branch/master/graph/badge.svg)]
 
 # jsonify
 
-jsonify converts R objects to JSON.
+jsonify between R objects and JSON.
 
 ### There are already JSON converters, why did you build this one?
 
@@ -77,10 +77,10 @@ df <- data.frame(
 
 microbenchmark(
   jsonlite = {
-    js <- jsonlite::toJSON( df )
+    jlt <- jsonlite::toJSON( df )
   },
   jsonify = {
-    js <- jsonify::to_json( df )
+    jfy <- jsonify::to_json( df )
   },
   times = 3
 )
@@ -89,6 +89,22 @@ microbenchmark(
 #      expr      min       lq     mean   median       uq      max neval
 #  jsonlite 2.017081 2.063732 2.540350 2.110383 2.801984 3.493585     3
 #   jsonify 1.186239 1.202719 1.514067 1.219198 1.677981 2.136763     3
+
+
+microbenchmark(
+  jsonlite = {
+    df_jlt <- jsonlite::fromJSON( jlt )
+  },
+  jsonify = {
+    df_jfy <- jsonify::from_json( jfy )
+  },
+  times = 3
+)
+
+# Unit: seconds
+#      expr      min       lq     mean   median       uq      max neval
+#  jsonlite 5.034888 5.149688 5.229363 5.264489 5.326601 5.388713     3
+#   jsonify 4.551434 4.629683 4.678198 4.707932 4.741579 4.775227     3
 
 n <- 1e4
 x <- list(
@@ -106,10 +122,10 @@ x <- list(
 
 microbenchmark(
   jsonlite = {
-    js <- jsonlite::toJSON( x )
+    jlt <- jsonlite::toJSON( x )
   },
   jsonify = {
-    js <- jsonify::to_json( x )
+    jfy <- jsonify::to_json( x )
   },
   times = 5
 )
@@ -119,57 +135,21 @@ microbenchmark(
 #  jsonlite 18.52028 18.82241 19.32112 18.99683 19.18103 21.08508     5
 #   jsonify 17.72060 18.19092 19.58308 19.52457 21.14687 21.33241     5
    
-```
-
-### I thought you had an example of it being MUCH quicker than `jsonlite` ?
-
-Yeah, but I realised it was comparing two different methods. When
-`jsonify` was parsing nested lists, it was parsing data.frames
-column-wise, whereas jsonlite was row-wise. Which is a slower operation
-
-### Oh right. So it wasn’t a fair test then.
-
-Correct.
-
-Here’s a more suitable comparison
-
-``` r
-n <- 1e4
-x <- list(
-  x = rnorm(n = n)
-  , y = list(x = rnorm(n = n))
-  , z = list( list( x = rnorm(n = n)))
-  , xx = rnorm(n = n)
-  , yy = data.frame(
-      id = 1:n
-      , value = sample(letters, size = n, replace = T)
-      , val2 = rnorm(n = n)
-      , log = sample(c(T,F), size = n, replace = T)
-    )
-)
 
 microbenchmark(
-  jsonlite_row = {
-    js <- jsonlite::toJSON( x )
+  jsonlite = {
+    df_jlt <- jsonlite::fromJSON( jlt )
   },
-  jsonlite_col = {
-    js <- jsonlite::toJSON( x, dataframe = "columns" )
+  jsonify = {
+    df_jfy <- jsonify::from_json( jfy )
   },
-  jsonify_row = {
-    js <- jsonify::to_json( x )
-  },
-  jsonify_col = {
-    js <- jsonify::to_json( x, by = "column" )
-  },
-  times = 5
+  times = 3
 )
 
 # Unit: milliseconds
-#          expr       min        lq      mean    median        uq       max neval
-#  jsonlite_row 20.533642 20.717894 27.294220 21.122860 21.426250 52.670456     5
-#  jsonlite_col 13.691643 13.812459 15.683795 14.293177 15.655705 20.965993     5
-#   jsonify_row 17.506507 17.951948 20.929641 19.827791 21.161389 28.200572     5
-#   jsonify_col  7.262305  7.382238  7.409085  7.434759  7.435476  7.530645     5
+#      expr      min       lq     mean   median       uq      max neval
+#  jsonlite 62.53554 62.96435 63.12574 63.39316 63.42084 63.44853     3
+#   jsonify 42.47449 42.53826 43.38475 42.60204 43.83988 45.07773     3
 ```
 
 ### There’s no `Date` type in JSON, how have you handled this?
@@ -213,112 +193,6 @@ jsonify::to_json( x )
 jsonify::to_json( x, numeric_dates = FALSE)
 #  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}
 ```
-
-### What about lists?
-
-~~The purpose of this library is speed. A lot of overhead is incurred
-iterating over a list to find and convert objects from one type to
-another.~~
-
-For v0.2.0 I’ve managed to get the date handling at the c++ level, so
-there’s no penalty for recursing through the list to coerce to
-character.
-
-Therefore, lists will work too
-
-``` r
-l <- list(
-  dte = as.Date("2018-01-01")
-  , psx = seq(as.POSIXct("2018-01-01 13:00:00"), as.POSIXct("2018-01-05 13:00:00"), length.out = 5)
-  , df = data.frame(psx = seq(as.POSIXct("2018-01-01 13:00:00"), as.POSIXct("2018-01-05 13:00:00"), length.out = 5))
-)
-jsonify::to_json( l )
-#  {"dte":[17532.0],"psx":[1514772000,1514858400,1514944800,1515031200,1515117600],"df":[{"psx":1514772000},{"psx":1514858400},{"psx":1514944800},{"psx":1515031200},{"psx":1515117600}]}
-```
-
-``` r
-js <- jsonify::to_json( l, numeric_dates = FALSE )
-jsonify::pretty_json( js )
-#  {
-#      "dte": [
-#          "2018-01-01"
-#      ],
-#      "psx": [
-#          "2018-01-01T02:00:00",
-#          "2018-01-02T02:00:00",
-#          "2018-01-03T02:00:00",
-#          "2018-01-04T02:00:00",
-#          "2018-01-05T02:00:00"
-#      ],
-#      "df": [
-#          {
-#              "psx": "2018-01-01T02:00:00"
-#          },
-#          {
-#              "psx": "2018-01-02T02:00:00"
-#          },
-#          {
-#              "psx": "2018-01-03T02:00:00"
-#          },
-#          {
-#              "psx": "2018-01-04T02:00:00"
-#          },
-#          {
-#              "psx": "2018-01-05T02:00:00"
-#          }
-#      ]
-#  }
-```
-
-And it’s still fast because of the design choice to coerce dates to UTC.
-All the date handling is done at the C++ leve, not R. So it’s faster.
-
-``` r
-dtes <- seq(as.Date("2018-01-01"), as.Date("2019-01-01"), length.out = 365)
-psx <- seq(as.POSIXct("2018-01-01"), as.POSIXct("2019-01-01"), length.out = 365)
-n <- 1e5
-
-lst <- list(
-  x = sample(dtes, size = n, replace = T)
-  , y = list(
-    ya = sample(dtes, size = n, replace = TRUE)
-    , yb = rnorm(n = n)
-    , yx = list( sample(dtes, size = n, replace = T ) )
-  )
-  , p = psx
-)
-
-library( microbenchmark )
-
-microbenchmark(
-  jsonify1 = {
-    jsonify::to_json( lst, numeric_dates = TRUE )
-  },
-  jsonify2 = {
-    jsonify::to_json( lst, numeric_dates = FALSE )
-  },
-  jsonlite = {
-    jsonlite::toJSON( lst )
-  },
-  times = 3
-)
-#  Registered S3 method overwritten by 'jsonlite':
-#    method     from   
-#    print.json jsonify
-#  Unit: milliseconds
-#       expr       min        lq      mean    median        uq       max
-#   jsonify1  58.24201  59.55658  60.82796  60.87114  62.12094  63.37073
-#   jsonify2 313.52606 313.66925 314.99959 313.81244 315.73635 317.66025
-#   jsonlite 700.36038 716.17692 726.07386 731.99347 738.93061 745.86775
-#   neval
-#       3
-#       3
-#       3
-```
-
-### That output looks nice, is that `pretty_json()` function new?
-
-Yep, it’s a new feature in v0.2.0
 
 ### I see factors are converted to strings
 

@@ -205,12 +205,15 @@ namespace from_json {
         
         // array
         case rapidjson::kArrayType: {
+          //https://github.com/Tencent/rapidjson/issues/1187#issuecomment-370224050
           rapidjson::Document temp_doc;
           temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
           out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
+          //out[i] = json_to_sexp( itr->value, simplify, sequential_array_counter );
           break;
         }
         case rapidjson::kObjectType: {
+          //https://github.com/Tencent/rapidjson/issues/1187#issuecomment-370224050
           rapidjson::Document temp_doc;
           temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
           out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
