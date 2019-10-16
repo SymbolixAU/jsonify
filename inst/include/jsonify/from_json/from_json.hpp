@@ -51,8 +51,11 @@ namespace from_json {
     return dtypes;
   }
   
-  template< typename T >
-  inline SEXP array_to_vector( T& array, bool& simplify ) {
+  //template< typename T >
+  inline SEXP array_to_vector(
+      const rapidjson::Value& array, 
+      bool& simplify
+    ) {
     // takes an array of scalars (any types) and returns
     // them in an R vector
     
@@ -136,17 +139,215 @@ namespace from_json {
     return contains_array( dtypes ) || contains_object( dtypes );
   }
   
-  template<typename T>
+  // for testing iterative parsing
+  inline void parse_recursive(rapidjson::Value::ConstMemberIterator it) {
+    
+  }
+  
+  // //template<typename T>
+  // inline SEXP json_to_sexp(
+  //   //T& json,
+  //   bool& simplify, 
+  //   int sequential_array_counter
+  // ) {
+  // 
+  //   Rcpp::List res(1);
+  //   
+  //   int json_type = json.GetType();
+  //   int json_length = json.Size();
+  //   
+  //   if(json_length == 0) {
+  //     if( json_type == 4 ) {
+  //       // array goes to list
+  //       return Rcpp::List::create();
+  //     } else {
+  //       return R_NilValue;
+  //     }
+  //   }
+  //   
+  //   
+  //   R_xlen_t i;
+  //   
+  //   std::unordered_set< int > dtypes;
+  //   dtypes = get_dtypes< T >( json );
+  //   
+  //   if( json_type == rapidjson::kObjectType ) {
+  //     // object {}
+  // 
+  //     Rcpp::List out( json_length );
+  //     Rcpp::CharacterVector names( json_length );
+  //     
+  //     int i = 0;
+  //     for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
+  //       
+  //       // Get current key
+  //       names[i] = itr->name.GetString();
+  //       
+  //       // Get current value
+  //       switch(itr->value.GetType()) {
+  //       
+  //       // bool - false/ true
+  //       case rapidjson::kFalseType: {}
+  //       case rapidjson::kTrueType: {
+  //         out[i] = itr->value.GetBool();
+  //         break;
+  //       }
+  //         
+  //         // string
+  //       case rapidjson::kStringType: {
+  //         out[i] = itr->value.GetString();
+  //         break;
+  //       }
+  //         
+  //         // numeric
+  //       case rapidjson::kNumberType: {
+  //         if(itr->value.IsDouble()) {
+  //           // double
+  //           out[i] = itr->value.GetDouble();
+  //         } else {
+  //           // int
+  //           out[i] = itr->value.GetInt();
+  //         }
+  //         break;
+  //       }
+  //       
+  //       // array
+  //       case rapidjson::kArrayType: {
+  //         //https://github.com/Tencent/rapidjson/issues/1187#issuecomment-370224050
+  //         //rapidjson::Document temp_doc;
+  //         //temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
+  //         //out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
+  //         
+  //         //rapidjson::Value temp_array( rapidjson::kArrayType );
+  //         //const rapidjson::Value::ConstArray temp_array = itr->value;
+  //         //out[i] = json_to_sexp< rapidjson::Value::ConstArray >( temp_array, simplify, sequential_array_counter );
+  //         
+  //         //parse_recursive( itr );
+  //         
+  //         //out[i] = json_to_sexp( itr->value, simplify, sequential_array_counter );
+  //         break;
+  //       }
+  //       case rapidjson::kObjectType: {
+  //         //https://github.com/Tencent/rapidjson/issues/1187#issuecomment-370224050
+  //         rapidjson::Document temp_doc;
+  //         temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
+  //         out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
+  //         break;
+  //       }
+  //         
+  //         // null
+  //       case rapidjson::kNullType: {
+  //         out[i] = R_NA_VAL;
+  //         break;
+  //       }
+  //       // some other data type not covered
+  //       default: {
+  //         Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, array, and json");
+  //       }
+  //       }
+  //       
+  //       // Bump i
+  //       i++;
+  //     } // for
+  //     
+  //     out.attr("names") = names;
+  //     res[0] = out;
+  //     
+  //   } else if( json_type == rapidjson::kArrayType && !contains_object_or_array( dtypes ) ) {
+  //     // array of scalars (no internal arrays or objects)
+  //     rapidjson::Value::Array curr_array = json.GetArray();
+  //     res[0] = array_to_vector( curr_array, simplify );
+  //     
+  //   } else if ( json_type == rapidjson::kArrayType ) {
+  //     // array with internal array
+  //     // possibly simplified to matrix
+  // 
+  //     Rcpp::List array_of_array( json_length );
+  //     
+  //     for( i = 0; i < json_length; i++ ) {
+  // 
+  //       switch( json[i].GetType() ) {
+  //       
+  //       case rapidjson::kNullType: {
+  //         sequential_array_counter = 0;
+  //         array_of_array[i] = R_NA_VAL;
+  //         break;
+  //       }
+  //       case rapidjson::kFalseType: {}
+  //       case rapidjson::kTrueType: {
+  //         sequential_array_counter = 0;
+  //         array_of_array[i] = json[i].GetBool();
+  //         break;
+  //       }
+  //       case rapidjson::kStringType: {
+  //         sequential_array_counter = 0;
+  //         array_of_array[i] = json[i].GetString();
+  //         break;
+  //       }
+  //       // numeric
+  //       case rapidjson::kNumberType: {
+  //         sequential_array_counter = 0;
+  //         if(json[i].IsDouble()) {
+  //         // double
+  //         array_of_array[i] = json[i].GetDouble();
+  //       } else {
+  //         // int
+  //         array_of_array[i] = json[i].GetInt();
+  //       }
+  //       break;
+  //       }
+  //       // array
+  //       case rapidjson::kArrayType: {
+  //         // consecutive inner-arrays *can* be simplified to a matrix
+  //         rapidjson::Value::Array inner_array = json[i].GetArray();
+  //         array_of_array[i] = json_to_sexp( json[i], simplify, sequential_array_counter );
+  //         sequential_array_counter++;
+  //         break;
+  //       }
+  //         // object
+  //       case rapidjson::kObjectType: {
+  //         sequential_array_counter = 0;
+  //         rapidjson::Value& temp_val = json[i];
+  //         array_of_array[i] = json_to_sexp( temp_val, simplify, sequential_array_counter );
+  //         break;
+  //       }
+  //       default: {
+  //         Rcpp::stop("jsonify - case not handled");
+  //       }
+  //       } // switch
+  //     }   // for
+  //     
+  //     if( sequential_array_counter > 0  && simplify ) {
+  //       
+  //       res[0] = jsonify::from_json::list_to_matrix( array_of_array );
+  //       
+  //     } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) && simplify ) {
+  //       
+  //       res[0] = jsonify::from_json::simplify_dataframe( array_of_array, json_length );
+  //       
+  //     } else {
+  //       res[0] = array_of_array;
+  //     }
+  // 
+  //   } else {
+  //     Rcpp::stop("jsonify - case not handled");
+  //   }
+  //   
+  //   return res[0];
+  // }
+  
+  //template<typename T>
   inline SEXP json_to_sexp(
-    T& json,
-    bool& simplify, 
-    int sequential_array_counter
+      //T& json,
+      rapidjson::Value::ConstMemberIterator json,
+      bool& simplify, 
+      int sequential_array_counter
   ) {
-
+    
     Rcpp::List res(1);
     
-    int json_type = json.GetType();
-    int json_length = json.Size();
+    int json_type = json->value.GetType();
+    int json_length = json->value.Size();
     
     if(json_length == 0) {
       if( json_type == 4 ) {
@@ -161,16 +362,16 @@ namespace from_json {
     R_xlen_t i;
     
     std::unordered_set< int > dtypes;
-    dtypes = get_dtypes< T >( json );
+    dtypes = get_dtypes( json->value );
     
     if( json_type == rapidjson::kObjectType ) {
       // object {}
-
+      
       Rcpp::List out( json_length );
       Rcpp::CharacterVector names( json_length );
       
       int i = 0;
-      for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
+      for(rapidjson::Value::ConstMemberIterator itr = json->value.MemberBegin(); itr != json->value.MemberEnd(); ++itr) {
         
         // Get current key
         names[i] = itr->name.GetString();
@@ -194,29 +395,41 @@ namespace from_json {
           // numeric
         case rapidjson::kNumberType: {
           if(itr->value.IsDouble()) {
-            // double
-            out[i] = itr->value.GetDouble();
-          } else {
-            // int
-            out[i] = itr->value.GetInt();
-          }
-          break;
+          // double
+          out[i] = itr->value.GetDouble();
+        } else {
+          // int
+          out[i] = itr->value.GetInt();
         }
-        
-        // array
+        break;
+        }
+          
+          // array
         case rapidjson::kArrayType: {
           //https://github.com/Tencent/rapidjson/issues/1187#issuecomment-370224050
-          rapidjson::Document temp_doc;
-          temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
-          out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
+          //rapidjson::Document temp_doc;
+          //temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
+          //out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
+          
+          //rapidjson::Value temp_array( rapidjson::kArrayType );
+          //const rapidjson::Value::ConstArray temp_array = itr->value;
+          //out[i] = json_to_sexp< rapidjson::Value::ConstArray >( temp_array, simplify, sequential_array_counter );
+          
+          //parse_recursive( itr );
+          
           //out[i] = json_to_sexp( itr->value, simplify, sequential_array_counter );
           break;
         }
         case rapidjson::kObjectType: {
           //https://github.com/Tencent/rapidjson/issues/1187#issuecomment-370224050
-          rapidjson::Document temp_doc;
-          temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
-          out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
+          //rapidjson::Document temp_doc;
+          //temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
+          //out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
+          
+          for( auto curr_obj_it = itr->value.MemberBegin(); curr_obj_it != itr->value.MemberEnd(); curr_obj_it++) {
+            out[i] = json_to_sexp( curr_obj_it, simplify, sequential_array_counter );
+          }
+          
           break;
         }
           
@@ -225,7 +438,7 @@ namespace from_json {
           out[i] = R_NA_VAL;
           break;
         }
-        // some other data type not covered
+          // some other data type not covered
         default: {
           Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, array, and json");
         }
@@ -240,18 +453,19 @@ namespace from_json {
       
     } else if( json_type == rapidjson::kArrayType && !contains_object_or_array( dtypes ) ) {
       // array of scalars (no internal arrays or objects)
-      rapidjson::Value::Array curr_array = json.GetArray();
+      const rapidjson::Value& curr_array = json->value; //.GetArray();
       res[0] = array_to_vector( curr_array, simplify );
       
     } else if ( json_type == rapidjson::kArrayType ) {
       // array with internal array
       // possibly simplified to matrix
-
+      
       Rcpp::List array_of_array( json_length );
+      const rapidjson::Value& curr_array = json->value;
       
       for( i = 0; i < json_length; i++ ) {
-  
-        switch( json[i].GetType() ) {
+        
+        switch( curr_array[i].GetType() ) {
         
         case rapidjson::kNullType: {
           sequential_array_counter = 0;
@@ -261,39 +475,42 @@ namespace from_json {
         case rapidjson::kFalseType: {}
         case rapidjson::kTrueType: {
           sequential_array_counter = 0;
-          array_of_array[i] = json[i].GetBool();
+          array_of_array[i] = curr_array[i].GetBool();
           break;
         }
         case rapidjson::kStringType: {
           sequential_array_counter = 0;
-          array_of_array[i] = json[i].GetString();
+          array_of_array[i] = curr_array[i].GetString();
           break;
         }
-        // numeric
+          // numeric
         case rapidjson::kNumberType: {
           sequential_array_counter = 0;
-          if(json[i].IsDouble()) {
-          // double
-          array_of_array[i] = json[i].GetDouble();
-        } else {
-          // int
-          array_of_array[i] = json[i].GetInt();
+          if(curr_array[i].IsDouble()) {
+            // double
+            array_of_array[i] = curr_array[i].GetDouble();
+          } else {
+            // int
+            array_of_array[i] = curr_array[i].GetInt();
+          }
+          break;
         }
-        break;
-        }
-        // array
+          // array
         case rapidjson::kArrayType: {
           // consecutive inner-arrays *can* be simplified to a matrix
-          rapidjson::Value::Array inner_array = json[i].GetArray();
-          array_of_array[i] = json_to_sexp( json[i], simplify, sequential_array_counter );
-          sequential_array_counter++;
+          // rapidjson::Value::Array inner_array = json[i].GetArray();
+          // array_of_array[i] = json_to_sexp( json[i], simplify, sequential_array_counter );
+          // sequential_array_counter++;
           break;
         }
           // object
         case rapidjson::kObjectType: {
           sequential_array_counter = 0;
-          rapidjson::Value& temp_val = json[i];
-          array_of_array[i] = json_to_sexp( temp_val, simplify, sequential_array_counter );
+          const rapidjson::Value& temp_val = curr_array[i];
+          // array_of_array[i] = json_to_sexp( temp_val, simplify, sequential_array_counter );
+          for( auto curr_obj_it = temp_val.MemberBegin(); curr_obj_it != temp_val.MemberEnd(); curr_obj_it++) {
+            array_of_array[i] = json_to_sexp( curr_obj_it, simplify, sequential_array_counter );
+          }
           break;
         }
         default: {
@@ -313,7 +530,7 @@ namespace from_json {
       } else {
         res[0] = array_of_array;
       }
-
+      
     } else {
       Rcpp::stop("jsonify - case not handled");
     }
@@ -368,8 +585,12 @@ namespace from_json {
       return x;
     }
     
-    return json_to_sexp( doc, simplify, sequential_array_count );
-
+    Rcpp::List res(1);
+    for( auto json_itr = doc.MemberBegin(); json_itr != doc.MemberEnd(); json_itr++ ) {
+      res[0] = json_to_sexp( json_itr, simplify, sequential_array_count );
+    }
+    
+    return res;
   }
   
   // Test array types
