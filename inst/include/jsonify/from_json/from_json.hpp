@@ -139,14 +139,7 @@ namespace from_json {
     return contains_array( dtypes ) || contains_object( dtypes );
   }
   
-  // for testing iterative parsing
-  inline void parse_recursive(rapidjson::Value::ConstMemberIterator it) {
-    
-  }
-  
-  //template<typename T>
   inline SEXP json_to_sexp(
-    //T& json,
     const rapidjson::Value& json,
     bool& simplify,
     int sequential_array_counter
@@ -214,25 +207,11 @@ namespace from_json {
 
         // array
         case rapidjson::kArrayType: {
-          //https://github.com/Tencent/rapidjson/issues/1187#issuecomment-370224050
-          //rapidjson::Document temp_doc;
-          //temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
-          //out[i] = json_to_sexp( temp_doc, simplify, sequential_array_counter );
-
-          //rapidjson::Value temp_array( rapidjson::kArrayType );
           const rapidjson::Value& temp_array = itr->value;
-          //const rapidjson::Value& arr = (*itr);
           out[i] = json_to_sexp( temp_array, simplify, sequential_array_counter );
-
-          //parse_recursive( itr );
-
-          //out[i] = json_to_sexp( itr->value, simplify, sequential_array_counter );
           break;
         }
         case rapidjson::kObjectType: {
-          //https://github.com/Tencent/rapidjson/issues/1187#issuecomment-370224050
-          // rapidjson::Document temp_doc;
-          // temp_doc.CopyFrom( itr->value, temp_doc.GetAllocator() );
           out[i] = json_to_sexp( itr->value, simplify, sequential_array_counter );
           break;
         }
@@ -300,8 +279,6 @@ namespace from_json {
         }
         // array
         case rapidjson::kArrayType: {
-          // consecutive inner-arrays *can* be simplified to a matrix
-          //const rapidjson::Value::ConstArray& inner_array = json[i].GetArray();
           array_of_array[i] = json_to_sexp( json[i], simplify, sequential_array_counter );
           sequential_array_counter++;
           break;

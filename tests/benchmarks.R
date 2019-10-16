@@ -104,7 +104,7 @@ microbenchmark(
 
 ## mixture of NAs, NULLs, Infs etc
 set.seed(20191012)
-n <- 1e6
+n <- 1e5
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -142,7 +142,7 @@ microbenchmark(
   jsonify = {
     jfy <- jsonify::from_json( js_jfy , simplify = FALSE)
   },
-  times = 1
+  times = 5
 )
 # Unit: seconds
 #   expr      min       lq     mean   median       uq      max neval
