@@ -336,7 +336,7 @@ namespace from_json {
   //   return res[0];
   // }
   
-  //template<typename T>
+  template<typename T>
   inline SEXP json_to_sexp(
       //T& json,
       rapidjson::Value::ConstMemberIterator json,
@@ -498,9 +498,12 @@ namespace from_json {
           // array
         case rapidjson::kArrayType: {
           // consecutive inner-arrays *can* be simplified to a matrix
-          // rapidjson::Value::Array inner_array = json[i].GetArray();
+          const rapidjson::Value::ConstArray& inner_array = curr_array[i].GetArray();
+          for( auto curr_arr_it = inner_array.Begin(); curr_arr_it != inner_array.End(); curr_arr_it++ ) {
+            array_of_array[i] = json_to_sexp( curr_arr_it, simplify, sequential_array_counter );
+          }
           // array_of_array[i] = json_to_sexp( json[i], simplify, sequential_array_counter );
-          // sequential_array_counter++;
+          sequential_array_counter++;
           break;
         }
           // object
