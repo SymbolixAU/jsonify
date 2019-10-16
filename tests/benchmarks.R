@@ -1,10 +1,3 @@
-## TODO
-## - lists
-## - POSIXlt
-## - POSIXct
-## - Date
-
-
 library(microbenchmark)
 library(jsonlite)
 
@@ -46,9 +39,9 @@ microbenchmark(
   times = 5
 )
 # Unit: seconds
-# expr      min       lq     mean   median       uq      max neval
-# jsonlite 1.750814 1.894219 2.096893 2.034916 2.250064 2.554454     5
-#  jsonify 1.732922 1.746326 1.856985 1.805632 1.820807 2.179239     5
+#     expr      min       lq     mean   median       uq      max neval
+# jsonlite 1.353150 1.534014 1.548655 1.545189 1.584838 1.726087     5
+#  jsonify 1.456572 1.460230 1.507303 1.463506 1.524051 1.632157     5
 
 # from_json
 js <- jsonify::to_json( x )
@@ -62,9 +55,9 @@ microbenchmark(
   times = 5
 )
 # Unit: seconds
-#     expr      min       lq     mean   median       uq       max neval
-# jsonlite 8.996560 9.164908 9.628287 9.205365 10.00561 10.768996     5
-#  jsonify 2.651533 2.809438 2.929623 2.967455  3.05825  3.161441     5
+#     expr      min       lq     mean   median       uq      max neval
+# jsonlite 7.986898 8.023153 8.303378 8.145451 8.295069 9.066318     5
+#  jsonify 2.223123 2.531027 2.736762 2.746553 2.866034 3.317075     5
 
 ## numeric vector with NAs
 n <- 1e6
@@ -103,8 +96,9 @@ microbenchmark(
 #  jsonify 181.9075 182.8828 214.3332 209.5452 224.1336 273.1970     5
 
 ## mixture of NAs, NULLs, Infs etc
+rm(list=ls()); gc()
 set.seed(20191012)
-n <- 1e5
+n <- 1e7
 df <- data.frame(
   id = 1:n
   , value = sample(letters, size = n, replace = T)
@@ -125,12 +119,12 @@ microbenchmark(
   jsonify = {
     jfy <- jsonify::to_json( df, digits = 4 )
   },
-  times = 5
+  times = 3
 )
 # Unit: seconds
 #     expr      min       lq     mean   median       uq      max neval
-# jsonlite 30.29614 30.29614 30.29614 30.29614 30.29614 30.29614     1
-#  jsonify 19.88902 19.88902 19.88902 19.88902 19.88902 19.88902     1
+# jsonlite 19.87568 20.67037 24.10039 21.46506 26.21274 30.96042     3
+#  jsonify 12.92456 14.22520 15.98015 15.52584 17.50794 19.49004     3
 
 # from_json
 js_jfy <- jsonify::to_json(df)
@@ -142,13 +136,14 @@ microbenchmark(
   jsonify = {
     jfy <- jsonify::from_json( js_jfy , simplify = FALSE)
   },
-  times = 5
+  times = 3
 )
 # Unit: seconds
-#   expr      min       lq     mean   median       uq      max neval
-# jsonlite 42.12359 77.00299 72.53358 78.70986 79.59812 85.23332     5
-#  jsonify 22.17143 24.22952 27.90723 25.01322 33.13034 34.99164     5
+#     expr      min      lq     mean   median        uq       max neval
+# jsonlite 32.16290 34.9752 83.15379 37.78749 108.64924 179.51098     3
+#  jsonify 23.04863 39.6811 53.73789 56.31357  69.08251  81.85146     3
 
+rm( jlt, jfy ); gc()
 microbenchmark(
   jsonlite = {
     jlt <- jsonlite::fromJSON( js_jlt )
@@ -156,5 +151,10 @@ microbenchmark(
   jsonify = {
     jfy <- jsonify::from_json( js_jfy )
   },
-  times = 1
+  times = 3
 )
+
+# Unit: seconds
+#     expr      min       lq     mean   median       uq      max neval
+# jsonlite 50.12151 58.74930 63.45008 67.37709 70.11437 72.85165     3
+#  jsonify 52.16836 53.00044 62.65738 53.83251 67.90190 81.97128     3
