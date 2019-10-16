@@ -147,7 +147,7 @@ namespace from_json {
     return out;
   }
 
-  SEXP simplify_matrix(
+  inline SEXP simplify_matrix(
       Rcpp::List& out,
       int& n_col, 
       int& n_row,

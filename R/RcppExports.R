@@ -29,6 +29,10 @@ rcpp_pretty_print <- function(json) {
     invisible(.Call(`_jsonify_rcpp_pretty_print`, json))
 }
 
+rcpp_read_json_file <- function(file, mode, simplify, buffer_size = 1024L) {
+    .Call(`_jsonify_rcpp_read_json_file`, file, mode, simplify, buffer_size)
+}
+
 source_tests <- function() {
     invisible(.Call(`_jsonify_source_tests`))
 }

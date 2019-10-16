@@ -2,10 +2,11 @@
 #' 
 #' Converts a JSON string to an R list
 #' 
-#' @param x JSON string to convert to R list
+#' @param json JSON string to convert to R list
 #' @param simplify logical, if \code{TRUE}, coerce JSON arrays 
 #' containing only records (JSON objects) into a data frame. Default value is 
 #' \code{TRUE}.
+#' @param buffer_size size of buffer used when reading a file from disk. Defaults 1024
 #' 
 #' @examples 
 #' 
@@ -21,68 +22,66 @@
 #' from_json("[{\"id\":1,\"val\":\"a\"},{\"id\":2,\"val\":\"b\"}]")
 #' 
 #' @export
-from_json <- function(x, simplify = TRUE ) {
-  # if( "col" %in% by ) by <- "column"
-  # by <- match.arg( by, choices = c("row", "column") )
-  
-  res <- rcpp_from_json( x, simplify )
-  
-  # if( simplify ) {
-  #   return( list_to_df( res ) )
-  # }
-  
-  return( res )
-  # res <- rcpp_from_json(x, simplify, by)
-  # 
-  # if (!simplify || !inherits(res, "list")) {
-  #   return(res)
-  # }
-  # 
-  #list_to_df(res)
+from_json <- function(json, simplify = TRUE, buffer_size = 1024 ) {
+  json_to_r( json, simplify, buffer_size )
 }
 
-# # Helper function to convert a "from_json()" list to a data frame.
-# list_to_df <- function(res) {
-#   # Get all unique names from a list object.
-#   cols <- rcpp_get_col_headers(res)
-#   
-#   # If column headers are NULL, return res.
-#   if (is.null(cols)) {
-#     return(res)
-#   }
-#   
-#   # Convert row lists to column lists.
-#   columnlist <- rcpp_transpose_list(res, cols)
-#   
-#   # Convert all NULL values in each nested list to NA.
-#   for (i in columnlist) {
-#     rcpp_null_to_na(i)
-#   }
-#   
-#   # If the value of each inner list is length one, unlist each element, which 
-#   # will naturally convert data types and NA values within each "list column" 
-#   # to be the same, and thus data frame friendly.
-#   unlist_values <- TRUE
-#   for (i in columnlist) {
-#     for (j in i) {
-#       if (length(j) > 1) {
-#         unlist_values <- FALSE
-#         break
-#       }
-#       if (!unlist_values) {
-#         break
-#       }
-#     }
-#   }
-#   
-#   if (unlist_values) {
-#     # Unlist each element.
-#     columnlist <- lapply(columnlist, unlist, recursive = FALSE, use.names = FALSE)
-#   }
-# 
-#   # Convert columnlist to a data frame, then return.
-#   class(columnlist) <- "data.frame"
-#   row.names(columnlist) <- seq_len(length(res))
-#   colnames(columnlist) <- cols
-#   columnlist
+json_to_r <- function( json, simplify = TRUE, buffer_size ) {
+  UseMethod("json_to_r")
+}
+
+#' @export
+json_to_r.character <- function( json, simplify = TRUE, buffer_size ) {
+  if( is_url( json ) ) {
+    return( json_to_r( curl::curl( json ), simplify, buffer_size ))
+  } else if ( file.exists( json ) ) {
+    return(
+      rcpp_read_json_file(
+        normalizePath( json )
+        , get_download_mode()
+        , simplify
+        , buffer_size
+      )
+    )
+  }
+  return( rcpp_from_json( json, simplify ) )
+}
+
+#' @export
+json_to_r.connection <- function( json, simplify = TRUE, buffer_size ) {
+  json_to_r( read_url( json ), simplify, buffer_size )
+}
+
+#' @export
+json_to_r.json <- function( json, simplify = TRUE, buffer_size ) {
+  rcpp_from_json( json, simplify )
+}
+
+#' @export
+json_to_r.default <- function( json, simplify = TRUE, buffer_size ) {
+  stop("jsonify - expecting a JSON string, url or file")
+}
+
+# json_to_r.default <- function( json, simplify = TRUE, buffer_size ) {
+#   res <- rcpp_from_json( json, simplify )
+#   return( res )
 # }
+
+
+is_url <- function(geojson) grepl("^https?://", geojson, useBytes=TRUE)
+
+read_url <- function(con) {
+  out <- tryCatch({
+    paste0(readLines(con), collapse = "")
+  },
+  error = function(cond){
+    stop("There was an error downloading the geojson")
+  },
+  finally = {
+    close(con)
+  })
+}
+
+get_download_mode <- function() {
+  ifelse( .Platform$OS.type == "windows", "r", "rb" )
+}

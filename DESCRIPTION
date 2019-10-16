@@ -11,6 +11,7 @@ Description: Converts 'R' objects into Javascript Object Notation (JSON) using
     the 'rapidjsonr' library <https://CRAN.R-project.org/package=rapidjsonr>. 
 License: GPL (>= 2)
 Imports: 
+  curl,
   Rcpp (>= 0.12.18)
 LinkingTo: 
   BH,
@@ -20,7 +21,6 @@ RoxygenNote: 6.1.1
 Suggests:
     covr,
     microbenchmark,
-    jsonlite,
     testthat,
     knitr,
     rmarkdown

@@ -4,14 +4,16 @@
 \alias{from_json}
 \title{From JSON}
 \usage{
-from_json(x, simplify = TRUE)
+from_json(json, simplify = TRUE, buffer_size = 1024)
 }
 \arguments{
-\item{x}{JSON string to convert to R list}
+\item{json}{JSON string to convert to R list}
 
 \item{simplify}{logical, if \code{TRUE}, coerce JSON arrays 
 containing only records (JSON objects) into a data frame. Default value is 
 \code{TRUE}.}
+
+\item{buffer_size}{size of buffer used when reading a file from disk. Defaults 1024}
 }
 \description{
 Converts a JSON string to an R list

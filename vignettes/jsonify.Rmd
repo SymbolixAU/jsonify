@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 )
 
 library(jsonify)
-library(jsonlite)
 ```
 
 There are two types of R objects we need to handle when converting to JSON, simple and complex.
@@ -146,10 +145,3 @@ pretty_json( df )
 ```
 
 
-### From JSON
-
-- missing keys - can't simplify to data.frame
-```r
-'[{"id":1,"val":"a","val2":"b"},{"id":2,"val":"b"}]'  ## val2 is missing from 2nd object
-
-```

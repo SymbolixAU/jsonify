@@ -192,19 +192,11 @@ namespace from_json {
   //' @param json const char, JSON string to be parsed. Coming from R, this
   //'  input should be a character vector of length 1.
   //' @export
-  inline SEXP from_json(const char * json, bool& simplify ) {
-    
-    rapidjson::Document doc;
-    doc.Parse(json);
+  inline SEXP from_json(rapidjson::Value& doc, bool& simplify ) {
     
     std::unordered_set< int > dtypes;
     
     int sequential_array_counter = 0;
-    
-    // Make sure there were no parse errors
-    if(doc.HasParseError()) {
-      Rcpp::stop("json parse error");
-    }
     
     // If the input is a scalar value of type int, double, string, or bool, 
     // return Rcpp vector with length 1.
