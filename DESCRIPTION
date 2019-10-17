@@ -19,10 +19,10 @@ LinkingTo:
   Rcpp
 RoxygenNote: 6.1.1
 Suggests:
-    covr,
-    microbenchmark,
-    testthat,
-    knitr,
-    rmarkdown
+  covr,
+  microbenchmark,
+  testthat,
+  knitr,
+  rmarkdown
 Encoding: UTF-8
 VignetteBuilder: knitr

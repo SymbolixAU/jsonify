@@ -1,25 +1,38 @@
 #' From JSON
 #' 
-#' Converts a JSON string to an R list
+#' Converts JSON to an R objects
 #' 
-#' @param json JSON string to convert to R list
-#' @param simplify logical, if \code{TRUE}, coerce JSON arrays 
-#' containing only records (JSON objects) into a data frame. Default value is 
-#' \code{TRUE}.
+#' @param json JSON to convert to R object. Can be a string, url or link to a file.
+#' @param simplify logical, if \code{TRUE}, coerces JSON to the simplest R object possible. See Details
 #' @param buffer_size size of buffer used when reading a file from disk. Defaults 1024
+#' 
+#' @details 
+#' 
+#' When \code{simplify = TRUE}
+#' \itemize{
+#'   \item{single arrays are coerced to vectors}
+#'   \item{array of arrays (all the same length) are coerced to matrices}
+#'   \item{objects with the same keys are coerced to data.frames}
+#' }
 #' 
 #' @examples 
 #' 
-#' from_json("{\"a\":[1, 2, 3]}")
-#' from_json("{\"a\":8, \"b\":99.5, \"c\":true, \"d\":\"cats\", \"e\":[1, \"cats\", 3]}")
-#' from_json("{\"a\":8, \"b\":{\"c\":123, \"d\":{\"e\":456}}}")
+#' from_json('{"a":[1, 2, 3]}')
+#' from_json('{"a":8, "b":99.5, "c":true, "d":"cats", "e":[1, "cats", 3]}')
+#' from_json('{"a":8, "b":{"c":123, "d":{"e":456}}}')
 #' 
 #' lst <- list("a" = 5L, "b" = 1.43, "c" = "cats", "d" = FALSE)
-#' json_str <- jsonify::to_json(lst, unbox = TRUE)
-#' from_json(json_str)
+#' js <- jsonify::to_json(lst, unbox = TRUE)
+#' from_json( js )
 #' 
 #' # Return a data frame
-#' from_json("[{\"id\":1,\"val\":\"a\"},{\"id\":2,\"val\":\"b\"}]")
+#' from_json('[{"id":1,"val":"a"},{"id":2,"val":"b"}]')
+#' 
+#' #' # Return a data frame with a list column
+#' from_json('[{"id":1,"val":"a"},{"id":2,"val":["b","c"]}]')
+#' 
+#' # Without simplifying to a data.frame
+#' from_json('[{"id":1,"val":"a"},{"id":2,"val":["b","c"]}]', simplify = FALSE )
 #' 
 #' @export
 from_json <- function(json, simplify = TRUE, buffer_size = 1024 ) {
@@ -33,7 +46,9 @@ json_to_r <- function( json, simplify = TRUE, buffer_size ) {
 #' @export
 json_to_r.character <- function( json, simplify = TRUE, buffer_size ) {
   if( is_url( json ) ) {
-    return( json_to_r( curl::curl( json ), simplify, buffer_size ))
+    
+    json_to_r( curl::curl( json ), simplify, buffer_size )
+
   } else if ( file.exists( json ) ) {
     return(
       rcpp_read_json_file(
