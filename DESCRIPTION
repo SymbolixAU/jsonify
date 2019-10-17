@@ -1,6 +1,6 @@
 Package: jsonify
 Type: Package
-Title: Converts 'R' Objects to Javascript Object Notation (JSON)
+Title: Convert between 'R' Objects and Javascript Object Notation (JSON)
 Version: 0.9.0001
 Date: 2019-01-10
 Authors@R: c(
