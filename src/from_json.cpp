@@ -2,7 +2,8 @@
 #include "jsonify/from_json/from_json.hpp"
 
 // [[Rcpp::export]]
-SEXP rcpp_from_json( const char * json, bool& simplify ) {
+SEXP rcpp_from_json(const char * json, bool& simplify ) {
+
   rapidjson::Document doc;
   doc.Parse(json);
   

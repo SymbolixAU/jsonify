@@ -319,9 +319,31 @@ test_that("data frame returned properly", {
   # expect_equal(from_json(js), target)
 })
 
-test_that("empty inputs return NULL", {
+test_that("empty object returns NULL", {
   expect_null(from_json("{}"))
+})
+test_that("empty array returns list",{
   expect_true(is.list( from_json("[]")) )
+})
+
+test_that("empty elements in an array return correct structures",{
+  
+  ## issue 51
+  js <- '[{"test":[]}]'
+  res <- from_json( js )
+  expect_true( is.data.frame( res ) )
+  expect_true( is.list( res$test ) )
+  expect_true( length( res$test ) == 1 )
+  expect_true( length( res$test[[1]] ) == 0 )
+  expect_equal( as.character( to_json( res ) ), js )
+  
+  js <- '[{"test":{}}]'
+  res <- from_json( js )
+  expect_equal( as.character( to_json( res ) ), js )
+  
+  expect_true( is.list( res$test ) )
+  expect_true( is.null( res$test[[1]] ))
+  
 })
 
 test_that("round trips work", {
@@ -377,9 +399,6 @@ test_that("round trips work", {
 
 
 })
-
-
-
 
 
 
