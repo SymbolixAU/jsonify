@@ -303,6 +303,7 @@ namespace from_json {
     R_xlen_t i;
     
     // TODO; is this needed?
+    Rcpp::Rcout << "list_to_vector n_rows : " << n_rows << std::endl;
     if( n_rows > 0 ) {
       
       // if struct_type == 2; the result is a matrix
@@ -366,6 +367,8 @@ namespace from_json {
       
       if( struct_type == 1 ) {
         
+        Rcpp::Rcout << "r_Type : " << r_type << std::endl;
+        
         switch( r_type ) {
         case LGLSXP: {
           Rcpp::LogicalVector lv( n_rows );
@@ -399,15 +402,20 @@ namespace from_json {
             Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( s );
             sv[i] = x[0];
           }
-          
           columns[ this_name ] = sv;
           break;
+        }
+        case NILSXP: {
+          Rcpp::Rcout << "this_name : " << this_name << std::endl;
+          Rcpp::Rcout << "n_rows: " << n_rows << std::endl;
         }
         default: {
           Rcpp::stop("jsonify - vector-column not found");
         }
         }
       }
+    } else {
+      // nrows == 0; empty vector/list?
     }
   }
 
@@ -423,6 +431,8 @@ namespace from_json {
     // the number of columns is equal to the unique names
     R_xlen_t n_rows = out.size();
     R_xlen_t i, j;
+    
+    Rcpp::Rcout << "simplify_dataframe n_rows: " << n_rows << std::endl;
     
     // initialise a new list for each column
     // keep track of it's type
@@ -450,14 +460,18 @@ namespace from_json {
       }
       R_xlen_t list_size = this_list.size();
       
-      if( list_names.size() != list_size ) {
+      Rcpp::Rcout << "names: " << list_names << std::endl;
+      Rcpp::Rcout << "list_size: " << list_size << std::endl;
+      
+      if( list_names.size() != list_size || list_size == 0 ) {
+        Rcpp::Rcout << "resturning unnamed" << std::endl;
         return out;
       }
       
       // Iterate over names??
       for( j = 0; j < list_size; j++ ) { 
         const char* this_name = list_names[j];
-        
+        Rcpp::Rcout << "this_name: " << this_name << std::endl;
         Rcpp::StringVector these_names = this_list.names();
         int found_name = where_is( this_name, these_names );
         
@@ -533,6 +547,7 @@ namespace from_json {
       std::string this_name = it.first;
       int r_type = it.second;
       struct_type = column_value( column_structs, this_name.c_str() );
+      Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
       if( struct_type == 3 ) {
         // can it be a data.frame?
         Rcpp::List lst = columns[ this_name ];
