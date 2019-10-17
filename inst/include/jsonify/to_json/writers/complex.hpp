@@ -14,9 +14,14 @@ namespace writers {
 namespace complex {
 
   template < typename Writer >
-  inline void switch_vector( Writer& writer, SEXP this_vec, bool unbox, 
-                             int digits, bool numeric_dates, 
-                             bool factors_as_string ) {
+  inline void switch_vector(
+      Writer& writer, 
+      SEXP this_vec, 
+      bool unbox, 
+      int digits, 
+      bool numeric_dates, 
+      bool factors_as_string
+    ) {
     
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
@@ -79,10 +84,15 @@ namespace complex {
   
   // working by-row, so we only use a single element of each vector
   template < typename Writer >
-  inline void switch_vector( Writer& writer, SEXP this_vec, bool unbox, 
-                             int digits, bool numeric_dates, 
-                             bool factors_as_string, int row) {
-    
+  inline void switch_vector(
+      Writer& writer, 
+      SEXP this_vec, 
+      bool unbox, 
+      int digits, 
+      bool numeric_dates, 
+      bool factors_as_string, 
+      int row
+    ) {
     
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
@@ -357,7 +367,7 @@ namespace complex {
         jsonify::writers::simple::write_value( writer, nv, unbox, digits, numeric_dates );
         break;
       }
-      case INTSXP: { 
+      case INTSXP: {
         Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( list_element );
         jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates, factors_as_string );
         break;

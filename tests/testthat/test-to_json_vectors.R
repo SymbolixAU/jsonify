@@ -75,7 +75,7 @@ test_that("some randome thoughts I had work", {
 
 test_that("factors work as expected", {
   
-  expect_equal( as.character( to_json( factor() ) ), "null" )
+  expect_equal( as.character( to_json( factor() ) ), "[]" )
   
   expect_equal( as.character( to_json( factor( c("a","a") ) ) ), '["a","a"]')
   expect_equal( as.character( to_json( factor( c("a","a") ), factors_as_string = FALSE ) ), '[1,1]')
