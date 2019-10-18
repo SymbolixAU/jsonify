@@ -5,7 +5,6 @@
 #' @param json JSON to convert to R object. Can be a string, url or link to a file.
 #' @param simplify logical, if \code{TRUE}, coerces JSON to the simplest R object possible. See Details
 #' @param buffer_size size of buffer used when reading a file from disk. Defaults 1024
-#' 
 #' @details 
 #' 
 #' When \code{simplify = TRUE}
@@ -46,9 +45,9 @@ json_to_r <- function( json, simplify = TRUE, buffer_size ) {
 #' @export
 json_to_r.character <- function( json, simplify = TRUE, buffer_size ) {
   if( is_url( json ) ) {
-    
-    json_to_r( curl::curl( json ), simplify, buffer_size )
-
+    return(
+      json_to_r( url( json ), simplify, buffer_size )
+    )
   } else if ( file.exists( json ) ) {
     return(
       rcpp_read_json_file(
@@ -83,14 +82,14 @@ json_to_r.default <- function( json, simplify = TRUE, buffer_size ) {
 # }
 
 
-is_url <- function(geojson) grepl("^https?://", geojson, useBytes=TRUE)
+is_url <- function(json) grepl("^https?://", json, useBytes = TRUE)
 
 read_url <- function(con) {
   out <- tryCatch({
     paste0(readLines(con), collapse = "")
   },
   error = function(cond){
-    stop("There was an error downloading the geojson")
+    stop("There was an error downloading the json")
   },
   finally = {
     close(con)

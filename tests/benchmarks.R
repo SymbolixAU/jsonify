@@ -158,3 +158,19 @@ microbenchmark(
 #     expr      min       lq     mean   median       uq      max neval
 # jsonlite 50.12151 58.74930 63.45008 67.37709 70.11437 72.85165     3
 #  jsonify 52.16836 53.00044 62.65738 53.83251 67.90190 81.97128     3
+
+ul <- "https://raw.githubusercontent.com/SymbolixAU/data/master/geojson/SA1_2016_ACT.json"
+microbenchmark(
+  
+  jsonlite = {
+    jlt <- jsonlite::fromJSON( ul )
+  },
+  jsonify = {
+    jfy <- jsonify::from_json( ul )
+  },
+  times = 5
+)
+# Unit: seconds
+#     expr      min       lq     mean   median       uq      max neval
+# jsonlite 1.433624 1.486971 1.631894 1.537450 1.563000 2.138424     5
+#  jsonify 1.510242 1.528668 1.920362 1.531584 1.877338 3.153977     5
