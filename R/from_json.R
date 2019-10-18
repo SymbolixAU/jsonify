@@ -76,11 +76,6 @@ json_to_r.default <- function( json, simplify = TRUE, buffer_size ) {
   stop("jsonify - expecting a JSON string, url or file")
 }
 
-# json_to_r.default <- function( json, simplify = TRUE, buffer_size ) {
-#   res <- rcpp_from_json( json, simplify )
-#   return( res )
-# }
-
 
 is_url <- function(json) grepl("^https?://", json, useBytes = TRUE)
 

@@ -1,18 +1,10 @@
 #include "Rcpp.h"
-#include "jsonify/from_json/from_json.hpp"
+#include "jsonify/from_json/api.hpp"
+
 
 // [[Rcpp::export]]
 SEXP rcpp_from_json(const char * json, bool& simplify ) {
-
-  rapidjson::Document doc;
-  doc.Parse(json);
-  
-  // Make sure there were no parse errors
-  if(doc.HasParseError()) {
-    Rcpp::stop("json parse error");
-  }
-  
-  return jsonify::from_json::from_json( doc, simplify );
+  return jsonify::api::from_json( json, simplify );
 }
 
 

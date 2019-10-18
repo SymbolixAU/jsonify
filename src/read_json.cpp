@@ -4,7 +4,7 @@
 
 #include <fstream>
 
-#include "jsonify/from_json/from_json.hpp"
+#include "jsonify/from_json/api.hpp"
 
 #include <Rcpp.h>
 
@@ -30,5 +30,5 @@ SEXP rcpp_read_json_file(
   int buffer_size = 1024
 ) {
   rapidjson::Document d = buffer_string( file, mode, buffer_size );
-  return jsonify::from_json::from_json( d, simplify );
+  return jsonify::api::from_json( d, simplify );
 }

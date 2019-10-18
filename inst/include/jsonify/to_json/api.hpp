@@ -1,5 +1,5 @@
-#ifndef JSONIFY_API_H
-#define JSONIFY_API_H
+#ifndef JSONIFY_TO_JSON_API_H
+#define JSONIFY_TO_JSON_API_H
 
 #include <Rcpp.h>
 #include "jsonify/to_json/utils.hpp"
@@ -16,7 +16,8 @@ namespace api {
             int digits = -1, 
             bool numeric_dates = true, 
             bool factors_as_string = true, 
-            std::string by = "row") {
+            std::string by = "row"
+    ) {
         
         rapidjson::StringBuffer sb;
         rapidjson::Writer < rapidjson::StringBuffer > writer( sb );

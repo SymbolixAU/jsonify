@@ -185,48 +185,6 @@ namespace from_json {
     return res[0];
   }
   
-  //' Parse JSON String
-  //'
-  //' Takes a JSON string as input, returns an R list of key-value pairs
-  //'
-  //' @param json const char, JSON string to be parsed. Coming from R, this
-  //'  input should be a character vector of length 1.
-  //' @export
-  inline SEXP from_json(rapidjson::Value& doc, bool& simplify ) {
-    
-    std::unordered_set< int > dtypes;
-    
-    int sequential_array_counter = 0;
-    
-    // If the input is a scalar value of type int, double, string, or bool, 
-    // return Rcpp vector with length 1.
-    if( doc.IsInt() ) {
-      Rcpp::IntegerVector x(1);
-      x[0] = doc.GetInt();
-      return x;
-    }
-    
-    if( doc.IsDouble() ) {
-      Rcpp::NumericVector x(1);
-      x[0] = doc.GetDouble();
-      return x;
-    }
-    
-    if( doc.IsString() ) {
-      Rcpp::CharacterVector x(1);
-      x[0] = doc.GetString();
-      return x;
-    }
-    
-    if( doc.IsBool() ) {
-      Rcpp::LogicalVector x(1);
-      x[0] = doc.GetBool();
-      return x;
-    }
-    
-    return json_to_sexp( doc, simplify, sequential_array_counter );
-  }
-  
   // Test array types
   // If it's an object, it's 'simplify' value will be a data.frame
   // if it's an array, this test finds the types inside the array

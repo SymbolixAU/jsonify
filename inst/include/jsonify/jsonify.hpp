@@ -9,5 +9,6 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 #include "jsonify/to_json/api.hpp"
+#include "jsonify/from_json/api.hpp"
 
 #endif
