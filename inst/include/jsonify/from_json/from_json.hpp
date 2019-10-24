@@ -40,6 +40,8 @@ namespace from_json {
 
       Rcpp::List out( json_length );
       Rcpp::CharacterVector names( json_length );
+      
+      //std::unordered_map< int, std::string > column_types;
 
       int i = 0;
       for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
