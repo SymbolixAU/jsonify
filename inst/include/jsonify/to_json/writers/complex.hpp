@@ -329,9 +329,8 @@ namespace complex {
           }
           
           // LIST NAMES
-          //Rcpp::IntegerVector int_names = Rcpp::seq(1, lst.size());
-          //Rcpp::CharacterVector list_names = Rcpp::as< Rcpp::CharacterVector >( int_names );
-          Rcpp::CharacterVector list_names( lst.size() );
+          // issue 53
+          Rcpp::CharacterVector list_names( lst.size() ); // initialises an empty-string vector
           has_names = lst.hasAttribute("names");
           
           if ( has_names ) {
