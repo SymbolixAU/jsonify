@@ -1,5 +1,6 @@
 ## v1.0
 
+* empty list names handled [issue 53](https://github.com/SymbolixAU/jsonify/issues/53)
 * `from_json()` method from converting JSON to R objects
 
 ## v0.2.1

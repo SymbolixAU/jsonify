@@ -76,7 +76,7 @@ test_that("data.frame - complex columns are jsonified", {
   
   expect_equal(
     as.character( js ) , 
-    '[{"id":1,"norm":1.1,"letters":"a","val":[0.0,0.0]},{"id":2,"norm":2.2,"letters":"x","val":[1.0]},{"id":3,"norm":3.3,"letters":"B","val":{"1":[2.0,3.0],"myname":[4.0,5.0],"3":["a"]}}]'
+    '[{"id":1,"norm":1.1,"letters":"a","val":[0.0,0.0]},{"id":2,"norm":2.2,"letters":"x","val":[1.0]},{"id":3,"norm":3.3,"letters":"B","val":{"":[2.0,3.0],"myname":[4.0,5.0],"":["a"]}}]'
   )
   expect_true( jsonify::validate_json( js ) ) 
   
@@ -92,7 +92,7 @@ test_that("data.frame - complex columns are jsonified", {
   js <- to_json( df, unbox = TRUE )
   expect_equal(
     as.character( js ), 
-    '[{"id":1,"norm":1.1,"letters":"a","val":0.0},{"id":2,"norm":2.2,"letters":"x","val":1.0},{"id":3,"norm":3.3,"letters":"B","val":{"1":2.0,"myname":[4.0,5.0],"3":"a"}}]'
+    '[{"id":1,"norm":1.1,"letters":"a","val":0.0},{"id":2,"norm":2.2,"letters":"x","val":1.0},{"id":3,"norm":3.3,"letters":"B","val":{"":2.0,"myname":[4.0,5.0],"":"a"}}]'
   )
   expect_true( validate_json( js ) )
   
@@ -107,7 +107,7 @@ test_that("data.frame - complex columns are jsonified", {
   
   expect_equal(
     as.character( js ),
-    '[{"id":1,"val":{"x":[1,2]},"val2":{"a":["a"]},"val3":{"l":{"1":[1,2,3],"l2":["a","b"]}}},{"id":2,"val":{"y":[3,4,5,6]},"val2":{"b":["b","c"]},"val3":{"1":[1.0]}}]'
+    '[{"id":1,"val":{"x":[1,2]},"val2":{"a":["a"]},"val3":{"l":{"":[1,2,3],"l2":["a","b"]}}},{"id":2,"val":{"y":[3,4,5,6]},"val2":{"b":["b","c"]},"val3":{"":[1.0]}}]'
   )
   expect_true( validate_json( js ) )
 })
