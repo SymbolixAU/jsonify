@@ -154,6 +154,11 @@ namespace from_json {
     R_xlen_t n_rows
   ) {
     Rcpp::List new_column( n_rows );
+    // need NAs when fill_na = true;
+    R_xlen_t i;
+    for( i = 0; i < n_rows; i++ ) {
+      new_column[i] = NA_LOGICAL;
+    }
     columns[ this_column ] = new_column;
   }
   

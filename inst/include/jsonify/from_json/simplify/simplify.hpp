@@ -517,8 +517,9 @@ namespace from_json {
     int st;
     int ln;
     
-    //Rcpp::StringVector list_names;
+    Rcpp::StringVector list_names;
     std::vector< std::string > column_names;
+    bool new_column = true;
     
     
     for( i = 0; i < n_rows; i++ ) {
@@ -526,33 +527,34 @@ namespace from_json {
       // iterating list elements
       Rcpp::List this_list = out[i];
       //if( i == 0 ) {
-       // if( !Rf_isNull( this_list.names() ) ) {
-       //   list_names = this_list.names();
-       // }
+       if( !Rf_isNull( this_list.names() ) ) {
+         list_names = this_list.names();
+       }
       //}
       R_xlen_t list_size = this_list.size();
       
       Rcpp::Rcout << "list_size " << list_size << std::endl;
+      Rcpp::Rcout << "list_names : " << list_names << std::endl;
       
-      //if( list_names.size() != list_size || list_size == 0 ) {
-      //  return out;
-      //}
+      if( list_names.size() != list_size || list_size == 0 ) {
+       return out;
+      }
       
-      Rcpp::StringVector list_names = this_list.names();
+      //Rcpp::StringVector list_names = this_list.names();
       
       // Iterate over names??
       for( j = 0; j < list_size; j++ ) { 
-        //Rcpp::Rcout << "j : " << j << std::endl;
+        Rcpp::Rcout << "j : " << j << std::endl;
         const char* this_name = list_names[j];
         Rcpp::Rcout << "this_name: " << this_name << std::endl;
-        
-        // for each 
-        
+            
         // does this_name exist in the vector of names?
         if( std::find( column_names.begin(), column_names.end(), this_name ) != column_names.end() ) {
           // it exists in the vector
-          Rcpp::Rcout << this_name << " exists" << std::endl;
+          //Rcpp::Rcout << this_name << " exists" << std::endl;
+          new_column = false;
         } else {
+          new_column = true;
           // add it to the vector
           Rcpp::Rcout << "adding " << this_name << " as a column " << std::endl;
           column_names.push_back( this_name );
@@ -562,14 +564,14 @@ namespace from_json {
         SEXP this_elem = this_list[ this_name ]; 
         sexp_length = get_sexp_length( this_elem );
         
-        Rcpp::Rcout << "sexp_length " << sexp_length << std::endl;
+        //Rcpp::Rcout << "sexp_length " << sexp_length << std::endl;
         
         int this_type = TYPEOF( this_elem );
         bool is_matrix = Rf_isMatrix( this_elem );
         // bool is_data_frame = Rf_inherits( this_elem, "data.frame" );
         
         // Rcpp::Rcout << "is_data_frame: " << is_data_frame << std::endl;
-        Rcpp::Rcout << "this_type : " << this_type << std::endl;
+        //Rcpp::Rcout << "this_type : " << this_type << std::endl;
         
         
         if( sexp_length > 1 && this_type != VECSXP && !is_matrix ) {
@@ -583,11 +585,11 @@ namespace from_json {
         }
         
         tp = column_value( column_types, this_name );
-        Rcpp::Rcout << "tp: " << tp << std::endl;
+        //Rcpp::Rcout << "tp: " << tp << std::endl;
         st = column_value( column_structs, this_name );
-        Rcpp::Rcout << "st: " << st << std::endl;
+        //Rcpp::Rcout << "st: " << st << std::endl;
         ln = column_value( column_lengths, this_name );
-        Rcpp::Rcout << "ln: " << ln << std::endl;
+        //Rcpp::Rcout << "ln: " << ln << std::endl;
         
         //if( i == 0 && tp >= 0 ) {
         //  // on the first row, but the column already exists
@@ -595,7 +597,8 @@ namespace from_json {
         //}
         
         // only add column types if we're on the first 'row'
-        if( i == 0 ) {
+        //if( i == 0 ) { // TODO; change to be iff we haven't seen this name before
+        if( new_column ) { 
           column_types[ this_name ] = this_type;
           column_structs[ this_name ] = struct_type;
           column_lengths[ this_name ] = sexp_length;
@@ -616,6 +619,10 @@ namespace from_json {
           if( ( struct_type != st || sexp_length != ln ) || ( tp != this_type && struct_type == 2 ) ) {
             column_structs[ this_name ] = 3;
           }
+          
+          // if( sexp_length > ln ) {
+          //   column_lengths[ this_name ] = sexp_length;
+          // }
           
           if( this_type > tp ) {
             column_types[ this_name ] = this_type;
