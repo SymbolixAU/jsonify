@@ -367,7 +367,11 @@ namespace from_json {
         case LGLSXP: {
           Rcpp::LogicalVector lv( n_rows );
           for( i = 0; i < n_rows; i++ ) {
-            lv[i] = lst[i];
+            if( Rf_isNull( lst[i] ) ) {
+              lv[i] = NA_LOGICAL;
+            } else {
+              lv[i] = lst[i];
+            }
           }
           columns[ this_name ] = lv;
           break;
@@ -388,7 +392,11 @@ namespace from_json {
         case REALSXP: {
           Rcpp::NumericVector nv( n_rows );
           for( i = 0; i < n_rows; i++ ) {
-            nv[i] = lst[i];
+            if( Rf_isNull( lst[i] ) ) {
+              nv[i] = NA_REAL;
+            } else {
+              nv[i] = lst[i];
+            }
           }
           columns[ this_name ] = nv;
           break;
@@ -396,10 +404,14 @@ namespace from_json {
         case STRSXP: {
           Rcpp::StringVector sv( n_rows );
           for( i = 0; i < n_rows; i++ ) {
-            SEXP s = lst[i];
-            
-            Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( s );
-            sv[i] = x[0];
+            if( Rf_isNull( lst[i] ) ) {
+              sv[i] = NA_STRING;
+            } else {
+              SEXP s = lst[i];
+              
+              Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( s );
+              sv[i] = x[0];
+            }
           }
           columns[ this_name ] = sv;
           break;
