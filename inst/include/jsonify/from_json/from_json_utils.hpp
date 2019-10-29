@@ -137,9 +137,12 @@ namespace from_json {
     SEXP val,
     R_xlen_t& row_index
   ) {
-    
+    Rcpp::Rcout << "this_column: " << this_column << std::endl;
     Rcpp::List lst = columns[ this_column ];
+    Rcpp::Rcout << "TYPEOF( val ) " << TYPEOF( val ) << std::endl;
     lst[ row_index ] = val;
+    Rcpp::StringVector n = columns.names();
+    Rcpp::Rcout << "column_names: " << n << std::endl;
     columns[ this_column ] = lst;
   }
   
