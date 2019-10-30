@@ -295,7 +295,8 @@ namespace from_json {
       Rcpp::List& columns,
       std::string& this_name,
       int& r_type,
-      int& struct_type // 1 vector, 2 matrix, 3 list
+      int& struct_type, // 1 vector, 2 matrix, 3 list
+      bool na_fill
   ) {
     
     Rcpp::List lst = columns[ this_name.c_str() ];
@@ -417,8 +418,13 @@ namespace from_json {
           break;
         }
         case NILSXP: {
+          //Rcpp::Rcout << "NILSXP" << std::endl;
+        if( !na_fill ) {
+          // if we are filling with NAs, the column will already exist as NAs
+          // (from append_new_column_na_fill)
           Rcpp::Nullable< Rcpp::List >lst_null( n_rows );
           columns[ this_name ] = lst_null;
+        }
           break;
         }
         default: {
@@ -431,69 +437,7 @@ namespace from_json {
     }
   }
 
-  // inline SEXP simplify_dataframe_fill(
-  //   Rcpp::List& out,
-  //   int& doc_len
-  // ) {
-  //   // the number of rows is equal to the number of list elements?
-  //   // the number of columns is equal to the unique names
-  //   R_xlen_t n_rows = out.size();
-  //   R_xlen_t i, j;
-  //   
-  //   // initialise a new list for each column
-  //   // keep track of it's type
-  //   Rcpp::List columns;        // will grow when a new column name is found
-  //   
-  //   std::unordered_map< std::string, int > column_types;
-  //   std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
-  //   std::unordered_map< std::string, int > column_lengths;
-  //   
-  //   int struct_type;
-  //   int sexp_length;
-  //   int tp;
-  //   int st;
-  //   int ln;
-  //   
-  //   Rcpp::StringVector list_names;
-  //   
-  //   // design
-  //   // iterate 
-  //   for( i = 0; i < n_rows; i++ ) {
-  //     // iterating list elements
-  //     Rcpp::List this_list = out[i];
-  //     
-  //     if( !Rf_isNull( this_list.names() ) ) {
-  //       list_names = this_list.names();
-  //     }
-  //     
-  //     R_xlen_t list_size = this_list.size();
-  //     
-  //     if( list_names.size() != list_size || list_size == 0 ) {
-  //       return out;
-  //     }
-  //     
-  //     // Iterate over names??
-  //     for( j = 0; j < list_size; j++ ) { 
-  //       const char* this_name = list_names[j];
-  //       Rcpp::StringVector these_names = this_list.names();
-  //       int found_name = where_is( this_name, these_names );
-  //       
-  //       if( found_name == -1 ) {
-  //         // can't simplify
-  //         return out;
-  //       } 
-  //     }
-  //     
-  //   }
-  //   
-  //   return columns;
-  //   
-  // }
-
-  // iff all the column lengths are the same, and > 1, the whole column can become a matrix
-  // iff all the column lenghts are the same, and == 1, the whole column is a vector
-  // iff any column lenghts are different, it's a list
-  inline SEXP simplify_dataframe(
+  inline SEXP simplify_dataframe_na_fill(
       Rcpp::List& out,
       int& doc_len
   ) {
@@ -523,7 +467,7 @@ namespace from_json {
     
     
     for( i = 0; i < n_rows; i++ ) {
-      Rcpp::Rcout << "i: " << i << std::endl;
+      // Rcpp::Rcout << "i: " << i << std::endl;
       // iterating list elements
       Rcpp::List this_list = out[i];
       //if( i == 0 ) {
@@ -533,8 +477,8 @@ namespace from_json {
       //}
       R_xlen_t list_size = this_list.size();
       
-      Rcpp::Rcout << "list_size " << list_size << std::endl;
-      Rcpp::Rcout << "list_names : " << list_names << std::endl;
+      // Rcpp::Rcout << "list_size " << list_size << std::endl;
+      // Rcpp::Rcout << "list_names : " << list_names << std::endl;
       
       if( list_names.size() != list_size || list_size == 0 ) {
        return out;
@@ -544,7 +488,7 @@ namespace from_json {
       
       // Iterate over names??
       for( j = 0; j < list_size; j++ ) { 
-        Rcpp::Rcout << "j : " << j << std::endl;
+        // Rcpp::Rcout << "j : " << j << std::endl;
         const char* this_name = list_names[j];
         Rcpp::Rcout << "this_name: " << this_name << std::endl;
             
@@ -556,9 +500,9 @@ namespace from_json {
         } else {
           new_column = true;
           // add it to the vector
-          Rcpp::Rcout << "adding " << this_name << " as a column " << std::endl;
+          // Rcpp::Rcout << "adding " << this_name << " as a column " << std::endl;
           column_names.push_back( this_name );
-          append_new_column( columns, this_name, n_rows );
+          append_new_column_na_fill( columns, this_name, n_rows );
         }
 
         SEXP this_elem = this_list[ this_name ]; 
@@ -576,8 +520,8 @@ namespace from_json {
         
         if( sexp_length > 1 && this_type != VECSXP && !is_matrix ) {
           // the object is more than a scalar, but not a list or matrix
-          struct_type = 2; // matrix
-        } else if ( ( i == 0 && this_type == VECSXP ) || is_matrix) {
+          struct_type = 3; // matrix
+        } else if ( this_type == VECSXP || is_matrix) {
           // the object is a list
           struct_type = 3; // list
         } else { 
@@ -620,9 +564,9 @@ namespace from_json {
             column_structs[ this_name ] = 3;
           }
           
-          // if( sexp_length > ln ) {
-          //   column_lengths[ this_name ] = sexp_length;
-          // }
+          if( sexp_length > ln ) {
+            column_lengths[ this_name ] = sexp_length;
+          }
           
           if( this_type > tp ) {
             column_types[ this_name ] = this_type;
@@ -637,21 +581,159 @@ namespace from_json {
       } // for j
     }  // for i
     
-    Rcpp::Rcout << "simplifying lists: " << std::endl;
+    // Rcpp::Rcout << "simplifying lists: " << std::endl;
     for( auto& it: column_types ) {
       
       std::string this_name = it.first;
-      Rcpp::Rcout << "this_name " << this_name << std::endl;
+      // Rcpp::Rcout << "this_name " << this_name << std::endl;
       int r_type = it.second;
-      Rcpp::Rcout << "r_type: " << r_type << std::endl;
+      // Rcpp::Rcout << "r_type: " << r_type << std::endl;
       struct_type = column_value( column_structs, this_name.c_str() );
-      Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
+      // Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
+      if( struct_type == 3 ) {
+        // can it be a data.frame?
+        Rcpp::List lst = columns[ this_name ];
+        columns[ this_name ] = simplify_dataframe_na_fill( lst, doc_len );
+      } else {
+        // Rcpp::Rcout << "list to vector " << std::endl;
+        list_to_vector( columns, this_name, r_type, struct_type, true );  // true: na_fill
+      }
+    }
+    
+    //columns.attr("names") = names;
+    columns.attr("class") = "data.frame";
+    columns.attr("row.names") = Rcpp::seq(1, n_rows);
+    
+    return columns;
+  }
+
+  // iff all the column lengths are the same, and > 1, the whole column can become a matrix
+  // iff all the column lenghts are the same, and == 1, the whole column is a vector
+  // iff any column lenghts are different, it's a list
+  inline SEXP simplify_dataframe(
+      Rcpp::List& out,
+      int& doc_len
+  ) {
+    
+    // the number of rows is equal to the number of list elements?
+    // the number of columns is equal to the unique names
+    R_xlen_t n_rows = out.size();
+    R_xlen_t i, j;
+    
+    // initialise a new list for each column
+    // keep track of it's type
+    Rcpp::List columns;        // will grow when a new column name is found
+    
+    std::unordered_map< std::string, int > column_types;
+    std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
+    std::unordered_map< std::string, int > column_lengths;
+    
+    int struct_type;
+    int sexp_length;
+    int tp;
+    int st;
+    int ln;
+    
+    Rcpp::StringVector list_names;
+    
+    for( i = 0; i < n_rows; i++ ) {
+      // iterating list elements
+      Rcpp::List this_list = out[i];
+      if( i == 0 ) {
+        if( !Rf_isNull( this_list.names() ) ) {
+          list_names = this_list.names();
+        }
+      }
+      R_xlen_t list_size = this_list.size();
+      
+      if( list_names.size() != list_size || list_size == 0 ) {
+        return out;
+      }
+      
+      // Iterate over names??
+      for( j = 0; j < list_size; j++ ) { 
+        const char* this_name = list_names[j];
+        Rcpp::StringVector these_names = this_list.names();
+        int found_name = where_is( this_name, these_names );
+        
+        if( found_name == -1 ) {
+          // can't simplify
+          return out;
+        }
+        
+        SEXP this_elem = this_list[ this_name ]; 
+        sexp_length = get_sexp_length( this_elem );
+        
+        int this_type = TYPEOF( this_elem );
+        bool is_matrix = Rf_isMatrix( this_elem );
+        // bool is_data_frame = Rf_inherits( this_elem, "data.frame" );
+        
+        // Rcpp::Rcout << "is_data_frame: " << is_data_frame << std::endl;
+        
+        if( sexp_length > 1 && this_type != VECSXP && !is_matrix ) {
+          // the object is more than a scalar, but not a list or matrix
+          struct_type = 2; // matrix
+        } else if ( ( i == 0 && this_type == VECSXP ) || is_matrix) {
+          // the object is a list
+          struct_type = 3; // list
+        } else { 
+          struct_type = 1; // scalar-vector
+        }
+        
+        tp = column_value( column_types, this_name );
+        st = column_value( column_structs, this_name );
+        ln = column_value( column_lengths, this_name );
+        
+        if( i == 0 && tp >= 0 ) {
+          // on the first row, but the column already exists
+          return out;
+        }
+        
+        // only add column types if we're on the first 'row'
+        if( i == 0 ) {
+          column_types[ this_name ] = this_type;
+          column_structs[ this_name ] = struct_type;
+          column_lengths[ this_name ] = sexp_length;
+          
+          append_new_column( columns, this_name, n_rows );
+        }
+        
+        if( tp == -1 && i > 0 ) {
+          // can't simplify because new column names"
+          return out;
+        }
+        
+        if( i > 0 && st >= 0 ) {
+          // onto the second row
+          
+          // if this struct_type is different to the previous one, make it a list;
+          // OR, if it's going to be a matrix, but the type is different
+          if( ( struct_type != st || sexp_length != ln ) || ( tp != this_type && struct_type == 2 ) ) {
+            column_structs[ this_name ] = 3;
+          }
+          
+          if( this_type > tp ) {
+            column_types[ this_name ] = this_type;
+          }
+          
+        }
+        
+        // put the element in the correct column slot
+        insert_column_value( columns, this_name, this_elem, i );
+      }
+    }
+    
+    for( auto& it: column_types ) {
+      
+      std::string this_name = it.first;
+      int r_type = it.second;
+      struct_type = column_value( column_structs, this_name.c_str() );
       if( struct_type == 3 ) {
         // can it be a data.frame?
         Rcpp::List lst = columns[ this_name ];
         columns[ this_name ] = simplify_dataframe( lst, doc_len );
       } else {
-        list_to_vector( columns, this_name, r_type, struct_type );
+        list_to_vector( columns, this_name, r_type, struct_type, false );  // false : na_fill
       }
     }
     

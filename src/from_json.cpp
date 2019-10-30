@@ -3,16 +3,9 @@
 
 
 // [[Rcpp::export]]
-SEXP rcpp_from_json(const char * json, bool& simplify ) {
-  return jsonify::api::from_json( json, simplify );
+SEXP rcpp_from_json(const char * json, bool& simplify, bool& na_fill ) {
+  return jsonify::api::from_json( json, simplify, na_fill );
 }
-
-
-// [[Rcpp::export]]
-void rcpp_null_to_na( Rcpp::List& x ) {
-  return jsonify::from_json::null_to_na( x );
-}
-
 
 // [[Rcpp::export]]
 Rcpp::IntegerVector rcpp_get_dtypes( const char * json ) {

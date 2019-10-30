@@ -137,18 +137,25 @@ namespace from_json {
     SEXP val,
     R_xlen_t& row_index
   ) {
-    Rcpp::Rcout << "this_column: " << this_column << std::endl;
     Rcpp::List lst = columns[ this_column ];
-    Rcpp::Rcout << "TYPEOF( val ) " << TYPEOF( val ) << std::endl;
     lst[ row_index ] = val;
     Rcpp::StringVector n = columns.names();
-    Rcpp::Rcout << "column_names: " << n << std::endl;
     columns[ this_column ] = lst;
   }
+  
   
   // here we don't actually care what the type is yet
   // as for now a 'column' is just a list
   inline void append_new_column(
+      Rcpp::List& columns,
+      const char* this_column,
+      R_xlen_t n_rows
+  ) {
+    Rcpp::List new_column( n_rows );
+    columns[ this_column ] = new_column;
+  }
+  
+  inline void append_new_column_na_fill(
     Rcpp::List& columns,
     const char* this_column,
     R_xlen_t n_rows

@@ -6,25 +6,16 @@
 using namespace Rcpp;
 
 // rcpp_from_json
-SEXP rcpp_from_json(const char * json, bool& simplify);
-RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP, SEXP simplifySEXP) {
+SEXP rcpp_from_json(const char * json, bool& simplify, bool& na_fill);
+RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP, SEXP simplifySEXP, SEXP na_fillSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char * >::type json(jsonSEXP);
     Rcpp::traits::input_parameter< bool& >::type simplify(simplifySEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json, simplify));
+    Rcpp::traits::input_parameter< bool& >::type na_fill(na_fillSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json, simplify, na_fill));
     return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_null_to_na
-void rcpp_null_to_na(Rcpp::List& x);
-RcppExport SEXP _jsonify_rcpp_null_to_na(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List& >::type x(xSEXP);
-    rcpp_null_to_na(x);
-    return R_NilValue;
 END_RCPP
 }
 // rcpp_get_dtypes
@@ -84,16 +75,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_read_json_file
-SEXP rcpp_read_json_file(const char* file, const char* mode, bool& simplify, int buffer_size);
-RcppExport SEXP _jsonify_rcpp_read_json_file(SEXP fileSEXP, SEXP modeSEXP, SEXP simplifySEXP, SEXP buffer_sizeSEXP) {
+SEXP rcpp_read_json_file(const char* file, const char* mode, bool& simplify, bool& na_fill, int buffer_size);
+RcppExport SEXP _jsonify_rcpp_read_json_file(SEXP fileSEXP, SEXP modeSEXP, SEXP simplifySEXP, SEXP na_fillSEXP, SEXP buffer_sizeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char* >::type file(fileSEXP);
     Rcpp::traits::input_parameter< const char* >::type mode(modeSEXP);
     Rcpp::traits::input_parameter< bool& >::type simplify(simplifySEXP);
+    Rcpp::traits::input_parameter< bool& >::type na_fill(na_fillSEXP);
     Rcpp::traits::input_parameter< int >::type buffer_size(buffer_sizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_json_file(file, mode, simplify, buffer_size));
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_json_file(file, mode, simplify, na_fill, buffer_size));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -135,14 +127,13 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_jsonify_rcpp_from_json", (DL_FUNC) &_jsonify_rcpp_from_json, 2},
-    {"_jsonify_rcpp_null_to_na", (DL_FUNC) &_jsonify_rcpp_null_to_na, 1},
+    {"_jsonify_rcpp_from_json", (DL_FUNC) &_jsonify_rcpp_from_json, 3},
     {"_jsonify_rcpp_get_dtypes", (DL_FUNC) &_jsonify_rcpp_get_dtypes, 1},
     {"_jsonify_rcpp_simplify_vector", (DL_FUNC) &_jsonify_rcpp_simplify_vector, 3},
     {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
     {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
     {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},
-    {"_jsonify_rcpp_read_json_file", (DL_FUNC) &_jsonify_rcpp_read_json_file, 4},
+    {"_jsonify_rcpp_read_json_file", (DL_FUNC) &_jsonify_rcpp_read_json_file, 5},
     {"_jsonify_source_tests", (DL_FUNC) &_jsonify_source_tests, 0},
     {"_jsonify_rcpp_to_json", (DL_FUNC) &_jsonify_rcpp_to_json, 6},
     {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
