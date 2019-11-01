@@ -1,12 +1,13 @@
 #' From JSON
 #' 
-#' Converts JSON to an R objects
+#' Converts JSON to an R object. 
 #' 
 #' @param json JSON to convert to R object. Can be a string, url or link to a file.
 #' @param simplify logical, if \code{TRUE}, coerces JSON to the simplest R object possible. See Details
 #' @param na_fill logical, if \code{TRUE} and \code{simplify} is \code{TRUE}, 
-#' data.frames will be na-filled if there are missing JSON keys.See examples
-#' @param buffer_size size of buffer used when reading a file from disk. Defaults 1024
+#' data.frames will be na-filled if there are missing JSON keys.
+#' Ignored if \code{simplify} is \code{FALSE}. See details and examples.
+#' @param buffer_size size of buffer used when reading a file from disk. Defaults to 1024
 #' @details 
 #' 
 #' When \code{simplify = TRUE}
@@ -14,6 +15,17 @@
 #'   \item{single arrays are coerced to vectors}
 #'   \item{array of arrays (all the same length) are coerced to matrices}
 #'   \item{objects with the same keys are coerced to data.frames}
+#' }
+#' 
+#' When \code{simplify = TRUE} and \code{na_fill = TRUE}
+#' \itemize{
+#'   \item{objects are coerced to data.frames, and any missing values are filled with NAs}
+#'   \item{objects with duplicates keys, only the first key is returned}
+#' }
+#' 
+#' When \code{simplify = TRUE} and \code{na_fill = FALSE}
+#' \itemize{
+#'   \item{objects with duplicates keys are all returned as list elements}
 #' }
 #' 
 #' @examples 
@@ -26,13 +38,13 @@
 #' js <- jsonify::to_json(lst, unbox = TRUE)
 #' from_json( js )
 #' 
-#' # Return a data frame
+#' ## Return a data frame
 #' from_json('[{"id":1,"val":"a"},{"id":2,"val":"b"}]')
 #' 
-#' #' # Return a data frame with a list column
+#' ## Return a data frame with a list column
 #' from_json('[{"id":1,"val":"a"},{"id":2,"val":["b","c"]}]')
 #' 
-#' # Without simplifying to a data.frame
+#' ## Without simplifying to a data.frame
 #' from_json('[{"id":1,"val":"a"},{"id":2,"val":["b","c"]}]', simplify = FALSE )
 #' 
 #' ## Missing JSON keys 
@@ -40,6 +52,14 @@
 #' 
 #' ## Missing JSON keys - filling with NAs
 #' from_json('[{"x":1},{"x":2,"y":"hello"}]', na_fill = TRUE )
+#' 
+#' ## Duplicate object keys
+#' from_json('[{"x":1,"x":"a"},{"x":2,"x":"b"}]')
+#' 
+#' from_json('[{"id":1,"val":"a","val":1},{"id":2,"val":"b"}]')
+#' 
+#' ## Duplicate object keys using na_fill
+#' from_json('[{"x":1,"x":"a"},{"x":2,"x":"b"}]', na_fill = TRUE )
 #' 
 #' @export
 from_json <- function(json, simplify = TRUE, na_fill = FALSE, buffer_size = 1024 ) {

@@ -147,6 +147,11 @@ test_that("data frame returned properly", {
   js <- jsonify::to_json(target)
   expect_equal(from_json(js), target)
 
+  ## na_fill
+  target <- data.frame(id = c(1,2), val = c("a","b"), val2 = c(1,NA), stringsAsFactors = FALSE)
+  x <- from_json( js, na_fill = TRUE )
+  expect_equal(x, target)
+  
   ## two entries with same key
   target <- list( list(id = 1, val = "a", val = 1), list(id = 2, val = "b"))
   js <- '[{"id":1,"val":"a","val":1},{"id":2,"val":"b"}]'
@@ -155,6 +160,11 @@ test_that("data frame returned properly", {
 
   js <- jsonify::to_json(target)
   expect_equal(from_json(js), target)
+  
+  ## na_fill (on duplicate keys)
+  target <- data.frame(id = c(1,2), val = c("a","b"), stringsAsFactors = FALSE)
+  x <- from_json( js, na_fill = TRUE )
+  expect_equal(x, target)
 
   # Return data frame in which the values in each name are NOT of the same data type.
   target <- data.frame("id" = c("cats", 2L), val = c("a", "b"), stringsAsFactors = FALSE)
