@@ -216,3 +216,11 @@ test_that("data.frame with a matrix-column works", {
   
 })
 
+test_that("issue 55 is solved",{
+  
+  df <- data.frame(string = c("first", NA))
+  js <- to_json( df )
+  expect_equal( as.character( js ), '[{"string":"first"},{"string":null}]')
+  
+})
+

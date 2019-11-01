@@ -40,22 +40,7 @@ namespace complex {
       jsonify::writers::simple::write_value( writer, im, unbox );
     } else {
       Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-      if ( factors_as_string && Rf_isFactor( this_vec ) ) {
-        Rcpp::CharacterVector lvls = iv.attr( "levels" );
-        if( lvls.length() == 0 ) {
-          // no levels - from NA_character_ vector
-          
-          Rcpp::StringVector s(1);
-          s[0] = NA_STRING;
-          int ele = 0;
-          jsonify::writers::simple::write_value( writer, s, ele );
-        } else {
-          Rcpp::StringVector str = Rcpp::as< Rcpp::StringVector >( iv );
-          jsonify::writers::simple::write_value( writer, str, unbox );
-        }
-      } else {
-        jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates, factors_as_string );
-      }
+      jsonify::writers::simple::write_value( writer, iv, unbox, numeric_dates, factors_as_string );
     }
       break;
     }
@@ -115,23 +100,7 @@ namespace complex {
       } else {
         
         Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( this_vec );
-        if( factors_as_string && Rf_isFactor( this_vec ) ) {
-          Rcpp::CharacterVector lvls = iv.attr("levels");
-          if ( lvls.length() == 0 ) {
-            // no levls - from NA_character_ vector
-            
-            Rcpp::StringVector s(1);
-            s[0] = NA_STRING;
-            int ele = 0;
-            jsonify::writers::simple::write_value( writer, s, ele );
-          } else {
-            int this_int = iv[ row ];
-            const char * this_char = lvls[ this_int -1 ];
-            writer.String( this_char );
-          }
-        } else {
-          jsonify::writers::simple::write_value( writer, iv, row, numeric_dates, factors_as_string );
-        }
+        jsonify::writers::simple::write_value( writer, iv, row, numeric_dates, factors_as_string );
       }
       break;
     }

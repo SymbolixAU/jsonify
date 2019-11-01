@@ -380,7 +380,6 @@ namespace from_json {
         case INTSXP: {
           Rcpp::IntegerVector iv( n_rows );
           for( i = 0; i < n_rows; i++ ) {
-            //Rcpp::Rcout << "type of list element " << TYPEOF( lst[i] ) << std::endl;
             if( Rf_isNull( lst[i] ) ) {
               iv[i] = NA_INTEGER;
             } else {
@@ -418,7 +417,6 @@ namespace from_json {
           break;
         }
         case NILSXP: {
-          //Rcpp::Rcout << "NILSXP" << std::endl;
         if( !fill_na ) {
           // if we are filling with NAs, the column will already exist as NAs
           // (from append_new_column_fill_na)
@@ -467,40 +465,30 @@ namespace from_json {
     
     
     for( i = 0; i < n_rows; i++ ) {
-      // Rcpp::Rcout << "i: " << i << std::endl;
       // iterating list elements
       Rcpp::List this_list = out[i];
-      //if( i == 0 ) {
+
        if( !Rf_isNull( this_list.names() ) ) {
          list_names = this_list.names();
        }
-      //}
+
       R_xlen_t list_size = this_list.size();
-      
-      // Rcpp::Rcout << "list_size " << list_size << std::endl;
-      // Rcpp::Rcout << "list_names : " << list_names << std::endl;
       
       if( list_names.size() != list_size || list_size == 0 ) {
        return out;
       }
       
-      //Rcpp::StringVector list_names = this_list.names();
-      
       // Iterate over names??
       for( j = 0; j < list_size; j++ ) { 
-        // Rcpp::Rcout << "j : " << j << std::endl;
         const char* this_name = list_names[j];
-        // Rcpp::Rcout << "this_name: " << this_name << std::endl;
             
         // does this_name exist in the vector of names?
         if( std::find( column_names.begin(), column_names.end(), this_name ) != column_names.end() ) {
           // it exists in the vector
-          //Rcpp::Rcout << this_name << " exists" << std::endl;
           new_column = false;
         } else {
           new_column = true;
           // add it to the vector
-          // Rcpp::Rcout << "adding " << this_name << " as a column " << std::endl;
           column_names.push_back( this_name );
           append_new_column_fill_na( columns, this_name, n_rows );
         }
@@ -508,14 +496,8 @@ namespace from_json {
         SEXP this_elem = this_list[ this_name ]; 
         sexp_length = get_sexp_length( this_elem );
         
-        //Rcpp::Rcout << "sexp_length " << sexp_length << std::endl;
-        
         int this_type = TYPEOF( this_elem );
         bool is_matrix = Rf_isMatrix( this_elem );
-        // bool is_data_frame = Rf_inherits( this_elem, "data.frame" );
-        
-        // Rcpp::Rcout << "is_data_frame: " << is_data_frame << std::endl;
-        //Rcpp::Rcout << "this_type : " << this_type << std::endl;
         
         
         if( sexp_length > 1 && this_type != VECSXP && !is_matrix ) {
@@ -529,33 +511,16 @@ namespace from_json {
         }
         
         tp = column_value( column_types, this_name );
-        //Rcpp::Rcout << "tp: " << tp << std::endl;
         st = column_value( column_structs, this_name );
-        //Rcpp::Rcout << "st: " << st << std::endl;
         ln = column_value( column_lengths, this_name );
-        //Rcpp::Rcout << "ln: " << ln << std::endl;
         
-        //if( i == 0 && tp >= 0 ) {
-        //  // on the first row, but the column already exists
-        //  return out;
-        //}
-        
-        // only add column types if we're on the first 'row'
-        //if( i == 0 ) { // TODO; change to be iff we haven't seen this name before
         if( new_column ) { 
           column_types[ this_name ] = this_type;
           column_structs[ this_name ] = struct_type;
           column_lengths[ this_name ] = sexp_length;
-          // append_new_column( columns, this_name, n_rows );
         }
-        
-        // if( tp == -1 && i > 0 ) {
-        //   // can't simplify because new column names"
-        //   return out;
-        // }
-        
+
         if( i > 0 && st >= 0 ) {
-        //Rcpp::Rcout << "onto other rows" << std::endl;
           // onto the second row
           
           // if this struct_type is different to the previous one, make it a list;
@@ -575,32 +540,24 @@ namespace from_json {
         }
         
         // put the element in the correct column slot
-        //Rcpp::Rcout << "inserting column value " << std::endl;
         insert_column_value( columns, this_name, this_elem, i );
-        //Rcpp::Rcout << "back to top of j " << std::endl;
       } // for j
     }  // for i
     
-    // Rcpp::Rcout << "simplifying lists: " << std::endl;
     for( auto& it: column_types ) {
       
       std::string this_name = it.first;
-      // Rcpp::Rcout << "this_name " << this_name << std::endl;
       int r_type = it.second;
-      // Rcpp::Rcout << "r_type: " << r_type << std::endl;
       struct_type = column_value( column_structs, this_name.c_str() );
-      // Rcpp::Rcout << "struct_type: " << struct_type << std::endl;
       if( struct_type == 3 ) {
         // can it be a data.frame?
         Rcpp::List lst = columns[ this_name ];
         columns[ this_name ] = simplify_dataframe_fill_na( lst, doc_len );
       } else {
-        // Rcpp::Rcout << "list to vector " << std::endl;
         list_to_vector( columns, this_name, r_type, struct_type, true );  // true: fill_na
       }
     }
     
-    //columns.attr("names") = names;
     columns.attr("class") = "data.frame";
     columns.attr("row.names") = Rcpp::seq(1, n_rows);
     
@@ -638,7 +595,6 @@ namespace from_json {
     
     for( i = 0; i < n_rows; i++ ) {
       // iterating list elements
-      // Rcpp::Rcout << "i " << i << std::endl;
       Rcpp::List this_list = out[i];
       if( i == 0 ) {
         if( !Rf_isNull( this_list.names() ) ) {
@@ -653,7 +609,6 @@ namespace from_json {
       
       // Iterate over names??
       for( j = 0; j < list_size; j++ ) { 
-        // Rcpp::Rcout << "j " << j << std::endl;
         const char* this_name = list_names[j];
         Rcpp::StringVector these_names = this_list.names();
         int found_name = where_is( this_name, these_names );

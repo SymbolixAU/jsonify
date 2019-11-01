@@ -211,6 +211,7 @@ namespace simple {
     } else if ( factors_as_string && Rf_isFactor( iv ) ) {
       
       Rcpp::StringVector lvls = iv.attr( "levels" );
+      
       if (lvls.length() == 0 && iv.length() == 0 ) {
         writer.StartArray();
         writer.EndArray();
