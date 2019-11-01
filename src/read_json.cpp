@@ -27,9 +27,9 @@ SEXP rcpp_read_json_file(
   const char* file,
   const char* mode,
   bool& simplify,
-  bool& na_fill,
+  bool& fill_na,
   int buffer_size = 1024
 ) {
   rapidjson::Document d = buffer_string( file, mode, buffer_size );
-  return jsonify::api::from_json( d, simplify, na_fill );
+  return jsonify::api::from_json( d, simplify, fill_na );
 }

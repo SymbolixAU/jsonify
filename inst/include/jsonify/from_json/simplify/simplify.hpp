@@ -296,7 +296,7 @@ namespace from_json {
       std::string& this_name,
       int& r_type,
       int& struct_type, // 1 vector, 2 matrix, 3 list
-      bool na_fill
+      bool fill_na
   ) {
     
     Rcpp::List lst = columns[ this_name.c_str() ];
@@ -419,9 +419,9 @@ namespace from_json {
         }
         case NILSXP: {
           //Rcpp::Rcout << "NILSXP" << std::endl;
-        if( !na_fill ) {
+        if( !fill_na ) {
           // if we are filling with NAs, the column will already exist as NAs
-          // (from append_new_column_na_fill)
+          // (from append_new_column_fill_na)
           Rcpp::Nullable< Rcpp::List >lst_null( n_rows );
           columns[ this_name ] = lst_null;
         }
@@ -437,7 +437,7 @@ namespace from_json {
     }
   }
 
-  inline SEXP simplify_dataframe_na_fill(
+  inline SEXP simplify_dataframe_fill_na(
       Rcpp::List& out,
       int& doc_len
   ) {
@@ -490,7 +490,7 @@ namespace from_json {
       for( j = 0; j < list_size; j++ ) { 
         // Rcpp::Rcout << "j : " << j << std::endl;
         const char* this_name = list_names[j];
-        Rcpp::Rcout << "this_name: " << this_name << std::endl;
+        // Rcpp::Rcout << "this_name: " << this_name << std::endl;
             
         // does this_name exist in the vector of names?
         if( std::find( column_names.begin(), column_names.end(), this_name ) != column_names.end() ) {
@@ -502,7 +502,7 @@ namespace from_json {
           // add it to the vector
           // Rcpp::Rcout << "adding " << this_name << " as a column " << std::endl;
           column_names.push_back( this_name );
-          append_new_column_na_fill( columns, this_name, n_rows );
+          append_new_column_fill_na( columns, this_name, n_rows );
         }
 
         SEXP this_elem = this_list[ this_name ]; 
@@ -593,10 +593,10 @@ namespace from_json {
       if( struct_type == 3 ) {
         // can it be a data.frame?
         Rcpp::List lst = columns[ this_name ];
-        columns[ this_name ] = simplify_dataframe_na_fill( lst, doc_len );
+        columns[ this_name ] = simplify_dataframe_fill_na( lst, doc_len );
       } else {
         // Rcpp::Rcout << "list to vector " << std::endl;
-        list_to_vector( columns, this_name, r_type, struct_type, true );  // true: na_fill
+        list_to_vector( columns, this_name, r_type, struct_type, true );  // true: fill_na
       }
     }
     
@@ -638,6 +638,7 @@ namespace from_json {
     
     for( i = 0; i < n_rows; i++ ) {
       // iterating list elements
+      // Rcpp::Rcout << "i " << i << std::endl;
       Rcpp::List this_list = out[i];
       if( i == 0 ) {
         if( !Rf_isNull( this_list.names() ) ) {
@@ -652,6 +653,7 @@ namespace from_json {
       
       // Iterate over names??
       for( j = 0; j < list_size; j++ ) { 
+        // Rcpp::Rcout << "j " << j << std::endl;
         const char* this_name = list_names[j];
         Rcpp::StringVector these_names = this_list.names();
         int found_name = where_is( this_name, these_names );
@@ -666,9 +668,6 @@ namespace from_json {
         
         int this_type = TYPEOF( this_elem );
         bool is_matrix = Rf_isMatrix( this_elem );
-        // bool is_data_frame = Rf_inherits( this_elem, "data.frame" );
-        
-        // Rcpp::Rcout << "is_data_frame: " << is_data_frame << std::endl;
         
         if( sexp_length > 1 && this_type != VECSXP && !is_matrix ) {
           // the object is more than a scalar, but not a list or matrix
@@ -684,10 +683,10 @@ namespace from_json {
         st = column_value( column_structs, this_name );
         ln = column_value( column_lengths, this_name );
         
-        if( i == 0 && tp >= 0 ) {
+        //if( i == 0 && tp >= 0 ) {
           // on the first row, but the column already exists
-          return out;
-        }
+          //return out;
+        //}
         
         // only add column types if we're on the first 'row'
         if( i == 0 ) {
@@ -733,7 +732,7 @@ namespace from_json {
         Rcpp::List lst = columns[ this_name ];
         columns[ this_name ] = simplify_dataframe( lst, doc_len );
       } else {
-        list_to_vector( columns, this_name, r_type, struct_type, false );  // false : na_fill
+        list_to_vector( columns, this_name, r_type, struct_type, false );  // false : fill_na
       }
     }
     

@@ -14,7 +14,7 @@ namespace api {
   //' @param json const char, JSON string to be parsed. Coming from R, this
   //'  input should be a character vector of length 1.
   //' @export
-  inline SEXP from_json(rapidjson::Value& doc, bool& simplify, bool& na_fill ) {
+  inline SEXP from_json(rapidjson::Value& doc, bool& simplify, bool& fill_na ) {
 
     int sequential_array_counter = 0;
     
@@ -44,10 +44,10 @@ namespace api {
       return x;
     }
     
-    return jsonify::from_json::json_to_sexp( doc, simplify, na_fill, sequential_array_counter );
+    return jsonify::from_json::json_to_sexp( doc, simplify, fill_na, sequential_array_counter );
   }
 
-  inline SEXP from_json( const char* json, bool& simplify, bool& na_fill ) {
+  inline SEXP from_json( const char* json, bool& simplify, bool& fill_na ) {
     rapidjson::Document doc;
     doc.Parse(json);
 
@@ -56,7 +56,7 @@ namespace api {
       Rcpp::stop("json parse error");
     }
     
-    return from_json( doc, simplify, na_fill );
+    return from_json( doc, simplify, fill_na );
   }
 
 }

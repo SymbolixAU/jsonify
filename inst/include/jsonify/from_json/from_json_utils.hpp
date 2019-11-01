@@ -155,7 +155,7 @@ namespace from_json {
     columns[ this_column ] = new_column;
   }
   
-  inline void append_new_column_na_fill(
+  inline void append_new_column_fill_na(
     Rcpp::List& columns,
     const char* this_column,
     R_xlen_t n_rows

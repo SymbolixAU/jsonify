@@ -174,3 +174,39 @@ microbenchmark(
 #     expr      min       lq     mean   median       uq      max neval
 # jsonlite 1.433624 1.486971 1.631894 1.537450 1.563000 2.138424     5
 #  jsonify 1.510242 1.528668 1.920362 1.531584 1.877338 3.153977     5
+
+## Filling NAs
+rm(list=ls()); gc()
+set.seed(20191012)
+n <- 1e5
+df <- data.frame(
+  id = 1:n
+  , value = sample(letters, size = n, replace = T)
+  , val2 = rnorm(n = n)
+  , log = sample(c(T,F), size = n, replace = T)
+  #, dte = sample(seq(as.Date("2018-01-01"), as.Date("2018-01-31"), length.out = n), size = n, replace = T)
+)
+
+df[sample(1:n, size = n / 3), 'id'] <- NA_integer_
+df[sample(1:n, size = n / 3), 'val2'] <- NA_real_
+df[sample(1:n, size = n / 3), 'log'] <- NA
+
+js <- jsonlite::toJSON( df )
+
+microbenchmark(
+  jsonify = {
+    jfy <- from_json( js, fill_na = TRUE )
+  },
+  jsonlite = {
+    jlt <- jsonlite::fromJSON( js )  
+  },
+  times = 5
+)
+
+# Unit: milliseconds
+#      expr      min       lq     mean   median       uq      max neval
+#  jsonify 798.3926 1079.845 1217.471 1348.545 1372.726 1487.848     5
+# jsonlite 976.6249 1043.940 1190.661 1056.836 1416.410 1459.494     5
+
+
+

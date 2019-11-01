@@ -6,15 +6,15 @@
 using namespace Rcpp;
 
 // rcpp_from_json
-SEXP rcpp_from_json(const char * json, bool& simplify, bool& na_fill);
-RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP, SEXP simplifySEXP, SEXP na_fillSEXP) {
+SEXP rcpp_from_json(const char * json, bool& simplify, bool& fill_na);
+RcppExport SEXP _jsonify_rcpp_from_json(SEXP jsonSEXP, SEXP simplifySEXP, SEXP fill_naSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char * >::type json(jsonSEXP);
     Rcpp::traits::input_parameter< bool& >::type simplify(simplifySEXP);
-    Rcpp::traits::input_parameter< bool& >::type na_fill(na_fillSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json, simplify, na_fill));
+    Rcpp::traits::input_parameter< bool& >::type fill_na(fill_naSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_from_json(json, simplify, fill_na));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -75,17 +75,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_read_json_file
-SEXP rcpp_read_json_file(const char* file, const char* mode, bool& simplify, bool& na_fill, int buffer_size);
-RcppExport SEXP _jsonify_rcpp_read_json_file(SEXP fileSEXP, SEXP modeSEXP, SEXP simplifySEXP, SEXP na_fillSEXP, SEXP buffer_sizeSEXP) {
+SEXP rcpp_read_json_file(const char* file, const char* mode, bool& simplify, bool& fill_na, int buffer_size);
+RcppExport SEXP _jsonify_rcpp_read_json_file(SEXP fileSEXP, SEXP modeSEXP, SEXP simplifySEXP, SEXP fill_naSEXP, SEXP buffer_sizeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const char* >::type file(fileSEXP);
     Rcpp::traits::input_parameter< const char* >::type mode(modeSEXP);
     Rcpp::traits::input_parameter< bool& >::type simplify(simplifySEXP);
-    Rcpp::traits::input_parameter< bool& >::type na_fill(na_fillSEXP);
+    Rcpp::traits::input_parameter< bool& >::type fill_na(fill_naSEXP);
     Rcpp::traits::input_parameter< int >::type buffer_size(buffer_sizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_json_file(file, mode, simplify, na_fill, buffer_size));
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_json_file(file, mode, simplify, fill_na, buffer_size));
     return rcpp_result_gen;
 END_RCPP
 }

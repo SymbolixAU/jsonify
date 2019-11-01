@@ -12,7 +12,7 @@ namespace from_json {
   inline SEXP json_to_sexp(
     const rapidjson::Value& json,
     bool& simplify,
-    bool& na_fill,
+    bool& fill_na,
     int sequential_array_counter
   ) {
 
@@ -79,11 +79,11 @@ namespace from_json {
         // array
         case rapidjson::kArrayType: {
           const rapidjson::Value& temp_array = itr->value;
-          out[i] = json_to_sexp( temp_array, simplify, na_fill, sequential_array_counter );
+          out[i] = json_to_sexp( temp_array, simplify, fill_na, sequential_array_counter );
           break;
         }
         case rapidjson::kObjectType: {
-          out[i] = json_to_sexp( itr->value, simplify, na_fill, sequential_array_counter );
+          out[i] = json_to_sexp( itr->value, simplify, fill_na, sequential_array_counter );
           break;
         }
 
@@ -150,7 +150,7 @@ namespace from_json {
         }
         // array
         case rapidjson::kArrayType: {
-          array_of_array[i] = json_to_sexp( json[i], simplify, na_fill, sequential_array_counter );
+          array_of_array[i] = json_to_sexp( json[i], simplify, fill_na, sequential_array_counter );
           sequential_array_counter++;
           break;
         }
@@ -158,7 +158,7 @@ namespace from_json {
         case rapidjson::kObjectType: {
           sequential_array_counter = 0;
           const rapidjson::Value& temp_val = json[i];
-          array_of_array[i] = json_to_sexp( temp_val, simplify, na_fill, sequential_array_counter );
+          array_of_array[i] = json_to_sexp( temp_val, simplify, fill_na, sequential_array_counter );
           break;
         }
         default: {
@@ -173,8 +173,8 @@ namespace from_json {
 
       } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) && simplify ) {
         
-        if( na_fill ) {
-          res[0] = jsonify::from_json::simplify_dataframe_na_fill( array_of_array, json_length );
+        if( fill_na ) {
+          res[0] = jsonify::from_json::simplify_dataframe_fill_na( array_of_array, json_length );
         } else {
           res[0] = jsonify::from_json::simplify_dataframe( array_of_array, json_length );
         }

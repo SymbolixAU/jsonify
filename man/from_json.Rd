@@ -4,18 +4,18 @@
 \alias{from_json}
 \title{From JSON}
 \usage{
-from_json(json, simplify = TRUE, na_fill = FALSE, buffer_size = 1024)
+from_json(json, simplify = TRUE, fill_na = FALSE, buffer_size = 1024)
 }
 \arguments{
 \item{json}{JSON to convert to R object. Can be a string, url or link to a file.}
 
 \item{simplify}{logical, if \code{TRUE}, coerces JSON to the simplest R object possible. See Details}
 
-\item{na_fill}{logical, if \code{TRUE} and \code{simplify} is \code{TRUE}, 
+\item{fill_na}{logical, if \code{TRUE} and \code{simplify} is \code{TRUE}, 
 data.frames will be na-filled if there are missing JSON keys.
-Ignored if \code{simplify} is \code{FALSE}. See examples}
+Ignored if \code{simplify} is \code{FALSE}. See details and examples.}
 
-\item{buffer_size}{size of buffer used when reading a file from disk. Defaults 1024}
+\item{buffer_size}{size of buffer used when reading a file from disk. Defaults to 1024}
 }
 \description{
 Converts JSON to an R object.
@@ -28,15 +28,9 @@ When \code{simplify = TRUE}
   \item{objects with the same keys are coerced to data.frames}
 }
 
-When \code{simplify = TRUE} and \code{na_fill = TRUE}
+When \code{simplify = TRUE} and \code{fill_na = TRUE}
 \itemize{
-  \item{objects are coerced to data.frames, and any missing keys are filled with NAs}
-  \item{objects with duplicates keys, only the first key is returned}
-}
-
-When \code{simplify = TRUE} and \code{na_fill = FALSE}
-\itemize{
-  \item{objects with duplicates keys are all returned as list elements}
+  \item{objects are coerced to data.frames, and any missing values are filled with NAs}
 }
 }
 \examples{
@@ -49,27 +43,25 @@ lst <- list("a" = 5L, "b" = 1.43, "c" = "cats", "d" = FALSE)
 js <- jsonify::to_json(lst, unbox = TRUE)
 from_json( js )
 
-# Return a data frame
+## Return a data frame
 from_json('[{"id":1,"val":"a"},{"id":2,"val":"b"}]')
 
-#' # Return a data frame with a list column
+## Return a data frame with a list column
 from_json('[{"id":1,"val":"a"},{"id":2,"val":["b","c"]}]')
 
-# Without simplifying to a data.frame
+## Without simplifying to a data.frame
 from_json('[{"id":1,"val":"a"},{"id":2,"val":["b","c"]}]', simplify = FALSE )
 
 ## Missing JSON keys 
 from_json('[{"x":1},{"x":2,"y":"hello"}]')
 
 ## Missing JSON keys - filling with NAs
-from_json('[{"x":1},{"x":2,"y":"hello"}]', na_fill = TRUE )
+from_json('[{"x":1},{"x":2,"y":"hello"}]', fill_na = TRUE )
 
 ## Duplicate object keys
 from_json('[{"x":1,"x":"a"},{"x":2,"x":"b"}]')
 
-from_json('[{"id":1,"val":"a","val":1},{"id":2,"val":"b"}]')
+from_json('[{"id":1,"val":"a","val":1},{"id":2,"val":"b"}]', fill_na = TRUE )
 
-## Duplicate object keys using na_fill
-from_json('[{"x":1,"x":"a"},{"x":2,"x":"b"}]', na_fill = TRUE )
 
 }

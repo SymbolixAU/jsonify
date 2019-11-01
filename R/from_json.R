@@ -4,7 +4,7 @@
 #' 
 #' @param json JSON to convert to R object. Can be a string, url or link to a file.
 #' @param simplify logical, if \code{TRUE}, coerces JSON to the simplest R object possible. See Details
-#' @param na_fill logical, if \code{TRUE} and \code{simplify} is \code{TRUE}, 
+#' @param fill_na logical, if \code{TRUE} and \code{simplify} is \code{TRUE}, 
 #' data.frames will be na-filled if there are missing JSON keys.
 #' Ignored if \code{simplify} is \code{FALSE}. See details and examples.
 #' @param buffer_size size of buffer used when reading a file from disk. Defaults to 1024
@@ -17,15 +17,9 @@
 #'   \item{objects with the same keys are coerced to data.frames}
 #' }
 #' 
-#' When \code{simplify = TRUE} and \code{na_fill = TRUE}
+#' When \code{simplify = TRUE} and \code{fill_na = TRUE}
 #' \itemize{
 #'   \item{objects are coerced to data.frames, and any missing values are filled with NAs}
-#'   \item{objects with duplicates keys, only the first key is returned}
-#' }
-#' 
-#' When \code{simplify = TRUE} and \code{na_fill = FALSE}
-#' \itemize{
-#'   \item{objects with duplicates keys are all returned as list elements}
 #' }
 #' 
 #' @examples 
@@ -51,30 +45,28 @@
 #' from_json('[{"x":1},{"x":2,"y":"hello"}]')
 #' 
 #' ## Missing JSON keys - filling with NAs
-#' from_json('[{"x":1},{"x":2,"y":"hello"}]', na_fill = TRUE )
+#' from_json('[{"x":1},{"x":2,"y":"hello"}]', fill_na = TRUE )
 #' 
 #' ## Duplicate object keys
 #' from_json('[{"x":1,"x":"a"},{"x":2,"x":"b"}]')
 #' 
-#' from_json('[{"id":1,"val":"a","val":1},{"id":2,"val":"b"}]')
+#' from_json('[{"id":1,"val":"a","val":1},{"id":2,"val":"b"}]', fill_na = TRUE )
 #' 
-#' ## Duplicate object keys using na_fill
-#' from_json('[{"x":1,"x":"a"},{"x":2,"x":"b"}]', na_fill = TRUE )
 #' 
 #' @export
-from_json <- function(json, simplify = TRUE, na_fill = FALSE, buffer_size = 1024 ) {
-  json_to_r( json, simplify, na_fill, buffer_size )
+from_json <- function(json, simplify = TRUE, fill_na = FALSE, buffer_size = 1024 ) {
+  json_to_r( json, simplify, fill_na, buffer_size )
 }
 
-json_to_r <- function( json, simplify = TRUE, na_fill = FALSE, buffer_size ) {
+json_to_r <- function( json, simplify = TRUE, fill_na = FALSE, buffer_size ) {
   UseMethod("json_to_r")
 }
 
 #' @export
-json_to_r.character <- function( json, simplify = TRUE, na_fill, buffer_size ) {
+json_to_r.character <- function( json, simplify = TRUE, fill_na, buffer_size ) {
   if( is_url( json ) ) {
     return(
-      json_to_r( url( json ), simplify, na_fill, buffer_size )
+      json_to_r( url( json ), simplify, fill_na, buffer_size )
     )
   } else if ( file.exists( json ) ) {
     return(
@@ -82,26 +74,26 @@ json_to_r.character <- function( json, simplify = TRUE, na_fill, buffer_size ) {
         normalizePath( json )
         , get_download_mode()
         , simplify
-        , na_fill
+        , fill_na
         , buffer_size
       )
     )
   }
-  return( rcpp_from_json( json, simplify, na_fill ) )
+  return( rcpp_from_json( json, simplify, fill_na ) )
 }
 
 #' @export
-json_to_r.connection <- function( json, simplify = TRUE, na_fill, buffer_size ) {
-  json_to_r( read_url( json ), simplify, na_fill, buffer_size )
+json_to_r.connection <- function( json, simplify = TRUE, fill_na, buffer_size ) {
+  json_to_r( read_url( json ), simplify, fill_na, buffer_size )
 }
 
 #' @export
-json_to_r.json <- function( json, simplify = TRUE, na_fill, buffer_size ) {
-  rcpp_from_json( json, simplify, na_fill )
+json_to_r.json <- function( json, simplify = TRUE, fill_na, buffer_size ) {
+  rcpp_from_json( json, simplify, fill_na )
 }
 
 #' @export
-json_to_r.default <- function( json, simplify = TRUE, na_fill, buffer_size ) {
+json_to_r.default <- function( json, simplify = TRUE, fill_na, buffer_size ) {
   stop("jsonify - expecting a JSON string, url or file")
 }
 

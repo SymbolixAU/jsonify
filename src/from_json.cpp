@@ -3,8 +3,8 @@
 
 
 // [[Rcpp::export]]
-SEXP rcpp_from_json(const char * json, bool& simplify, bool& na_fill ) {
-  return jsonify::api::from_json( json, simplify, na_fill );
+SEXP rcpp_from_json(const char * json, bool& simplify, bool& fill_na ) {
+  return jsonify::api::from_json( json, simplify, fill_na );
 }
 
 // [[Rcpp::export]]
