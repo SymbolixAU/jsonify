@@ -13,7 +13,7 @@ namespace from_json {
 
   inline int where_is(
       Rcpp::String to_find,
-      Rcpp::StringVector& sv ) {
+      Rcpp::CharacterVector& sv ) {
     int n = sv.size();
     int i;
     for( i = 0; i < n; i++ ) {
@@ -139,7 +139,7 @@ namespace from_json {
   ) {
     Rcpp::List lst = columns[ this_column ];
     lst[ row_index ] = val;
-    Rcpp::StringVector n = columns.names();
+    Rcpp::CharacterVector n = columns.names();
     columns[ this_column ] = lst;
   }
   

@@ -59,9 +59,9 @@ namespace from_json {
     }
     default: {
       
-      Rcpp::StringVector sv( vec_length );
+      Rcpp::CharacterVector sv( vec_length );
       for( i = 0; i < vec_length; counter++, i+= n ) {
-        Rcpp::StringVector this_vec = x[ counter ];
+        Rcpp::CharacterVector this_vec = x[ counter ];
         std::copy( this_vec.begin(), this_vec.end(), sv.begin() + i );
       }
       
@@ -232,14 +232,14 @@ namespace from_json {
       //   Rcpp::StringMatrix mat( n_row, n_col );
       //   //if by == col
       //   for(int i = 0; i < n_col; i++ ) {
-      //     Rcpp::StringVector this_vec = out[i];
+      //     Rcpp::CharacterVector this_vec = out[i];
       //     mat( Rcpp::_, i ) = this_vec;
       //   }
       //   return mat;
       // } else {
-      Rcpp::StringMatrix mat( n_row, n_col );
+      Rcpp::CharacterMatrix mat( n_row, n_col );
       for( int i = 0; i < n_row; i++ ) {
-        Rcpp::StringVector this_vec = out[i];
+        Rcpp::CharacterVector this_vec = out[i];
         for( int j = 0; j < n_col; j++ ) {
           Rcpp::String this_val = this_vec[j];
           mat( i, j ) = this_val;
@@ -343,9 +343,9 @@ namespace from_json {
           break;
         }
         case STRSXP: {
-          Rcpp::StringMatrix m( n_rows, n_cols );
+          Rcpp::CharacterMatrix m( n_rows, n_cols );
           for( i = 0; i < n_rows; i++ ) {
-            Rcpp::StringVector v = Rcpp::as< Rcpp::StringVector >( lst[i] );
+            Rcpp::CharacterVector v = Rcpp::as< Rcpp::CharacterVector >( lst[i] );
             m( i, Rcpp::_ ) = v;
           }
           columns[ this_name ] = m;
@@ -402,14 +402,14 @@ namespace from_json {
           break;
         }
         case STRSXP: {
-          Rcpp::StringVector sv( n_rows );
+          Rcpp::CharacterVector sv( n_rows );
           for( i = 0; i < n_rows; i++ ) {
             if( Rf_isNull( lst[i] ) ) {
               sv[i] = NA_STRING;
             } else {
               SEXP s = lst[i];
               
-              Rcpp::StringVector x = Rcpp::as< Rcpp::StringVector >( s );
+              Rcpp::CharacterVector x = Rcpp::as< Rcpp::CharacterVector >( s );
               sv[i] = x[0];
             }
           }
@@ -459,7 +459,7 @@ namespace from_json {
     int st;
     int ln;
     
-    Rcpp::StringVector list_names;
+    Rcpp::CharacterVector list_names;
     std::vector< std::string > column_names;
     bool new_column = true;
     
@@ -591,7 +591,7 @@ namespace from_json {
     int st;
     int ln;
     
-    Rcpp::StringVector list_names;
+    Rcpp::CharacterVector list_names;
     
     for( i = 0; i < n_rows; i++ ) {
       // iterating list elements
@@ -610,7 +610,7 @@ namespace from_json {
       // Iterate over names??
       for( j = 0; j < list_size; j++ ) { 
         const char* this_name = list_names[j];
-        Rcpp::StringVector these_names = this_list.names();
+        Rcpp::CharacterVector these_names = this_list.names();
         int found_name = where_is( this_name, these_names );
         
         if( found_name == -1 ) {
