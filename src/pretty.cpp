@@ -8,9 +8,6 @@ using namespace Rcpp;
 #include "rapidjson/stringbuffer.h"
 
 
-#include "R_ext/Riconv.h"
-
-
 // reference: https://stackoverflow.com/questions/40833243/rapidjson-pretty-print-using-json-string-as-input-to-the-writer
 
 // [[Rcpp::export]]
