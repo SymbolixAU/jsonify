@@ -175,6 +175,26 @@ microbenchmark(
 # jsonlite 1.433624 1.486971 1.631894 1.537450 1.563000 2.138424     5
 #  jsonify 1.510242 1.528668 1.920362 1.531584 1.877338 3.153977     5
 
+url <- 'https://github.com/SymbolixAU/data/blob/master/geojson/SA1_2016_VIC.json?raw=true'
+
+js <- readLines(url)
+
+microbenchmark(
+  jsonify = {
+    jfy <- jsonify::from_json( js )
+  },
+  jsonlite = {
+    jlt <- jsonlite::fromJSON( js )
+  },
+  times = 5
+)
+
+# Unit: seconds
+#      expr      min        lq      mean    median        uq       max neval
+#  jsonify  4.14308  4.248493  4.589085  4.298684  5.016845  5.238324     5
+# jsonlite 38.72263 40.025316 40.089307 40.373840 40.646151 40.678591     5
+
+
 ## Filling NAs
 rm(list=ls()); gc()
 set.seed(20191012)

@@ -2,9 +2,17 @@
 title: "jsonify"
 author: "David Cooley"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+    html_document:
+        toc: true
+        toc_float: true
+        number_sections: false
+        theme: flatly
+header-includes: 
+    - \usepackage{tikz}
+    - \usetikzlibrary{arrows}
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Jsonify}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,6 +25,8 @@ knitr::opts_chunk$set(
 
 library(jsonify)
 ```
+
+# To JSON
 
 There are two types of R objects we need to handle when converting to JSON, simple and complex.
 
@@ -143,5 +153,51 @@ df
 pretty_json( df )
 
 ```
+
+# From JSON
+
+Use `from_json()` to convert from JSON to an R object. 
+
+
+```{r}
+## scalar / vector
+js <- '[1,2,3]'
+from_json( js )
+
+## matrix
+js <- '[[1,2],[3,4],[5,6]]'
+from_json( js )
+
+## data.frame
+js <- '[{"x":1,"y":"a"},{"x":2,"y":"b"}]'
+from_json( js )
+```
+
+## Simplifying and NAs
+
+By default `from_json()` will try and simplify 
+
+- arrays to vectors
+- arrays of arrays to matrices
+- array of objects with consistent key-value pairs to data.frames
+
+If an array contains objects with different keys, for example `'[{"x":1},{"y":2}]'`, `from_json()` will not simplify this to a data.frame, because it would have to assume and insert `NA`s in rows where data is missing. 
+
+```{r}
+js <- '[{"x":1},{"y":2}]'
+from_json( js )
+```
+
+You can override this default and use `fill_na = TRUE` to force it to a data.frame with `NA`s in place of missing values
+
+```{r}
+js <- '[{"x":1},{"y":2}]'
+from_json( js, fill_na = TRUE )
+```
+
+
+
+
+
 
 

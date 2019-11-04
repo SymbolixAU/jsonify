@@ -36,26 +36,6 @@ test_that("R Lists simplified to vectors",{
 
 test_that("simplify types",{
   
-  ## tests function only works for arrays
-  
-  ## mapping
-  # 0 - null
-  # 1 - false
-  # 2 - true
-  # 3 - object
-  # 4 - array
-  # 5 - string
-  # 6 - number 
-  #   - 8 - int
-  #   - 9 - double
-  
-  ## Simplification rules (oposite of 'to_json')
-  ## 1. array -> vector
-  ## 2. array of arrays (of arrays of arrays ... ) 
-  ##  - each array is a vector (as per 1.)
-  ##  - each vector becomes a list element
-  ##  - 
-  
   x <- 1:4
   js <- to_json( x )
   #js
@@ -137,10 +117,6 @@ test_that("arrays of arrays of same length go to matrix",{
   x <- from_json( js )
   expect_equal(x, matrix(1:6, ncol = 2, byrow = T ) )
   
-  # x <- from_json( js, by = "col" )
-  # expect_equal(x, matrix(1:6, ncol = 2, byrow = F ) )
-  
-  
 })
 
 test_that("array of arrays of different lenghts go to list",{
@@ -148,9 +124,7 @@ test_that("array of arrays of different lenghts go to list",{
   js <- '[[1,2],[1,2,3]]'
   x <- from_json( js )
   expect_equal( x, list(1:2, 1:3))
-  
-  ## TODO
-  ## - 
+
   js <- '[[5,[6,7]]]'
   x <- from_json( js )
   expect_equal( x, list( list( 5, 6:7 )  ) ) 
@@ -158,9 +132,6 @@ test_that("array of arrays of different lenghts go to list",{
   js <- '[[5,[6,"a"]]]'
   x <- from_json( js )
   expect_equal( x, list( list( 5, c("6","a") )  ) )
-  
-  ## compare with 
-  # jsonlite::fromJSON( js )
   
   js <- '[[1,2],[3,4],[5,[6,7]]]'
   x <- from_json( js )
@@ -177,6 +148,4 @@ test_that("array of various types converted to matrices",{
   x <- from_json( js )
   expect_equal(x, matrix(c(1.1,2,3,4), ncol = 2, byrow = T ) )
 })
-
-
 

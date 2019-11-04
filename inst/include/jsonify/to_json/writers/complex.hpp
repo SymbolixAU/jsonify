@@ -188,18 +188,8 @@ namespace complex {
           const char *h = column_names[ df_col ];
           writer.String( h );
           SEXP this_vec = df[ h ];
+          write_value( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, by, -1, in_data_frame );
           
-          // switch( TYPEOF( this_vec ) ) {
-          // case VECSXP: {
-            write_value( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, by, -1, in_data_frame );
-          //   break;
-          // }
-          // default: {
-          //   Rcpp::Rcout << "by column default" << std::endl;
-          //   // if it's a matrix, or another data.frame??
-          //   switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string );
-          // }
-          // }
         }
         writer.EndObject();
         
@@ -321,7 +311,7 @@ namespace complex {
               const char *s = list_names[ i ];
               writer.String( s );
             }
-            // setting in_data_frame to false becaseu we're no longer at the data.frame top-level
+            // setting in_data_frame to false because we're no longer at the data.frame top-level
             write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by, -1, false ); 
           }
           

@@ -653,7 +653,7 @@ namespace from_json {
         }
         
         if( tp == -1 && i > 0 ) {
-          // can't simplify because new column names"
+          // can't simplify because new column names
           return out;
         }
         

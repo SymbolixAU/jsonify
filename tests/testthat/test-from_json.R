@@ -403,12 +403,7 @@ test_that("round trips work", {
   x <- list(x = 1, y = letters)
   expect_identical( f1(x), x )
   expect_identical( f2(x), x )
-
-  # # TODO
-  # x <- list(1L, "cats", 3L, NA)
-  # expect_identical( f1(x), x )
-  # expect_identical( f2(x), x )
-
+  
   x <- data.frame(
     "col1" = c(1, 2),
     "col2" = c(1L, 2L),
@@ -418,7 +413,11 @@ test_that("round trips work", {
   )
   expect_identical( f1(x), x )
 
-
+  
+  x <- list(1L, "cats", 3L, NA)
+  f2 <- function( x ) from_json( to_json( x, unbox = TRUE ), simplify = FALSE )
+  expect_identical( f2(x), x )
+  
 })
 
 
