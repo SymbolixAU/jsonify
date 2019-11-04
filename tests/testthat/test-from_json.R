@@ -420,5 +420,16 @@ test_that("round trips work", {
   
 })
 
+test_that("UTF-8 encoding is not mangled", {
+  skip_if_not(Sys.info()['sysname'] == "Windows")
+  
+  example_json <- '{"name":"回收站","arabic_alphabet":"غ ظ ض ذ خ ث ت ش ر ق ص ف ع س ن م ل ك ي ط ح ز و ه د ج ب أ"}'
+
+  expect_identical(
+    from_json(example_json),
+    list(name = "回收站",
+         arabic_alphabet = "غ ظ ض ذ خ ث ت ش ر ق ص ف ع س ن م ل ك ي ط ح ز و ه د ج ب أ")
+  )
+})
 
 
