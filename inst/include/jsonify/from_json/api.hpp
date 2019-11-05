@@ -34,7 +34,7 @@ namespace api {
     
     if( doc.IsString() ) {
       Rcpp::CharacterVector x(1);
-      x[0] = doc.GetString();
+      x[0] = Rcpp::String(doc.GetString());
       return x;
     }
     

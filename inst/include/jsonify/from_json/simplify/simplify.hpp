@@ -106,7 +106,7 @@ namespace from_json {
         
         // string
       case rapidjson::kStringType: {
-        out[i] = array[i].GetString();
+        out[i] = Rcpp::String(array[i].GetString());
         r_type = STRSXP > r_type ? STRSXP : r_type;
         break;
       }

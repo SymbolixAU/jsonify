@@ -32,7 +32,9 @@ namespace utils {
 
 
   inline Rcpp::StringVector finalise_json( rapidjson::StringBuffer& sb ) {
-    Rcpp::StringVector js = sb.GetString();
+    Rcpp::StringVector js(1);
+    js[0] = Rcpp::String(sb.GetString());
+    
     js.attr("class") = "json";
     return js;
   }

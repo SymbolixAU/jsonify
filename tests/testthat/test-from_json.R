@@ -420,5 +420,32 @@ test_that("round trips work", {
   
 })
 
-
-
+test_that("UTF-8 encoding is not mangled", {
+  test_list <- list(
+    id = c("回", "站"),
+    val = list("收", c("غ ظ ض ذ خ ث ت ش ر ق ص ف ع س ن" ,
+                      "م ل ك ي ط ح ز و ه د ج ب أ"))
+  )
+  
+  test_df <- structure(test_list,
+                       row.names = 1:2,
+                       class = "data.frame")
+  
+  test_json_df <- '[{"id":"回","val":"收"},{"id":"站","val":["غ ظ ض ذ خ ث ت ش ر ق ص ف ع س ن","م ل ك ي ط ح ز و ه د ج ب أ"]}]'
+  
+  
+  expect_identical(
+    from_json(to_json(test_list)),
+    test_list
+  )
+  
+  expect_identical(
+    from_json(test_json_df),
+    test_df
+  )
+  
+  expect_identical(
+    from_json(to_json(test_df)),
+    test_df
+  )
+})

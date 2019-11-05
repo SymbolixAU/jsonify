@@ -7,6 +7,7 @@ using namespace Rcpp;
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 
+
 // reference: https://stackoverflow.com/questions/40833243/rapidjson-pretty-print-using-json-string-as-input-to-the-writer
 
 // [[Rcpp::export]]
@@ -19,7 +20,9 @@ Rcpp::StringVector rcpp_pretty_json( const char* json ) {
   rapidjson::PrettyWriter< rapidjson::StringBuffer > writer(sb);
   d.Accept(writer);
   
-  Rcpp::StringVector js = sb.GetString();
+  Rcpp::StringVector js(1);
+  js[0] = Rcpp::String(sb.GetString());
+  
   js.attr("class") = "json";
   return js;
 }
@@ -34,7 +37,9 @@ Rcpp::StringVector rcpp_minify_json( const char* json ) {
   rapidjson::Writer< rapidjson::StringBuffer > writer(sb);
   d.Accept(writer);
   
-  Rcpp::StringVector js = sb.GetString();
+  Rcpp::StringVector js(1);
+  js[0] = Rcpp::String(sb.GetString());
+  
   js.attr("class") = "json";
   return js;
 }

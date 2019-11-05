@@ -46,7 +46,7 @@ namespace from_json {
       for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
 
         // Get current key
-        names[i] = itr->name.GetString();
+        names[i] = Rcpp::String(itr->name.GetString());
 
         // Get current value
         switch(itr->value.GetType()) {
@@ -60,7 +60,7 @@ namespace from_json {
 
           // string
         case rapidjson::kStringType: {
-          out[i] = itr->value.GetString();
+          out[i] = Rcpp::String(itr->value.GetString());
           break;
         }
 
@@ -133,7 +133,7 @@ namespace from_json {
         }
         case rapidjson::kStringType: {
           sequential_array_counter = 0;
-          array_of_array[i] = json[i].GetString();
+          array_of_array[i] = Rcpp::String(json[i].GetString());
           break;
         }
         // numeric
