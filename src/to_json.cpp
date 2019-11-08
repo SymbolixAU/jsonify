@@ -13,3 +13,10 @@ Rcpp::StringVector rcpp_to_json( SEXP lst, bool unbox = false, int digits = -1,
   return jsonify::api::to_json( lst, unbox, digits, numeric_dates, factors_as_string, by );
 }
 
+// [[Rcpp::export]]
+Rcpp::StringVector rcpp_to_ndjson(
+  SEXP lst, bool unbox = false, int digits = -1, bool numeric_dates = true,
+  bool factors_as_string = true, std::string by = "row"
+) {
+  
+}

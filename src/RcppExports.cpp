@@ -114,6 +114,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_to_ndjson
+Rcpp::StringVector rcpp_to_ndjson(SEXP lst, bool unbox, int digits, bool numeric_dates, bool factors_as_string, std::string by);
+RcppExport SEXP _jsonify_rcpp_to_ndjson(SEXP lstSEXP, SEXP unboxSEXP, SEXP digitsSEXP, SEXP numeric_datesSEXP, SEXP factors_as_stringSEXP, SEXP bySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type lst(lstSEXP);
+    Rcpp::traits::input_parameter< bool >::type unbox(unboxSEXP);
+    Rcpp::traits::input_parameter< int >::type digits(digitsSEXP);
+    Rcpp::traits::input_parameter< bool >::type numeric_dates(numeric_datesSEXP);
+    Rcpp::traits::input_parameter< bool >::type factors_as_string(factors_as_stringSEXP);
+    Rcpp::traits::input_parameter< std::string >::type by(bySEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_to_ndjson(lst, unbox, digits, numeric_dates, factors_as_string, by));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_validate_json
 Rcpp::LogicalVector rcpp_validate_json(Rcpp::StringVector json);
 RcppExport SEXP _jsonify_rcpp_validate_json(SEXP jsonSEXP) {
@@ -136,6 +152,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_read_json_file", (DL_FUNC) &_jsonify_rcpp_read_json_file, 5},
     {"_jsonify_source_tests", (DL_FUNC) &_jsonify_source_tests, 0},
     {"_jsonify_rcpp_to_json", (DL_FUNC) &_jsonify_rcpp_to_json, 6},
+    {"_jsonify_rcpp_to_ndjson", (DL_FUNC) &_jsonify_rcpp_to_ndjson, 6},
     {"_jsonify_rcpp_validate_json", (DL_FUNC) &_jsonify_rcpp_validate_json, 1},
     {NULL, NULL, 0}
 };
