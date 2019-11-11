@@ -23,8 +23,6 @@ namespace complex {
       bool factors_as_string
     ) {
     
-    //Rcpp::Rcout << "is_factor: 1 " << Rf_isFactor( this_vec ) << std::endl;
-    
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
     if( Rf_isMatrix( this_vec ) ) {
@@ -80,8 +78,6 @@ namespace complex {
       bool factors_as_string, 
       int row
     ) {
-    
-    //Rcpp::Rcout << "is_factor: 2 " << Rf_isFactor( this_vec ) << std::endl;
     
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
@@ -184,14 +180,14 @@ namespace complex {
       int n_rows = df.nrows();
       Rcpp::StringVector column_names = df.names();
       
+      // issue 59
+      // moving the factor_as_string conersion as high up as possible, 
+      // so it works on the whole vector. 
       if( factors_as_string ) {
-        //Rcpp::Rcout << "factors_as_string " << std::endl;
-        // convert here, cos speed?
         for( df_col = 0; df_col < n_cols; ++df_col ) {
-          const char *h = column_names[ df_col ];
-          if( Rf_isFactor( df[ h ] ) ) {
-            //Rcpp::Rcout << "converting factor" << std::endl;
-            df[ h ] = Rcpp::as< Rcpp::StringVector >( df[ h ] );
+          const char * col_name = column_names[ df_col ];
+          if( Rf_isFactor( df[ col_name ] ) ) {
+            df[ col_name ] = Rcpp::as< Rcpp::StringVector >( df[ col_name ] );
           }
         }
       }
@@ -200,7 +196,7 @@ namespace complex {
       if ( by == "column") {
         writer.StartObject();
         
-        for( df_col = 0; df_col < n_cols; df_col++ ) {
+        for( df_col = 0; df_col < n_cols; ++df_col ) {
 
           const char *h = column_names[ df_col ];
           writer.String( h );
@@ -223,8 +219,6 @@ namespace complex {
             SEXP this_vec = df[ h ];
             
             switch( TYPEOF( this_vec ) ) {
-            
-            //Rcpp::Rcout << "is_factor: " << Rf_isFactor( this_vec ) << std::endl;
             
             case VECSXP: {
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );

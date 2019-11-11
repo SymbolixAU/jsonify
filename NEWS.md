@@ -1,3 +1,8 @@
+## v1.0.1
+
+* performance improvement for factors [issue 59](https://github.com/symbolixAU/jsonify/issues59)
+* Fixed encoding issues on Windows [issue 56](https://github.com/symbolixAU/jsonify/issues56)
+
 ## v1.0
 
 * empty list names handled [issue 53](https://github.com/SymbolixAU/jsonify/issues/53)
