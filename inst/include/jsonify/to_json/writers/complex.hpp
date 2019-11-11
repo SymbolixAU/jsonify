@@ -23,6 +23,8 @@ namespace complex {
       bool factors_as_string
     ) {
     
+    //Rcpp::Rcout << "is_factor: 1 " << Rf_isFactor( this_vec ) << std::endl;
+    
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
     if( Rf_isMatrix( this_vec ) ) {
@@ -78,6 +80,8 @@ namespace complex {
       bool factors_as_string, 
       int row
     ) {
+    
+    //Rcpp::Rcout << "is_factor: 2 " << Rf_isFactor( this_vec ) << std::endl;
     
     switch( TYPEOF( this_vec ) ) {
     case REALSXP: {
@@ -180,6 +184,19 @@ namespace complex {
       int n_rows = df.nrows();
       Rcpp::StringVector column_names = df.names();
       
+      if( factors_as_string ) {
+        //Rcpp::Rcout << "factors_as_string " << std::endl;
+        // convert here, cos speed?
+        for( df_col = 0; df_col < n_cols; ++df_col ) {
+          const char *h = column_names[ df_col ];
+          if( Rf_isFactor( df[ h ] ) ) {
+            //Rcpp::Rcout << "converting factor" << std::endl;
+            df[ h ] = Rcpp::as< Rcpp::StringVector >( df[ h ] );
+          }
+        }
+      }
+      
+      
       if ( by == "column") {
         writer.StartObject();
         
@@ -206,7 +223,9 @@ namespace complex {
             SEXP this_vec = df[ h ];
             
             switch( TYPEOF( this_vec ) ) {
-     
+            
+            //Rcpp::Rcout << "is_factor: " << Rf_isFactor( this_vec ) << std::endl;
+            
             case VECSXP: {
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
               write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row, in_data_frame );
@@ -232,7 +251,7 @@ namespace complex {
               const char *h = column_names[ df_col ];
               writer.String( h );
               SEXP this_vec = df[ h ];
-       
+              
               switch( TYPEOF( this_vec ) ) {
               case VECSXP: {
                 Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );

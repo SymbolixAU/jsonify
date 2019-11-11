@@ -150,6 +150,8 @@ namespace simple {
       
     } else if ( factors_as_string && Rf_isFactor( iv ) ) {
       
+      //Rcpp::Rcout << "factors 1" << std::endl;
+      
       Rcpp::CharacterVector lvls = iv.attr( "levels" );
       if (lvls.length() == 0 && iv.length() == 0 ) {
         writer.StartArray();
@@ -209,7 +211,7 @@ namespace simple {
       write_value( writer, sv, row );
       
     } else if ( factors_as_string && Rf_isFactor( iv ) ) {
-      
+      //Rcpp::Rcout << "factors 2" << std::endl;
       Rcpp::StringVector lvls = iv.attr( "levels" );
       
       if (lvls.length() == 0 && iv.length() == 0 ) {
