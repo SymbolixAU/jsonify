@@ -184,10 +184,31 @@ namespace complex {
       // moving the factor_as_string conersion as high up as possible, 
       // so it works on the whole vector. 
       if( factors_as_string ) {
+        jsonify::utils::factors_to_string( df );
+      }
+      
+      // issue 60
+      if( !numeric_dates ) {
+        int tp;
+
         for( df_col = 0; df_col < n_cols; ++df_col ) {
           const char * col_name = column_names[ df_col ];
-          if( Rf_isFactor( df[ col_name ] ) ) {
-            df[ col_name ] = Rcpp::as< Rcpp::StringVector >( df[ col_name ] );
+          tp = TYPEOF( df[ col_name ] );
+
+          if( tp == REALSXP ) {
+            Rcpp::NumericVector nv_dte = Rcpp::as< Rcpp::NumericVector >( df[ col_name ] );
+            Rcpp::CharacterVector cls = jsonify::utils::getRClass( nv_dte );
+
+            if( jsonify::dates::is_in( "Date", cls ) ) {
+
+              Rcpp::StringVector sv_dte = jsonify::dates::date_to_string( nv_dte );
+              df[ col_name ] = sv_dte;
+
+            } else if (jsonify::dates::is_in( "POSIXt", cls ) ) {
+
+              Rcpp::StringVector sv_psx = jsonify::dates::posixct_to_string( nv_dte );
+              df[ col_name ] = sv_psx;
+            }
           }
         }
       }

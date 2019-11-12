@@ -29,7 +29,20 @@ namespace utils {
     }
     return "";
   }
-
+  
+  inline void factors_to_string( Rcpp::DataFrame& df ) {
+    R_xlen_t df_col;
+    R_xlen_t n_cols;
+    n_cols = df.ncol();
+    Rcpp::StringVector column_names = df.names();
+    
+    for( df_col = 0; df_col < n_cols; ++df_col ) {
+      const char * col_name = column_names[ df_col ];
+      if( Rf_isFactor( df[ col_name ] ) ) {
+        df[ col_name ] = Rcpp::as< Rcpp::StringVector >( df[ col_name ] );
+      }
+    }
+  }
 
   inline Rcpp::StringVector finalise_json( rapidjson::StringBuffer& sb ) {
     Rcpp::StringVector js(1);
