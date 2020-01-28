@@ -52,6 +52,20 @@ to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
   rcpp_to_json( x, unbox, digits, numeric_dates, factors_as_string, by )
 }
 
+#' To ndjson
+#' 
+#' Converts R objects to ndjson
+#' 
+#' 
+#' @export
+to_ndjson <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE, 
+                       factors_as_string = TRUE, by = "row" ) {
+  if( "col" %in% by ) by <- "column"
+  by <- match.arg( by, choices = c("row", "column") )
+  digits <- handle_digits( digits )
+  rcpp_to_ndjson( x, unbox, digits, numeric_dates, factors_as_string, by )
+}
+
 handle_digits <- function( digits ) {
   if( is.null( digits ) ) return(-1)
   return( as.integer( digits ) )

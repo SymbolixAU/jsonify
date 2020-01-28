@@ -102,38 +102,61 @@ namespace api {
         
         std::ostringstream os; // for storing the final string of ndjson
         
-        for( row = 0; row < n_row; row++ ) {
-          
-          // create new stream each row
-          rapidjson::StringBuffer sb;
-          rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-          
+        if( by == "row" ) {
         
-          writer.StartObject();
+          for( row = 0; row < n_row; row++ ) {
+            
+            // create new stream each row
+            rapidjson::StringBuffer sb;
+            rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
+            
+            writer.StartObject();
+            for( df_col = 0; df_col < n_cols; df_col++ ) {
+              
+              const char *h = column_names[ df_col ];
+              writer.String( h );
+              
+              SEXP this_vec = df[ h ];
+              
+              switch( TYPEOF( this_vec ) ) {
+              
+              case VECSXP: {
+                Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
+                jsonify::writers::complex::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row, in_data_frame );
+                break;
+              }
+              default: {
+                jsonify::writers::complex::switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, row );
+              }
+              } // end switch
+              
+            } // end for
+            writer.EndObject();
+            
+            os << sb.GetString();
+            os << '\n';
+          }  // end for (row)
+          
+        } else {
+          // by == "column"
           for( df_col = 0; df_col < n_cols; df_col++ ) {
+            // create new stream each row
+            rapidjson::StringBuffer sb;
+            rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
+            
+            writer.StartObject();
             
             const char *h = column_names[ df_col ];
             writer.String( h );
-            
             SEXP this_vec = df[ h ];
+            jsonify::writers::complex::write_value( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, by, -1, in_data_frame );
             
-            switch( TYPEOF( this_vec ) ) {
+            writer.EndObject();
             
-            case VECSXP: {
-              Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-              jsonify::writers::complex::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row, in_data_frame );
-              break;
-            }
-            default: {
-              jsonify::writers::complex::switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, row );
-            }
-            } // end switch
-            
-          } // end for
-          writer.EndObject();
+            os << sb.GetString();
+            os << '\n';
+          }  // end for (column)
           
-          os << sb.GetString();
-          os << '\n';
         }
         
         Rcpp::StringVector sv = os.str();
