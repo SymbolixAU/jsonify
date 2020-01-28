@@ -2,9 +2,11 @@
 #include "jsonify/to_json/api.hpp"
 
 // [[Rcpp::export]]
-Rcpp::StringVector rcpp_to_json( SEXP lst, bool unbox = false, int digits = -1, 
-                                 bool numeric_dates = true, bool factors_as_string = true,
-                                 std::string by = "row") {
+Rcpp::StringVector rcpp_to_json(
+    SEXP lst, bool unbox = false, int digits = -1,
+    bool numeric_dates = true, bool factors_as_string = true,
+    std::string by = "row"
+  ) {
   
   if ( digits >= 0 ) {
     SEXP lst2 = Rcpp::clone( lst );
@@ -18,5 +20,5 @@ Rcpp::StringVector rcpp_to_ndjson(
   SEXP lst, bool unbox = false, int digits = -1, bool numeric_dates = true,
   bool factors_as_string = true, std::string by = "row"
 ) {
-  
+  return jsonify::api::to_ndjson(lst, unbox, digits, numeric_dates, factors_as_string, by );
 }
