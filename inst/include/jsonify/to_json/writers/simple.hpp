@@ -237,6 +237,49 @@ namespace simple {
     }
   }
   
+  template< typename Writer >
+  inline void write_value(
+      Writer& writer,
+      Rcpp::NumericVector& nv,
+      bool unbox,
+      int digits
+  ) {
+    int n = nv.size();
+    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    jsonify::utils::start_array( writer, will_unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
+      if (Rcpp::NumericVector::is_na( nv[i] ) ) {
+        writer.Null();
+      } else {
+        double nn = nv[i];             // required for logical vectors
+        jsonify::writers::scalars::write_value( writer, nn, digits );
+      }
+    }
+    jsonify::utils::end_array( writer, will_unbox );
+  }
+  
+  template< typename Writer >
+  inline void write_value(
+    Writer& writer,
+    Rcpp::IntegerVector& iv,
+    bool unbox
+  ) {
+    int n = iv.size();
+    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    jsonify::utils::start_array( writer, will_unbox );
+    
+    for ( int i = 0; i < n; i++ ) {
+      if (Rcpp::IntegerVector::is_na( iv[i] ) ) {
+        writer.Null();
+      } else {
+        int ii = iv[i];             // required for logical vectors
+        jsonify::writers::scalars::write_value( writer, ii );
+      }
+    }
+    jsonify::utils::end_array( writer, will_unbox );
+  }
+  
   template <typename Writer>
   inline void write_value(
       Writer& writer, 
@@ -260,7 +303,11 @@ namespace simple {
   }
   
   template < typename Writer >
-  inline void write_value( Writer& writer, Rcpp::LogicalVector& lv, int row ) {
+  inline void write_value(
+      Writer& writer, 
+      Rcpp::LogicalVector& lv, 
+      int row
+    ) {
     if ( Rcpp::LogicalVector::is_na( lv[ row ] ) ) { 
       writer.Null();
     } else {
