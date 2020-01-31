@@ -5,6 +5,10 @@ rcpp_from_json <- function(json, simplify, fill_na) {
     .Call(`_jsonify_rcpp_from_json`, json, simplify, fill_na)
 }
 
+rcpp_from_ndjson <- function(ndjson, simplify, fill_na) {
+    .Call(`_jsonify_rcpp_from_ndjson`, ndjson, simplify, fill_na)
+}
+
 rcpp_get_dtypes <- function(json) {
     .Call(`_jsonify_rcpp_get_dtypes`, json)
 }
@@ -27,6 +31,10 @@ rcpp_pretty_print <- function(json) {
 
 rcpp_read_json_file <- function(file, mode, simplify, fill_na, buffer_size = 1024L) {
     .Call(`_jsonify_rcpp_read_json_file`, file, mode, simplify, fill_na, buffer_size)
+}
+
+rcpp_read_ndjson_file <- function(file, mode, simplify, fill_na) {
+    .Call(`_jsonify_rcpp_read_ndjson_file`, file, mode, simplify, fill_na)
 }
 
 source_tests <- function() {

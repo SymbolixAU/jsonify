@@ -58,8 +58,30 @@ from_json <- function(json, simplify = TRUE, fill_na = FALSE, buffer_size = 1024
   json_to_r( json, simplify, fill_na, buffer_size )
 }
 
+#' from ndjson
+#' 
+#' Converts ndjson into R objects
+#' 
+#' @inheritParams from_json
+#' 
+#' @examples
+#' 
+#' js <- to_ndjson( data.frame( x = 1:5, y = 6:10 ) )
+#' from_ndjson( js )
+#' 
+#' 
+#' @export
+from_ndjson <- function(ndjson, simplify = TRUE, fill_na = FALSE ) {
+  ndjson_to_r( ndjson, simplify, fill_na )
+}
+
+
 json_to_r <- function( json, simplify = TRUE, fill_na = FALSE, buffer_size ) {
   UseMethod("json_to_r")
+}
+
+ndjson_to_r <- function( ndjson, simplify = TRUE, fill_na = FALSE ) {
+  UseMethod("ndjson_to_r")
 }
 
 #' @export
@@ -83,8 +105,33 @@ json_to_r.character <- function( json, simplify = TRUE, fill_na, buffer_size ) {
 }
 
 #' @export
+ndjson_to_r.character <- function( ndjson, simplify = TRUE, fill_na ) {
+  if( is_url( ndjson ) ) {
+    return(
+      json_to_r( url( ndjson ), simplify, fill_na )
+    )
+  } else if ( file.exists( ndjson ) ) {
+    return(
+      rcpp_read_ndjson_file(
+        normalizePath( ndjson )
+        , get_download_mode()
+        , simplify
+        , fill_na
+        #, buffer_size
+      )
+    )
+  }
+  return( rcpp_from_ndjson( json, simplify, fill_na ) )
+}
+
+#' @export
 json_to_r.connection <- function( json, simplify = TRUE, fill_na, buffer_size ) {
   json_to_r( read_url( json ), simplify, fill_na, buffer_size )
+}
+
+#' @export
+ndjson_to_r.connection <- function( ndjson, simplify = TRUE, fill_na ) {
+  json_to_r( read_url( ndjson ), simplify, fill_na )
 }
 
 #' @export
@@ -93,8 +140,18 @@ json_to_r.json <- function( json, simplify = TRUE, fill_na, buffer_size ) {
 }
 
 #' @export
+ndjson_to_r.ndjson <- function( ndjson, simplify = TRUE, fill_na ) {
+  rcpp_from_ndjson( ndjson, simplify, fill_na )
+}
+
+#' @export
 json_to_r.default <- function( json, simplify = TRUE, fill_na, buffer_size ) {
   stop("jsonify - expecting a JSON string, url or file")
+}
+
+#' @export
+ndjson_to_r.default <- function( ndjson, simplify = TRUE, fill_na ) {
+  stop("jsonify - expecting an ndjson string, url or file")
 }
 
 

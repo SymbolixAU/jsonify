@@ -18,6 +18,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_from_ndjson
+SEXP rcpp_from_ndjson(const char * ndjson, bool& simplify, bool& fill_na);
+RcppExport SEXP _jsonify_rcpp_from_ndjson(SEXP ndjsonSEXP, SEXP simplifySEXP, SEXP fill_naSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char * >::type ndjson(ndjsonSEXP);
+    Rcpp::traits::input_parameter< bool& >::type simplify(simplifySEXP);
+    Rcpp::traits::input_parameter< bool& >::type fill_na(fill_naSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_from_ndjson(ndjson, simplify, fill_na));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_get_dtypes
 Rcpp::IntegerVector rcpp_get_dtypes(const char * json);
 RcppExport SEXP _jsonify_rcpp_get_dtypes(SEXP jsonSEXP) {
@@ -89,6 +102,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_read_ndjson_file
+SEXP rcpp_read_ndjson_file(const char* file, const char* mode, bool& simplify, bool& fill_na);
+RcppExport SEXP _jsonify_rcpp_read_ndjson_file(SEXP fileSEXP, SEXP modeSEXP, SEXP simplifySEXP, SEXP fill_naSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const char* >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< const char* >::type mode(modeSEXP);
+    Rcpp::traits::input_parameter< bool& >::type simplify(simplifySEXP);
+    Rcpp::traits::input_parameter< bool& >::type fill_na(fill_naSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_ndjson_file(file, mode, simplify, fill_na));
+    return rcpp_result_gen;
+END_RCPP
+}
 // source_tests
 void source_tests();
 RcppExport SEXP _jsonify_source_tests() {
@@ -144,12 +171,14 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_jsonify_rcpp_from_json", (DL_FUNC) &_jsonify_rcpp_from_json, 3},
+    {"_jsonify_rcpp_from_ndjson", (DL_FUNC) &_jsonify_rcpp_from_ndjson, 3},
     {"_jsonify_rcpp_get_dtypes", (DL_FUNC) &_jsonify_rcpp_get_dtypes, 1},
     {"_jsonify_rcpp_simplify_vector", (DL_FUNC) &_jsonify_rcpp_simplify_vector, 3},
     {"_jsonify_rcpp_pretty_json", (DL_FUNC) &_jsonify_rcpp_pretty_json, 1},
     {"_jsonify_rcpp_minify_json", (DL_FUNC) &_jsonify_rcpp_minify_json, 1},
     {"_jsonify_rcpp_pretty_print", (DL_FUNC) &_jsonify_rcpp_pretty_print, 1},
     {"_jsonify_rcpp_read_json_file", (DL_FUNC) &_jsonify_rcpp_read_json_file, 5},
+    {"_jsonify_rcpp_read_ndjson_file", (DL_FUNC) &_jsonify_rcpp_read_ndjson_file, 4},
     {"_jsonify_source_tests", (DL_FUNC) &_jsonify_source_tests, 0},
     {"_jsonify_rcpp_to_json", (DL_FUNC) &_jsonify_rcpp_to_json, 6},
     {"_jsonify_rcpp_to_ndjson", (DL_FUNC) &_jsonify_rcpp_to_ndjson, 6},

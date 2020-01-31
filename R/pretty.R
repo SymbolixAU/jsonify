@@ -2,6 +2,9 @@
 #' @export
 print.json <- function( x, ... ) cat( x )
 
+#' @export
+print.ndjson <- function( x, ... ) cat( x )
+
 #' Pretty Json
 #' 
 #' Adds indentiation to a JSON string

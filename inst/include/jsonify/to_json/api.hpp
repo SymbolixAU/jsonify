@@ -424,11 +424,13 @@ namespace api {
     default: {
       Rcpp::stop("jsonify - expecting a matrix, data.frame or list");
       }
-
     }
     
-    Rcpp::StringVector js = os.str();
-    js.attr("class") = "json";
+    // is this copy expensive?
+    std::string res = os.str();
+    res.pop_back(); // remove final \n
+    Rcpp::StringVector js = res.c_str();
+    js.attr("class") = "ndjson";
     return js;
   }
 

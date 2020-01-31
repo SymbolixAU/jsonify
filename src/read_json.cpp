@@ -20,7 +20,6 @@ rapidjson::Document buffer_string( const char* file, const char* mode, int buffe
   
   rapidjson::FileReadStream is(fp, readBuffer, sizeof( readBuffer ) );
   
-  
   rapidjson::Document d;
   d.ParseStream( is );
   fclose(fp);
@@ -40,3 +39,39 @@ SEXP rcpp_read_json_file(
   rapidjson::Document d = buffer_string( file, mode, buffer_size );
   return jsonify::api::from_json( d, simplify, fill_na );
 }
+
+// [[Rcpp::export]]
+SEXP rcpp_read_ndjson_file(
+    const char* file,
+    const char* mode,
+    bool& simplify,
+    bool& fill_na
+) {
+  // TODO:
+  
+  // https://stackoverflow.com/a/51572325/5977215
+  std::ifstream infile(file);
+  std::ostringstream os;
+  os << '[';
+  if (infile.is_open()) {
+    std::string line;
+    while (getline(infile, line)) {
+      // using printf() in all tests for consistency
+      //printf("%s", line.c_str());
+      os << line.c_str();
+      os << ",";
+      
+    }
+    infile.close();
+  }
+  // move head back one place to overwrite the final ','
+  os.seekp(-1, os.cur);
+  os << ']';
+  std::string json = os.str();
+  return jsonify::api::from_json( json.c_str(), simplify, fill_na );
+  
+  //Rcpp::Rcout << "infile: " << line.c_str() << std::endl;
+  //Rcpp::stop("jsonify - not implemented yet");
+  //return Rcpp::List();
+}
+

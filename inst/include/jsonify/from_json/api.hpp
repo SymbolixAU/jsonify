@@ -59,6 +59,20 @@ namespace api {
     return from_json( doc, simplify, fill_na );
   }
 
+  inline SEXP from_ndjson( const char * ndjson, bool& simplify, bool& fill_na ) {
+    
+    std::ostringstream os;
+    os << '[';
+    os << ndjson;
+    os << ']';
+    
+    std::string json = os.str();
+    std::replace( json.begin(), json.end(), '\n', ',');
+    
+    return from_json( json.c_str(), simplify, fill_na );
+    
+  }
+
 }
 } // jsonify
 
