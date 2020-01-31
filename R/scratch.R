@@ -37,6 +37,7 @@
 # )
 # 
 # cat( jsonify:::rcpp_to_ndjson(lst, FALSE, -1L, TRUE, TRUE, "row") )
+# cat( jsonify:::rcpp_to_ndjson(lst, FALSE, -1L, TRUE, TRUE, "column") )
 # 
 # N <- 1e6
 # data <- data.frame(

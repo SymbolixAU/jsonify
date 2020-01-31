@@ -56,6 +56,47 @@ to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
 #' 
 #' Converts R objects to ndjson
 #' 
+#' @inheritParams to_json
+#' 
+#' @details 
+#' 
+#' Lists are converted to ndjson non-recursively. That is, each of the objects
+#' in the list at the top level are converted to a new-line JSON object. Any nested
+#' sub-elements are then contained within that JSON object. See examples
+#' 
+#' @examples 
+#' 
+#' to_ndjson( 1:5 )
+#' to_ndjson( letters )
+#' 
+#' mat <- matrix(1:6, ncol = 2)
+#' 
+#' to_ndjson( x = mat )
+#' to_ndjson( x = mat, by = "col" )
+#' 
+#' df <- data.frame(
+#'   x = 1:5
+#'   , y = letters[1:5]
+#'   , z = as.Date(seq(18262, 18262 + 4, by = 1 ), origin = "1970-01-01" )
+#'   )
+#' 
+#' to_ndjson( x = df )
+#' to_ndjson( x = df, numeric_dates = FALSE )
+#' to_ndjson( x = df, factors_as_string = FALSE )
+#' to_ndjson( x = df, by = "column" )
+#' 
+#' ## Lists are non-recurisve; only elements `x` and `y` are converted to ndjson
+#' lst <- list(
+#'   x = 1:5
+#'   , y = list(
+#'     a = letters[1:5]
+#'     , b = data.frame(i = 10:15, j = 20:25)
+#'   )
+#' )
+#'  
+#' to_ndjson( x = lst )
+#' to_ndjson( x = lst, by = "column")
+#' 
 #' 
 #' @export
 to_ndjson <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE, 
@@ -67,7 +108,7 @@ to_ndjson <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
 }
 
 handle_digits <- function( digits ) {
-  if( is.null( digits ) ) return(-1)
+  if( is.null( digits ) ) return(-1L)
   return( as.integer( digits ) )
 }
 

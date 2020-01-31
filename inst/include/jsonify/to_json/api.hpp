@@ -33,8 +33,9 @@ namespace api {
   //   // loop over rows or columns, 
   // }
   
-  inline Rcpp::StringVector to_ndjson(
+  inline void to_ndjson(
       Rcpp::DataFrame& df,
+      std::ostringstream& os,
       bool unbox = false,
       int digits = -1,
       bool numeric_dates = true,
@@ -48,7 +49,7 @@ namespace api {
     Rcpp::StringVector column_names = df.names();
     bool in_data_frame = true;
     
-    std::ostringstream os; // for storing the final string of ndjson
+    //std::ostringstream os; // for storing the final string of ndjson
     
     if( by == "row" ) {
       
@@ -107,12 +108,13 @@ namespace api {
       
     }
     
-    Rcpp::StringVector sv = os.str();
-    return sv;
+    // Rcpp::StringVector sv = os.str();
+    // return sv;
   }
 
-  inline Rcpp::StringVector to_ndjson(
+  inline void to_ndjson(
       Rcpp::LogicalMatrix mat,
+      std::ostringstream& os,
       bool unbox = false,
       std::string by = "row"
   ) {
@@ -121,7 +123,7 @@ namespace api {
     R_xlen_t n_col = mat.ncol();
     R_xlen_t i;
     
-    std::ostringstream os; // for storing the final string of ndjson
+    //std::ostringstream os; // for storing the final string of ndjson
     
     if( by == "row" ) {
       
@@ -154,12 +156,13 @@ namespace api {
     } else {
       Rcpp::stop("jsonify - expecting matrix operatinos by row or column");
     }
-    Rcpp::StringVector sv = os.str();
-    return sv;
+    // Rcpp::StringVector sv = os.str();
+    // return sv;
   }
 
-  inline Rcpp::StringVector to_ndjson(
+  inline void to_ndjson(
       Rcpp::IntegerMatrix mat,
+      std::ostringstream& os,
       bool unbox = false,
       std::string by = "row"
   ) {
@@ -168,7 +171,7 @@ namespace api {
     R_xlen_t n_col = mat.ncol();
     R_xlen_t i;
     
-    std::ostringstream os; // for storing the final string of ndjson
+    //std::ostringstream os; // for storing the final string of ndjson
     
     if( by == "row" ) {
       
@@ -201,13 +204,14 @@ namespace api {
     } else {
       Rcpp::stop("jsonify - expecting matrix operatinos by row or column");
     }
-    Rcpp::StringVector sv = os.str();
-    return sv;
+    // Rcpp::StringVector sv = os.str();
+    // return sv;
   }
   
   
-  inline Rcpp::StringVector to_ndjson(
+  inline void to_ndjson(
     Rcpp::NumericMatrix mat,
+    std::ostringstream& os,
     bool unbox = false,
     int digits = -1,
     std::string by = "row"
@@ -217,7 +221,7 @@ namespace api {
     R_xlen_t n_col = mat.ncol();
     R_xlen_t i;
     
-    std::ostringstream os; // for storing the final string of ndjson
+    //std::ostringstream os; // for storing the final string of ndjson
     
     if( by == "row" ) {
       
@@ -250,12 +254,13 @@ namespace api {
     } else {
       Rcpp::stop("jsonify - expecting matrix operatinos by row or column");
     }
-    Rcpp::StringVector sv = os.str();
-    return sv;
+    // Rcpp::StringVector sv = os.str();
+    // return sv;
   }
 
   inline Rcpp::StringVector to_ndjson(
       Rcpp::StringMatrix mat,
+      std::ostringstream& os,
       bool unbox = false,
       std::string by = "row"
   ) {
@@ -264,7 +269,7 @@ namespace api {
     R_xlen_t n_col = mat.ncol();
     R_xlen_t i;
     
-    std::ostringstream os; // for storing the final string of ndjson
+    //std::ostringstream os; // for storing the final string of ndjson
     
     if( by == "row" ) {
       
@@ -295,12 +300,54 @@ namespace api {
       }
       
     } else {
-      Rcpp::stop("jsonify - expecting matrix operatinos by row or column");
+      Rcpp::stop("jsonify - expecting matrix operations by row or column");
     }
-    Rcpp::StringVector sv = os.str();
-    return sv;
+    // Rcpp::StringVector sv = os.str();
+    // return sv;
   }
 
+  inline void to_ndjson(
+      Rcpp::List& lst,
+      std::ostringstream& os,
+      bool unbox = false,
+      int digits = -1,
+      bool numeric_dates = true,
+      bool factors_as_string = true,
+      std::string by = "row"
+  ) {
+    R_xlen_t n = lst.size();
+    R_xlen_t i;
+    
+    for( i = 0; i < n; ++i ) {
+      rapidjson::StringBuffer sb;
+      rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
+      SEXP s = lst[ i ];
+      jsonify::writers::complex::write_value( writer, s, unbox, digits, numeric_dates, factors_as_string, by );
+      os << sb.GetString();
+      os << '\n';
+    }
+    
+  }
+
+  template < int RTYPE >
+  inline void to_ndjson(
+      Rcpp::Vector< RTYPE > obj,
+      std::ostringstream& os,
+      bool unbox = false,
+      int digits = -1,
+      bool numeric_dates = true,
+      bool factors_as_string = true
+      ) {
+    
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
+    jsonify::writers::simple::write_value( writer, obj, unbox, digits, numeric_dates, factors_as_string );
+    os << sb.GetString();
+    os << '\n';
+    
+  }
+
+  // lists are non-recursive; only the first element is ndjsonified...
   inline Rcpp::StringVector to_ndjson(
     SEXP obj,
     bool unbox = false,
@@ -310,111 +357,69 @@ namespace api {
     std::string by = "row"
   ) {
 
-    // rapidjson::StringBuffer sb;
-    // rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    // 
-    // std::ostringstream os; // for storing the final string of ndjson
+    std::ostringstream os; // for storing the final string of ndjson
     
-    // TODO
-    // the way ndjson is created depends on the type of input object
-    // a list will be element-wise
-    // data.frame / matrix will be whatever 'by' is set
-    // other cases not handled?
-    //
-    // given the rapidjson DOM doesn't accept '\n' characters,
-    // I may have to iterate over the object and create one json object at a time
-    // and output to an OSStream, append '\n', 
-    // then at the end convert to StringVector.
     switch( TYPEOF( obj ) ) {
     case LGLSXP: {
       if( !Rf_isMatrix( obj ) ) {
-        Rcpp::LogicalVector lv = Rcpp::as< Rcpp::LogicalVector >( obj );
-        std::ostringstream os; // for storing the final string of ndjson
-        
-        rapidjson::StringBuffer sb;
-        rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-        jsonify::writers::simple::write_value( writer, lv, unbox );
-        
-        os << sb.GetString();
-        os << '\n';
-        Rcpp::StringVector res = os.str();
-        return res;
+
+        to_ndjson< LGLSXP >( obj, os, unbox, digits, numeric_dates, factors_as_string );
+          
       } else {
         Rcpp::LogicalMatrix lm = Rcpp::as< Rcpp::LogicalMatrix >( obj );
-        return to_ndjson( lm, unbox, by );
+        to_ndjson( lm, os, unbox, by );
       }
+      break;
     }
     case INTSXP: {
       if( !Rf_isMatrix( obj ) ) {
-        Rcpp::IntegerVector iv = Rcpp::as< Rcpp::IntegerVector >( obj );
-        std::ostringstream os; // for storing the final string of ndjson
+      
+        to_ndjson< INTSXP >( obj, os, unbox, digits, numeric_dates, factors_as_string );
         
-        rapidjson::StringBuffer sb;
-        rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-        jsonify::writers::simple::write_value( writer, iv, unbox );
-        
-        os << sb.GetString();
-        os << '\n';
-        Rcpp::StringVector res = os.str();
-        return res;
       } else {
         Rcpp::IntegerMatrix im = Rcpp::as< Rcpp::IntegerMatrix >( obj );
-        return to_ndjson( im, unbox, by );
+        to_ndjson( im, os, unbox, by );
+
       }
+      break;
     }
     case REALSXP: {
       if( !Rf_isMatrix( obj ) ) {
-        Rcpp::NumericVector nv = Rcpp::as< Rcpp::NumericVector >( obj );
       
-        std::ostringstream os; // for storing the final string of ndjson
+        to_ndjson< REALSXP >( obj, os, unbox, digits, numeric_dates, factors_as_string );
         
-        rapidjson::StringBuffer sb;
-        rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-        jsonify::writers::simple::write_value( writer, nv, unbox, digits );
-        
-        os << sb.GetString();
-        os << '\n';
-        Rcpp::StringVector res = os.str();
-        return res;
       } else {
         Rcpp::NumericMatrix nm = Rcpp::as< Rcpp::NumericMatrix >( obj );
-        return to_ndjson( nm, unbox, digits, by );
+        to_ndjson( nm, os, unbox, digits, by );
+        
       }
+      break;
     }
     case STRSXP: {
       if( !Rf_isMatrix( obj ) ) {
-        Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( obj );
-      
-        std::ostringstream os; // for storing the final string of ndjson
         
-        rapidjson::StringBuffer sb;
-        rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-        jsonify::writers::simple::write_value( writer, sv, unbox );
-        
-        os << sb.GetString();
-        os << '\n';
-        Rcpp::StringVector res = os.str();
-        return res;
+        to_ndjson< STRSXP >( obj, os, unbox, digits, numeric_dates, factors_as_string );
         
       } else {
         Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( obj );
-        return to_ndjson( sm, unbox, by );
+        to_ndjson( sm, os, unbox, by );
+        
       }
+      break;
     }
     case VECSXP: {
       if( Rf_inherits( obj, "data.frame") ) {
+      
         Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( obj );
-        return to_ndjson( df, unbox, digits, numeric_dates, factors_as_string, by );
+        to_ndjson( df, os, unbox, digits, numeric_dates, factors_as_string, by );
+      
       } else {
         // list
         Rcpp::List lst = Rcpp::as< Rcpp::List >( obj );
-        R_xlen_t n = lst.size();
-        R_xlen_t i;
-        for( i = 0; i < n; ++i ) {
-          SEXP s = lst[ i ];
-          return to_ndjson( s, unbox, digits, numeric_dates, factors_as_string, by );
-        }
+        to_ndjson( lst, os, unbox, digits, numeric_dates, factors_as_string, by );
+
       }
+      break;
     }
     default: {
       Rcpp::stop("jsonify - expecting a matrix, data.frame or list");
@@ -422,12 +427,9 @@ namespace api {
 
     }
     
-    return Rcpp::StringVector::create();
-
-    //rapidjson::StringBuffer sb;
-    //rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    //jsonify::writers::complex::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
-    //return jsonify::utils::finalise_json( sb );
+    Rcpp::StringVector js = os.str();
+    js.attr("class") = "json";
+    return js;
   }
 
 

@@ -342,14 +342,14 @@ namespace simple {
       write_value( writer, lv, unbox );
       break;
     }
-    case STRSXP: {
+    default: {
       Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( sexp );
       write_value( writer, sv, unbox );
       break;
     }
-    default: {
-      Rcpp::stop("Unknown R object type");
-    }
+    // default: {
+    //   Rcpp::stop("Unknown R object type");
+    // }
     }
   }
   
@@ -491,7 +491,7 @@ namespace simple {
       bool unbox = false
     ) {
     
-    Rcpp::LogicalVector this_row = mat(row, Rcpp::_);
+    Rcpp::LogicalVector this_row = mat( row, Rcpp::_ );
     write_value( writer, this_row, unbox );
   }
   
