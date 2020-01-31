@@ -37,6 +37,10 @@ rcpp_to_json <- function(lst, unbox = FALSE, digits = -1L, numeric_dates = TRUE,
     .Call(`_jsonify_rcpp_to_json`, lst, unbox, digits, numeric_dates, factors_as_string, by)
 }
 
+rcpp_to_ndjson <- function(lst, unbox = FALSE, digits = -1L, numeric_dates = TRUE, factors_as_string = TRUE, by = "row") {
+    .Call(`_jsonify_rcpp_to_ndjson`, lst, unbox, digits, numeric_dates, factors_as_string, by)
+}
+
 rcpp_validate_json <- function(json) {
     .Call(`_jsonify_rcpp_validate_json`, json)
 }
