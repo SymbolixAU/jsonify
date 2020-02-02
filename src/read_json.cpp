@@ -8,16 +8,17 @@
 
 #include <Rcpp.h>
 
+
 rapidjson::Document buffer_string( const char* file, const char* mode, int buffer_size = 1024 ) {
   
   FILE* fp = fopen(file, mode );
   
-  
+  // this crashes for large files...
   //char readBuffer[ buffer_size ];
   // ISO C++ forbids variable length array ‘readBuffer’ [-Wvla]
   // https://stackoverflow.com/a/11379442/5977215
   char *readBuffer = new char[ buffer_size ];
-  
+
   rapidjson::FileReadStream is(fp, readBuffer, sizeof( readBuffer ) );
   
   rapidjson::Document d;

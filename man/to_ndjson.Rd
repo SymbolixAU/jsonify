@@ -52,6 +52,7 @@ to_ndjson( x = df )
 to_ndjson( x = df, numeric_dates = FALSE )
 to_ndjson( x = df, factors_as_string = FALSE )
 to_ndjson( x = df, by = "column" )
+to_ndjson( x = df, by = "column", numeric_dates = FALSE )
 
 ## Lists are non-recurisve; only elements `x` and `y` are converted to ndjson
 lst <- list(
