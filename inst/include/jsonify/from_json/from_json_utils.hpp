@@ -11,11 +11,12 @@
 namespace jsonify {
 namespace from_json {
 
-  inline int where_is(
-      Rcpp::String to_find,
-      Rcpp::StringVector& sv ) {
-    int n = sv.size();
-    int i;
+  inline R_xlen_t where_is(
+    Rcpp::String to_find,
+    Rcpp::StringVector& sv
+  ) {
+    R_xlen_t n = sv.size();
+    R_xlen_t i;
     for( i = 0; i < n; i++ ) {
       if ( to_find == sv[i] ) {
         return i;
@@ -32,10 +33,11 @@ namespace from_json {
     
     std::unordered_set< int > dtypes;
     
-    int doc_len = doc.Size();
+    R_xlen_t doc_len = doc.Size();
     
     int curr_dtype;
-    for(int i = 0; i < doc_len; ++i) {
+    R_xlen_t i;
+    for(i = 0; i < doc_len; ++i) {
       curr_dtype = doc[i].GetType();
       // rapidjson uses separate ints for types true (2) and false (1)...combine
       // them into one value such that bool is 1.
@@ -105,18 +107,18 @@ namespace from_json {
     return 0;
   }
   
-  // Convert all NULL elements in a list to NA.
-  inline void null_to_na(Rcpp::List& x) {
-    for(unsigned int i = 0; i < x.size(); ++i) {
-      if(Rf_isNull(x[i])) {
-        x[i] = R_NA_VAL;
-      }
-    }
-  }
+  // // Convert all NULL elements in a list to NA.
+  // inline void null_to_na(Rcpp::List& x) {
+  //   for(unsigned int i = 0; i < x.size(); ++i) {
+  //     if(Rf_isNull(x[i])) {
+  //       x[i] = R_NA_VAL;
+  //     }
+  //   }
+  // }
   
   // returns -1 if doens't exist
   // else the stored r_type
-  inline int column_value(
+  inline R_xlen_t column_value(
       std::unordered_map< std::string, int >& column_map,
       const char* to_find
     ) {
@@ -125,7 +127,7 @@ namespace from_json {
     it = column_map.find( str );
     
     if( it != column_map.end() ) {
-      int res = it->second;
+      R_xlen_t res = it->second;
       return res;
     }
     return -1;

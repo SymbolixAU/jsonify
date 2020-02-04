@@ -22,11 +22,12 @@ namespace simple {
       bool unbox
     ) {
 
-    int n = sv.size();
+    R_xlen_t n = sv.size();
     bool will_unbox = jsonify::utils::should_unbox( n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
+    R_xlen_t i;
     
-    for ( int i = 0; i < n; i++ ) {
+    for ( i = 0; i < n; i++ ) {
       if (Rcpp::StringVector::is_na( sv[i] ) ) {
         writer.Null();
       } else{
@@ -43,7 +44,7 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::StringVector& sv, 
-      int row
+      R_xlen_t row
     ) {
     
     if ( Rcpp::StringVector::is_na( sv[ row ] ) ) {
@@ -77,12 +78,13 @@ namespace simple {
       
     } else {
     
-      int n = nv.size();
+      R_xlen_t n = nv.size();
       bool will_unbox = jsonify::utils::should_unbox( n, unbox );
       
       jsonify::utils::start_array( writer, will_unbox );
+      R_xlen_t i;
     
-      for ( int i = 0; i < n; i++ ) {
+      for ( i = 0; i < n; i++ ) {
         if( Rcpp::NumericVector::is_na( nv[i] ) ) {
           writer.Null();
         } else {
@@ -100,7 +102,7 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::NumericVector& nv, 
-      int row, 
+      R_xlen_t row, 
       int digits, 
       bool numeric_dates
     ) {
@@ -158,7 +160,7 @@ namespace simple {
         // no levels - from NA_character_ vector
         Rcpp::StringVector s(1);
         s[0] = NA_STRING;
-        int ele = 0;
+        R_xlen_t ele = 0;
         write_value( writer, s, ele );
       } else {
         Rcpp::StringVector str = Rcpp::as< Rcpp::StringVector >( iv );
@@ -168,11 +170,12 @@ namespace simple {
       
     } else {
     
-      int n = iv.size();
+      R_xlen_t n = iv.size();
       bool will_unbox = jsonify::utils::should_unbox( n, unbox );
       jsonify::utils::start_array( writer, will_unbox );
+      R_xlen_t i;
       
-      for ( int i = 0; i < n; i++ ) {
+      for ( i = 0; i < n; i++ ) {
         if( Rcpp::IntegerVector::is_na( iv[i] ) ) {
           writer.Null();
         } else {
@@ -191,13 +194,12 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::IntegerVector& iv, 
-      int row, 
+      R_xlen_t row, 
       bool numeric_dates, 
       bool factors_as_string
     ) {
     
     Rcpp::CharacterVector cls = jsonify::utils::getRClass( iv );
-    
     
     if( !numeric_dates && jsonify::dates::is_in( "Date", cls ) ) {
       
@@ -219,7 +221,7 @@ namespace simple {
         // no level s- from NA_character_ vector
         Rcpp::StringVector s(1);
         s[0] = NA_STRING;
-        int ele = 0;
+        R_xlen_t ele = 0;
         write_value( writer, s, ele );
       } else {
         Rcpp::StringVector str = Rcpp::as< Rcpp::StringVector >( iv );
@@ -244,11 +246,12 @@ namespace simple {
       bool unbox,
       int digits
   ) {
-    int n = nv.size();
+    R_xlen_t n = nv.size();
     bool will_unbox = jsonify::utils::should_unbox( n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
+    R_xlen_t i;
     
-    for ( int i = 0; i < n; i++ ) {
+    for ( i = 0; i < n; i++ ) {
       if (Rcpp::NumericVector::is_na( nv[i] ) ) {
         writer.Null();
       } else {
@@ -265,11 +268,12 @@ namespace simple {
     Rcpp::IntegerVector& iv,
     bool unbox
   ) {
-    int n = iv.size();
+    R_xlen_t n = iv.size();
     bool will_unbox = jsonify::utils::should_unbox( n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
+    R_xlen_t i;
     
-    for ( int i = 0; i < n; i++ ) {
+    for ( i = 0; i < n; i++ ) {
       if (Rcpp::IntegerVector::is_na( iv[i] ) ) {
         writer.Null();
       } else {
@@ -287,11 +291,11 @@ namespace simple {
       bool unbox
     ) {
     
-    int n = lv.size();
+    R_xlen_t n = lv.size();
     bool will_unbox = jsonify::utils::should_unbox( n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
-    
-    for ( int i = 0; i < n; i++ ) {
+    R_xlen_t i;
+    for ( i = 0; i < n; i++ ) {
       if (Rcpp::LogicalVector::is_na( lv[i] ) ) {
         writer.Null();
       } else {
@@ -306,7 +310,7 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::LogicalVector& lv, 
-      int row
+      R_xlen_t row
     ) {
     if ( Rcpp::LogicalVector::is_na( lv[ row ] ) ) { 
       writer.Null();
@@ -362,7 +366,7 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::IntegerMatrix& mat,
-      int& row, 
+      R_xlen_t& row, 
       bool unbox = false
     ) {
 
@@ -380,8 +384,8 @@ namespace simple {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
-    int n;
-    int i;
+    R_xlen_t n;
+    R_xlen_t i;
     
     if ( by == "row" ) {
       n = mat.nrow();
@@ -403,7 +407,7 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::NumericMatrix& mat, 
-      int& row, 
+      R_xlen_t& row, 
       bool unbox = false
     ) {
 
@@ -424,8 +428,8 @@ namespace simple {
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
     
-    int n;
-    int i;
+    R_xlen_t n;
+    R_xlen_t i;
     if ( by == "row" ) {
       n = mat.nrow();
       for ( i = 0; i < n; i++ ) {
@@ -446,7 +450,7 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::StringMatrix& mat, 
-      int& row, 
+      R_xlen_t& row, 
       bool unbox = false
     ) {
 
@@ -464,8 +468,8 @@ namespace simple {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
-    int i;
-    int n;
+    R_xlen_t i;
+    R_xlen_t n;
     
     if( by == "row" ) {
       n = mat.nrow();
@@ -487,7 +491,7 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::LogicalMatrix& mat, 
-      int& row, 
+      R_xlen_t& row, 
       bool unbox = false
     ) {
     
@@ -505,8 +509,8 @@ namespace simple {
     
     bool will_unbox = false;
     jsonify::utils::start_array( writer, will_unbox );
-    int i;
-    int n;
+    R_xlen_t i;
+    R_xlen_t n;
     
     if( by == "row" ) {
       n = mat.nrow();
@@ -534,7 +538,7 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       SEXP sexp, 
-      int row, 
+      R_xlen_t row, 
       int digits, 
       bool numeric_dates, 
       bool factors_as_string

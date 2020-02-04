@@ -149,8 +149,8 @@ namespace from_json {
 
   inline SEXP simplify_matrix(
       Rcpp::List& out,
-      int& n_col, 
-      int& n_row,
+      R_xlen_t& n_col, 
+      R_xlen_t& n_row,
       int& r_type
   ) {
     
@@ -168,10 +168,13 @@ namespace from_json {
       // } else {
       
       Rcpp::IntegerMatrix mat( n_row, n_col );
-      for( int i = 0; i < n_row; i++ ) {
+      R_xlen_t i;
+      R_xlen_t j;
+      
+      for( i = 0; i < n_row; i++ ) {
         Rcpp::IntegerVector this_vec = out[i];
-        for( int j = 0; j < n_col; j++ ) {
-          int this_val = this_vec[j];
+        for( j = 0; j < n_col; j++ ) {
+          R_xlen_t this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
       }
@@ -190,9 +193,12 @@ namespace from_json {
       // } else {
       
       Rcpp::NumericMatrix mat( n_row, n_col );
-      for( int i = 0; i < n_row; i++ ) {
+      R_xlen_t i;
+      R_xlen_t j;
+      
+      for( i = 0; i < n_row; i++ ) {
         Rcpp::NumericVector this_vec = out[i];
-        for( int j = 0; j < n_col; j++ ) {
+        for( j = 0; j < n_col; j++ ) {
           double this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
@@ -212,9 +218,12 @@ namespace from_json {
       // } else {
       
       Rcpp::LogicalMatrix mat( n_row, n_col );
-      for( int i = 0; i < n_row; i++ ) {
+      R_xlen_t i;
+      R_xlen_t j;
+      
+      for( i = 0; i < n_row; i++ ) {
         Rcpp::LogicalVector this_vec = out[i];
-        for( int j = 0; j < n_col; j++ ) {
+        for( j = 0; j < n_col; j++ ) {
           bool this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
@@ -238,9 +247,12 @@ namespace from_json {
       //   return mat;
       // } else {
       Rcpp::StringMatrix mat( n_row, n_col );
-      for( int i = 0; i < n_row; i++ ) {
+      R_xlen_t i;
+      R_xlen_t j;
+      
+      for( i = 0; i < n_row; i++ ) {
         Rcpp::StringVector this_vec = out[i];
-        for( int j = 0; j < n_col; j++ ) {
+        for( j = 0; j < n_col; j++ ) {
           Rcpp::String this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
@@ -260,6 +272,7 @@ namespace from_json {
     std::unordered_set<int> array_lengths;
     std::unordered_set<int> array_types;
     bool can_be_matrix = true;
+    
     for( j = 0; j < n; j++ ) {
       SEXP s = array_of_array[j];
       int this_type = TYPEOF( s );
@@ -281,8 +294,9 @@ namespace from_json {
     if( can_be_matrix ) {
       Rcpp::IntegerVector arr_types( array_types.begin(), array_types.end() );
       int r_type = Rcpp::max( arr_types );
-      int n_col = *array_lengths.begin();  // only one sizez
-      int n_row = n;
+      R_xlen_t n_col = *array_lengths.begin();  // only one sizez
+      R_xlen_t n_row = n;
+      
       return jsonify::from_json::simplify_matrix( array_of_array, n_col, n_row, r_type );
     } else {
       return array_of_array;
@@ -437,7 +451,7 @@ namespace from_json {
 
   inline SEXP simplify_dataframe_fill_na(
       Rcpp::List& out,
-      int& doc_len
+      R_xlen_t& doc_len
   ) {
     
     // the number of rows is equal to the number of list elements?
@@ -454,10 +468,10 @@ namespace from_json {
     std::unordered_map< std::string, int > column_lengths;
     
     int struct_type;
-    int sexp_length;
+    R_xlen_t sexp_length;
     int tp;
     int st;
-    int ln;
+    R_xlen_t ln;
     
     Rcpp::StringVector list_names;
     std::vector< std::string > column_names;
@@ -569,7 +583,7 @@ namespace from_json {
   // iff any column lenghts are different, it's a list
   inline SEXP simplify_dataframe(
       Rcpp::List& out,
-      int& doc_len
+      R_xlen_t& doc_len
   ) {
     
     // the number of rows is equal to the number of list elements?
@@ -586,10 +600,10 @@ namespace from_json {
     std::unordered_map< std::string, int > column_lengths;
     
     int struct_type;
-    int sexp_length;
+    R_xlen_t sexp_length;
     int tp;
     int st;
-    int ln;
+    R_xlen_t ln;
     
     Rcpp::StringVector list_names;
     
@@ -611,7 +625,7 @@ namespace from_json {
       for( j = 0; j < list_size; j++ ) { 
         const char* this_name = list_names[j];
         Rcpp::StringVector these_names = this_list.names();
-        int found_name = where_is( this_name, these_names );
+        R_xlen_t found_name = where_is( this_name, these_names );
         
         if( found_name == -1 ) {
           // can't simplify

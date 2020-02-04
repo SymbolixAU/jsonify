@@ -10,8 +10,8 @@ namespace jsonify {
 namespace dates {
 
   inline bool is_in( const char* x, Rcpp::CharacterVector v ) {
-    int n = v.size();
-    int i;
+    R_xlen_t n = v.size();
+    R_xlen_t i;
     for( i = 0; i < n; i++ ) {
       if( v[i] == x ) {
         return true;
@@ -22,8 +22,8 @@ namespace dates {
 
   inline Rcpp::StringVector date_to_string( Rcpp::IntegerVector& iv ) {
     
-    int i;
-    int n = iv.size();
+    R_xlen_t i;
+    R_xlen_t n = iv.size();
     Rcpp::StringVector sv( n );
     
     for ( i = 0; i < n; i++ ) {
@@ -37,8 +37,8 @@ namespace dates {
 
   inline Rcpp::StringVector date_to_string( Rcpp::NumericVector& nv ) {
     
-    int i;
-    int n = nv.size();
+    R_xlen_t i;
+    R_xlen_t n = nv.size();
     Rcpp::StringVector sv( n );
     
     for ( i = 0; i < n; i++ ) {
@@ -52,8 +52,8 @@ namespace dates {
 
   inline Rcpp::StringVector posixct_to_string( Rcpp::IntegerVector& iv ) {
     
-    int i;
-    int n = iv.size();
+    R_xlen_t i;
+    R_xlen_t n = iv.size();
 
     Rcpp::StringVector sv( n );
     
@@ -75,8 +75,8 @@ namespace dates {
   
   inline Rcpp::StringVector posixct_to_string( Rcpp::NumericVector& nv ) {
     
-    int i;
-    int n = nv.size();
+    R_xlen_t i;
+    R_xlen_t n = nv.size();
     
     boost::local_time::tz_database tz_db;
     

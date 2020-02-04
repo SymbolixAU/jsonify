@@ -76,7 +76,7 @@ namespace complex {
       int digits, 
       bool numeric_dates, 
       bool factors_as_string, 
-      int row
+      R_xlen_t row
     ) {
     
     switch( TYPEOF( this_vec ) ) {
@@ -136,11 +136,11 @@ namespace complex {
       bool numeric_dates = true,
       bool factors_as_string = true, 
       std::string by = "row", 
-      int row = -1,   // for when we are recursing into a row of a data.frame
+      R_xlen_t row = -1,   // for when we are recursing into a row of a data.frame
       bool in_data_frame = false  // for keeping track of when we're in a column of a data.frame
       ) {
     
-    int i, df_col, df_row;
+    R_xlen_t i, df_col, df_row;
     
     if( Rf_isNull( list_element ) ) {
       writer.StartObject();
@@ -176,8 +176,8 @@ namespace complex {
       
       in_data_frame = true;
       Rcpp::DataFrame df = Rcpp::as< Rcpp::DataFrame >( list_element );
-      int n_cols = df.ncol();
-      int n_rows = df.nrows();
+      R_xlen_t n_cols = df.ncol();
+      R_xlen_t n_rows = df.nrows();
       Rcpp::StringVector column_names = df.names();
       
       // issue 59
@@ -313,7 +313,7 @@ namespace complex {
         } else {
           lst = temp_lst;
 
-          int n = lst.size();
+          R_xlen_t n = lst.size();
           
           if ( n == 0 ) {
             writer.StartArray();

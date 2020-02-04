@@ -13,15 +13,14 @@ namespace from_json {
     const rapidjson::Value& json,
     bool& simplify,
     bool& fill_na,
-    int sequential_array_counter,
-    R_xlen_t& depth
+    R_xlen_t sequential_array_counter
   ) {
 
     Rcpp::List res(1);
     
 
     int json_type = json.GetType();
-    int json_length = json.Size();
+    R_xlen_t json_length = json.Size();
 
     if(json_length == 0) {
       if( json_type == 4 ) {
@@ -34,8 +33,6 @@ namespace from_json {
 
 
     R_xlen_t i;
-    
-    depth = depth + 1;
     //Rcpp::Rcout << "depth: " << depth << std::endl;
     //Rcpp::Rcout << "i: " << i << std::endl;
 
@@ -91,11 +88,11 @@ namespace from_json {
         // array
         case rapidjson::kArrayType: {
           const rapidjson::Value& temp_array = itr->value;
-          out[i] = json_to_sexp( temp_array, simplify, fill_na, sequential_array_counter, depth );
+          out[i] = json_to_sexp( temp_array, simplify, fill_na, sequential_array_counter );
           break;
         }
         case rapidjson::kObjectType: {
-          out[i] = json_to_sexp( itr->value, simplify, fill_na, sequential_array_counter, depth );
+          out[i] = json_to_sexp( itr->value, simplify, fill_na, sequential_array_counter );
           break;
         }
           
@@ -164,7 +161,7 @@ namespace from_json {
         }
         // array
         case rapidjson::kArrayType: {
-          array_of_array[i] = json_to_sexp( json[i], simplify, fill_na, sequential_array_counter, depth );
+          array_of_array[i] = json_to_sexp( json[i], simplify, fill_na, sequential_array_counter );
           sequential_array_counter++;
           break;
         }
@@ -172,7 +169,7 @@ namespace from_json {
         case rapidjson::kObjectType: {
           sequential_array_counter = 0;
           const rapidjson::Value& temp_val = json[i];
-          array_of_array[i] = json_to_sexp( temp_val, simplify, fill_na, sequential_array_counter, depth );
+          array_of_array[i] = json_to_sexp( temp_val, simplify, fill_na, sequential_array_counter );
           break;
         }
         default: {

@@ -36,7 +36,7 @@ void source_tests() {
   Rcpp::LogicalVector lv;
   bool unbox, numeric_dates, factors_as_string;
   int digits;
-  int row;
+  R_xlen_t row;
 
   sv = Rcpp::StringVector::create("a");
   unbox = false;
