@@ -45,7 +45,7 @@ namespace from_json {
       Rcpp::List out( json_length );
       Rcpp::CharacterVector names( json_length );
 
-      i = 0;
+      R_xlen_t i = 0;
       for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
         
         // Rcpp::Rcout << "i: " << i << std::endl;
@@ -108,7 +108,7 @@ namespace from_json {
         }
         
         // Bump i
-        i++;
+        ++i;
       } // for
       
       //Rcpp::Rcout << "res[0] = out; " << std::endl;
@@ -127,7 +127,7 @@ namespace from_json {
 
       Rcpp::List array_of_array( json_length );
 
-      for( i = 0; i < json_length; i++ ) {
+      for( i = 0; i < json_length; ++i ) {
 
         switch( json[i].GetType() ) {
 

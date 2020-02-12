@@ -12,7 +12,7 @@ namespace dates {
   inline bool is_in( const char* x, Rcpp::CharacterVector v ) {
     R_xlen_t n = v.size();
     R_xlen_t i;
-    for( i = 0; i < n; i++ ) {
+    for( i = 0; i < n; ++i ) {
       if( v[i] == x ) {
         return true;
       }
@@ -26,7 +26,7 @@ namespace dates {
     R_xlen_t n = iv.size();
     Rcpp::StringVector sv( n );
     
-    for ( i = 0; i < n; i++ ) {
+    for ( i = 0; i < n; ++i ) {
       Rcpp::Date d = iv[i];
       boost::gregorian::date gd = boost::gregorian::date(d.getYear(), d.getMonth(), d.getDay());
       std::string s = boost::gregorian::to_iso_extended_string( gd );
@@ -41,7 +41,7 @@ namespace dates {
     R_xlen_t n = nv.size();
     Rcpp::StringVector sv( n );
     
-    for ( i = 0; i < n; i++ ) {
+    for ( i = 0; i < n; ++i ) {
       Rcpp::Date d = nv[i];
       boost::gregorian::date gd = boost::gregorian::date(d.getYear(), d.getMonth(), d.getDay());
       std::string s = boost::gregorian::to_iso_extended_string( gd );
@@ -57,7 +57,7 @@ namespace dates {
 
     Rcpp::StringVector sv( n );
     
-    for ( i = 0; i < n; i++ ) {
+    for ( i = 0; i < n; ++i ) {
       Rcpp::Datetime d = iv[i];
       boost::gregorian::date dt( d.getYear(), d.getMonth(), d.getDay() );
       boost::posix_time::hours h( d.getHours() );
@@ -82,7 +82,7 @@ namespace dates {
     
     Rcpp::StringVector sv( n );
     
-    for ( i = 0; i < n; i++ ) {
+    for ( i = 0; i < n; ++i ) {
       Rcpp::Datetime d = nv[i];
       boost::gregorian::date dt( d.getYear(), d.getMonth(), d.getDay() );
       boost::posix_time::hours h( d.getHours() );

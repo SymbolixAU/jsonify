@@ -16,11 +16,11 @@ namespace complex {
   template < typename Writer >
   inline void switch_vector(
       Writer& writer, 
-      SEXP this_vec, 
-      bool unbox, 
-      int digits, 
-      bool numeric_dates, 
-      bool factors_as_string
+      SEXP& this_vec, 
+      bool& unbox, 
+      int& digits, 
+      bool& numeric_dates, 
+      bool& factors_as_string
     ) {
     
     switch( TYPEOF( this_vec ) ) {
@@ -71,12 +71,12 @@ namespace complex {
   template < typename Writer >
   inline void switch_vector(
       Writer& writer, 
-      SEXP this_vec, 
-      bool unbox, 
-      int digits, 
-      bool numeric_dates, 
-      bool factors_as_string, 
-      R_xlen_t row
+      SEXP& this_vec, 
+      bool& unbox, 
+      int& digits, 
+      bool& numeric_dates, 
+      bool& factors_as_string, 
+      R_xlen_t& row
     ) {
     
     switch( TYPEOF( this_vec ) ) {
@@ -328,7 +328,7 @@ namespace complex {
           
           if ( has_names ) {
             Rcpp::CharacterVector temp_names = lst.names();
-            for( i = 0; i < n; i++ ) {
+            for( i = 0; i < n; ++i ) {
               list_names[i] = temp_names[i] == "" ? list_names[i] : temp_names[i];
             }
           }
@@ -338,7 +338,7 @@ namespace complex {
           // list-column in a data.frame shouldn't be nested inside another array
           jsonify::utils::writer_starter( writer, has_names, in_data_frame );
           
-          for ( i = 0; i < n; i++ ) {
+          for ( i = 0; i < n; ++i ) {
             
             SEXP recursive_list = lst[ i ];
             if ( has_names ) {

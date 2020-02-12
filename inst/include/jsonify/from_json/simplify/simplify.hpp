@@ -17,7 +17,7 @@ namespace from_json {
     R_xlen_t vec_length = x_size* n;
     
     // each list element MUST be length n
-    for( i = 0; i < x_size; i++ ) {
+    for( i = 0; i < x_size; ++i ) {
       if( Rf_length( x[i] ) != n ) {
         Rcpp::stop("jsonify - list elements different sizes");
       }
@@ -87,7 +87,7 @@ namespace from_json {
     R_xlen_t i;
     Rcpp::List out( arr_len );
     
-    for( i = 0; i < arr_len; i++ ) {
+    for( i = 0; i < arr_len; ++i ) {
       
       switch(array[i].GetType()) {
       // bool - false
@@ -154,13 +154,15 @@ namespace from_json {
       int& r_type
   ) {
     
+    R_xlen_t i, j;
+    
     switch( r_type ) {
     case INTSXP: {
       
       // if( by == "col") {
       //   Rcpp::IntegerMatrix mat( n_col, n_row ); // swapped
       // 
-      //   for(int i = 0; i < n_col; i++ ) {
+      //   for(int i = 0; i < n_col; ++i ) {
       //     Rcpp::IntegerVector this_vec = out[i];
       //     mat( Rcpp::_, i ) = this_vec;
       //   }
@@ -168,13 +170,11 @@ namespace from_json {
       // } else {
       
       Rcpp::IntegerMatrix mat( n_row, n_col );
-      R_xlen_t i;
-      R_xlen_t j;
       
-      for( i = 0; i < n_row; i++ ) {
+      for( i = 0; i < n_row; ++i ) {
         Rcpp::IntegerVector this_vec = out[i];
-        for( j = 0; j < n_col; j++ ) {
-          R_xlen_t this_val = this_vec[j];
+        for( j = 0; j < n_col; ++j ) {
+          int this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
       }
@@ -185,7 +185,7 @@ namespace from_json {
       // if( by == "col" ) {
       //   Rcpp::NumericMatrix mat( n_row, n_col );
       //   //if by == col
-      //   for(int i = 0; i < n_col; i++ ) {
+      //   for(int i = 0; i < n_col; ++i ) {
       //     Rcpp::NumericVector this_vec = out[i];
       //     mat( Rcpp::_, i ) = this_vec;
       //   }
@@ -193,12 +193,9 @@ namespace from_json {
       // } else {
       
       Rcpp::NumericMatrix mat( n_row, n_col );
-      R_xlen_t i;
-      R_xlen_t j;
-      
-      for( i = 0; i < n_row; i++ ) {
+      for( i = 0; i < n_row; ++i ) {
         Rcpp::NumericVector this_vec = out[i];
-        for( j = 0; j < n_col; j++ ) {
+        for( j = 0; j < n_col; ++j ) {
           double this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
@@ -210,7 +207,7 @@ namespace from_json {
       // if( by == "col" ) {
       //   Rcpp::LogicalMatrix mat( n_row, n_col );
       //   //if by == col
-      //   for(int i = 0; i < n_col; i++ ) {
+      //   for(int i = 0; i < n_col; ++i ) {
       //     Rcpp::LogicalVector this_vec = out[i];
       //     mat( Rcpp::_, i ) = this_vec;
       //   }
@@ -218,12 +215,9 @@ namespace from_json {
       // } else {
       
       Rcpp::LogicalMatrix mat( n_row, n_col );
-      R_xlen_t i;
-      R_xlen_t j;
-      
-      for( i = 0; i < n_row; i++ ) {
+      for( i = 0; i < n_row; ++i ) {
         Rcpp::LogicalVector this_vec = out[i];
-        for( j = 0; j < n_col; j++ ) {
+        for( j = 0; j < n_col; ++j ) {
           bool this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
@@ -240,19 +234,16 @@ namespace from_json {
       // if( by == "col" ) {
       //   Rcpp::StringMatrix mat( n_row, n_col );
       //   //if by == col
-      //   for(int i = 0; i < n_col; i++ ) {
+      //   for(int i = 0; i < n_col; ++i ) {
       //     Rcpp::StringVector this_vec = out[i];
       //     mat( Rcpp::_, i ) = this_vec;
       //   }
       //   return mat;
       // } else {
       Rcpp::StringMatrix mat( n_row, n_col );
-      R_xlen_t i;
-      R_xlen_t j;
-      
-      for( i = 0; i < n_row; i++ ) {
+      for( i = 0; i < n_row; ++i ) {
         Rcpp::StringVector this_vec = out[i];
-        for( j = 0; j < n_col; j++ ) {
+        for( j = 0; j < n_col; ++j ) {
           Rcpp::String this_val = this_vec[j];
           mat( i, j ) = this_val;
         }
@@ -269,11 +260,11 @@ namespace from_json {
   ) {
     R_xlen_t n = array_of_array.size();
     R_xlen_t j;
-    std::unordered_set<int> array_lengths;
-    std::unordered_set<int> array_types;
+    std::unordered_set< R_xlen_t > array_lengths;
+    std::unordered_set< int > array_types;
     bool can_be_matrix = true;
     
-    for( j = 0; j < n; j++ ) {
+    for( j = 0; j < n; ++j ) {
       SEXP s = array_of_array[j];
       int this_type = TYPEOF( s );
       if( Rf_isMatrix( s ) || this_type == VECSXP ) {
@@ -296,7 +287,7 @@ namespace from_json {
       int r_type = Rcpp::max( arr_types );
       R_xlen_t n_col = *array_lengths.begin();  // only one sizez
       R_xlen_t n_row = n;
-      
+
       return jsonify::from_json::simplify_matrix( array_of_array, n_col, n_row, r_type );
     } else {
       return array_of_array;
@@ -331,7 +322,7 @@ namespace from_json {
         switch( r_type ) {
         case LGLSXP: {
           Rcpp::LogicalMatrix m( n_rows, n_cols );
-          for( i = 0; i < n_rows; i++ ) {
+          for( i = 0; i < n_rows; ++i ) {
             Rcpp::LogicalVector v = Rcpp::as< Rcpp::LogicalVector >( lst[i] );
             m( i, Rcpp::_ ) = v;
           }
@@ -340,7 +331,7 @@ namespace from_json {
         }
         case INTSXP: {
           Rcpp::IntegerMatrix m( n_rows, n_cols );
-          for( i = 0; i < n_rows; i++ ) {
+          for( i = 0; i < n_rows; ++i ) {
             Rcpp::IntegerVector v = Rcpp::as< Rcpp::IntegerVector >( lst[i] );
             m( i, Rcpp::_ ) = v;
           }
@@ -349,7 +340,7 @@ namespace from_json {
         }
         case REALSXP: {
           Rcpp::NumericMatrix m( n_rows, n_cols );
-          for( i = 0; i < n_rows; i++ ) {
+          for( i = 0; i < n_rows; ++i ) {
             Rcpp::NumericVector v = Rcpp::as< Rcpp::NumericVector >( lst[i] );
             m( i, Rcpp::_ ) = v;
           }
@@ -358,7 +349,7 @@ namespace from_json {
         }
         case STRSXP: {
           Rcpp::StringMatrix m( n_rows, n_cols );
-          for( i = 0; i < n_rows; i++ ) {
+          for( i = 0; i < n_rows; ++i ) {
             Rcpp::StringVector v = Rcpp::as< Rcpp::StringVector >( lst[i] );
             m( i, Rcpp::_ ) = v;
           }
@@ -381,7 +372,7 @@ namespace from_json {
         switch( r_type ) {
         case LGLSXP: {
           Rcpp::LogicalVector lv( n_rows );
-          for( i = 0; i < n_rows; i++ ) {
+          for( i = 0; i < n_rows; ++i ) {
             if( Rf_isNull( lst[i] ) ) {
               lv[i] = NA_LOGICAL;
             } else {
@@ -393,7 +384,7 @@ namespace from_json {
         }
         case INTSXP: {
           Rcpp::IntegerVector iv( n_rows );
-          for( i = 0; i < n_rows; i++ ) {
+          for( i = 0; i < n_rows; ++i ) {
             if( Rf_isNull( lst[i] ) ) {
               iv[i] = NA_INTEGER;
             } else {
@@ -405,7 +396,7 @@ namespace from_json {
         }
         case REALSXP: {
           Rcpp::NumericVector nv( n_rows );
-          for( i = 0; i < n_rows; i++ ) {
+          for( i = 0; i < n_rows; ++i ) {
             if( Rf_isNull( lst[i] ) ) {
               nv[i] = NA_REAL;
             } else {
@@ -417,7 +408,7 @@ namespace from_json {
         }
         case STRSXP: {
           Rcpp::StringVector sv( n_rows );
-          for( i = 0; i < n_rows; i++ ) {
+          for( i = 0; i < n_rows; ++i ) {
             if( Rf_isNull( lst[i] ) ) {
               sv[i] = NA_STRING;
             } else {
@@ -465,7 +456,7 @@ namespace from_json {
     
     std::unordered_map< std::string, int > column_types;
     std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
-    std::unordered_map< std::string, int > column_lengths;
+    std::unordered_map< std::string, R_xlen_t > column_lengths;
     
     int struct_type;
     R_xlen_t sexp_length;
@@ -478,7 +469,7 @@ namespace from_json {
     bool new_column = true;
     
     
-    for( i = 0; i < n_rows; i++ ) {
+    for( i = 0; i < n_rows; ++i ) {
       // iterating list elements
       Rcpp::List this_list = out[i];
 
@@ -493,7 +484,7 @@ namespace from_json {
       }
       
       // Iterate over names??
-      for( j = 0; j < list_size; j++ ) { 
+      for( j = 0; j < list_size; ++j ) { 
         const char* this_name = list_names[j];
             
         // does this_name exist in the vector of names?
@@ -573,8 +564,11 @@ namespace from_json {
     }
     
     columns.attr("class") = "data.frame";
-    columns.attr("row.names") = Rcpp::seq(1, n_rows);
-    
+    if( n_rows > 0 ) {
+      columns.attr("row.names") = Rcpp::seq(1, n_rows);
+    } else {
+      columns.attr("row.names") = Rcpp::IntegerVector(0);
+    }
     return columns;
   }
 
@@ -597,7 +591,7 @@ namespace from_json {
     
     std::unordered_map< std::string, int > column_types;
     std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
-    std::unordered_map< std::string, int > column_lengths;
+    std::unordered_map< std::string, R_xlen_t > column_lengths;
     
     int struct_type;
     R_xlen_t sexp_length;
@@ -607,7 +601,7 @@ namespace from_json {
     
     Rcpp::StringVector list_names;
     
-    for( i = 0; i < n_rows; i++ ) {
+    for( i = 0; i < n_rows; ++i ) {
       // iterating list elements
       Rcpp::List this_list = out[i];
       if( i == 0 ) {
@@ -622,7 +616,7 @@ namespace from_json {
       }
       
       // Iterate over names??
-      for( j = 0; j < list_size; j++ ) { 
+      for( j = 0; j < list_size; ++j ) { 
         const char* this_name = list_names[j];
         Rcpp::StringVector these_names = this_list.names();
         R_xlen_t found_name = where_is( this_name, these_names );
@@ -707,7 +701,11 @@ namespace from_json {
     
     //columns.attr("names") = names;
     columns.attr("class") = "data.frame";
-    columns.attr("row.names") = Rcpp::seq(1, n_rows);
+    if( n_rows > 0 ) {
+      columns.attr("row.names") = Rcpp::seq(1, n_rows);
+    } else {
+      columns.attr("row.names") = Rcpp::IntegerVector(0);
+    }
     
     return columns;
   }

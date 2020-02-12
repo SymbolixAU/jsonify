@@ -9,7 +9,7 @@ namespace jsonify {
 namespace api {
 
   inline Rcpp::StringVector to_json(
-    SEXP lst, 
+    SEXP& lst, 
     bool unbox = false, 
     int digits = -1, 
     bool numeric_dates = true, 
@@ -53,14 +53,14 @@ namespace api {
     
     if( by == "row" ) {
       
-      for( row = 0; row < n_row; row++ ) {
+      for( row = 0; row < n_row; ++row ) {
         
         // create new stream each row
         rapidjson::StringBuffer sb;
         rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
         
         writer.StartObject();
-        for( df_col = 0; df_col < n_cols; df_col++ ) {
+        for( df_col = 0; df_col < n_cols; ++df_col ) {
           
           const char *h = column_names[ df_col ];
           writer.String( h );
@@ -71,11 +71,15 @@ namespace api {
           
           case VECSXP: {
             Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-            jsonify::writers::complex::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row, in_data_frame );
+            jsonify::writers::complex::write_value(
+              writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row, in_data_frame
+              );
             break;
           }
           default: {
-            jsonify::writers::complex::switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, row );
+            jsonify::writers::complex::switch_vector(
+              writer, this_vec, unbox, digits, numeric_dates, factors_as_string, row
+            );
           }
           } // end switch
           
@@ -88,7 +92,7 @@ namespace api {
       
     } else {
       // by == "column"
-      for( df_col = 0; df_col < n_cols; df_col++ ) {
+      for( df_col = 0; df_col < n_cols; ++df_col ) {
         // create new stream each row
         rapidjson::StringBuffer sb;
         rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
@@ -113,7 +117,7 @@ namespace api {
   }
 
   inline void to_ndjson(
-      Rcpp::LogicalMatrix mat,
+      Rcpp::LogicalMatrix& mat,
       std::ostringstream& os,
       bool unbox = false,
       std::string by = "row"
@@ -161,7 +165,7 @@ namespace api {
   }
 
   inline void to_ndjson(
-      Rcpp::IntegerMatrix mat,
+      Rcpp::IntegerMatrix& mat,
       std::ostringstream& os,
       bool unbox = false,
       std::string by = "row"
@@ -210,7 +214,7 @@ namespace api {
   
   
   inline void to_ndjson(
-    Rcpp::NumericMatrix mat,
+    Rcpp::NumericMatrix& mat,
     std::ostringstream& os,
     bool unbox = false,
     int digits = -1,
@@ -259,7 +263,7 @@ namespace api {
   }
 
   inline Rcpp::StringVector to_ndjson(
-      Rcpp::StringMatrix mat,
+      Rcpp::StringMatrix& mat,
       std::ostringstream& os,
       bool unbox = false,
       std::string by = "row"
@@ -349,7 +353,7 @@ namespace api {
 
   // lists are non-recursive; only the first element is ndjsonified...
   inline Rcpp::StringVector to_ndjson(
-    SEXP obj,
+    SEXP& obj,
     bool unbox = false,
     int digits = -1,
     bool numeric_dates = true,
