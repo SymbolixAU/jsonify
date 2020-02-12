@@ -121,7 +121,7 @@ ndjson_to_r.character <- function( ndjson, simplify = TRUE, fill_na ) {
       )
     )
   }
-  return( rcpp_from_ndjson( json, simplify, fill_na ) )
+  return( rcpp_from_ndjson( ndjson, simplify, fill_na ) )
 }
 
 #' @export

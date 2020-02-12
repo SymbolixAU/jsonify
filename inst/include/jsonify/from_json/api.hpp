@@ -61,15 +61,24 @@ namespace api {
 
   inline SEXP from_ndjson( const char * ndjson, bool& simplify, bool& fill_na ) {
     
-    std::ostringstream os;
-    os << '[';
-    os << ndjson;
-    os << ']';
+    // TODO:
+    // - if ndjson is a single json object, no need to wrap in `[]` as this will nest it deeper
+    rapidjson::Document doc;
+    doc.Parse(ndjson);
     
-    std::string json = os.str();
-    std::replace( json.begin(), json.end(), '\n', ',');
+    std::string json;
     
-    return from_json( json.c_str(), simplify, fill_na );
+    if(doc.HasParseError()) {
+      std::ostringstream os;
+      os << '[';
+      os << ndjson;
+      os << ']';
+      json = os.str();
+      std::replace( json.begin(), json.end(), '\n', ',');
+      return from_json( json.c_str(), simplify, fill_na );
+    } 
+    
+    return from_json( doc, simplify, fill_na );
     
   }
 

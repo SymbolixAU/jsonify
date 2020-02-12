@@ -321,12 +321,27 @@ namespace api {
   ) {
     R_xlen_t n = lst.size();
     R_xlen_t i;
+    bool has_names = lst.hasAttribute("names");
+    
+    Rcpp::StringVector list_names;
+    if( has_names ) {
+      list_names = lst.names();
+    }
     
     for( i = 0; i < n; ++i ) {
       rapidjson::StringBuffer sb;
       rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
       SEXP s = lst[ i ];
+      
+      if( has_names ) {
+        writer.StartObject();
+        const char *h = list_names[ i ];
+        writer.String( h );
+      }
       jsonify::writers::complex::write_value( writer, s, unbox, digits, numeric_dates, factors_as_string, by );
+      if( has_names ) {
+        writer.EndObject();
+      }
       os << sb.GetString();
       os << '\n';
     }
