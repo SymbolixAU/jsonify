@@ -13,13 +13,13 @@ namespace from_json {
     const rapidjson::Value& json,
     bool& simplify,
     bool& fill_na,
-    int sequential_array_counter
+    R_xlen_t sequential_array_counter
   ) {
 
     Rcpp::List res(1);
 
     int json_type = json.GetType();
-    int json_length = json.Size();
+    R_xlen_t json_length = json.Size();
 
     if(json_length == 0) {
       if( json_type == 4 ) {
@@ -42,7 +42,7 @@ namespace from_json {
       Rcpp::List out( json_length );
       Rcpp::CharacterVector names( json_length );
 
-      int i = 0;
+      R_xlen_t i = 0;
       for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
 
         // Get current key
@@ -99,7 +99,7 @@ namespace from_json {
         }
 
         // Bump i
-        i++;
+        ++i;
       } // for
 
       out.attr("names") = names;
@@ -116,7 +116,7 @@ namespace from_json {
 
       Rcpp::List array_of_array( json_length );
 
-      for( i = 0; i < json_length; i++ ) {
+      for( i = 0; i < json_length; ++i ) {
 
         switch( json[i].GetType() ) {
 

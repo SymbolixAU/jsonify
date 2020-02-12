@@ -24,7 +24,7 @@ namespace scalars {
   }
   
   template <typename Writer>
-  inline void write_value( Writer& writer, double& value, int digits ) {
+  inline void write_value( Writer& writer, double& value, int& digits ) {
     
     if(std::isnan( value ) ) {
       writer.Null();

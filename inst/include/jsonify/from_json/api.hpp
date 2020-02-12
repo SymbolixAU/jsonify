@@ -16,7 +16,7 @@ namespace api {
   //' @export
   inline SEXP from_json(rapidjson::Value& doc, bool& simplify, bool& fill_na ) {
 
-    int sequential_array_counter = 0;
+    R_xlen_t sequential_array_counter = 0;
     
     // If the input is a scalar value of type int, double, string, or bool, 
     // return Rcpp vector with length 1.
