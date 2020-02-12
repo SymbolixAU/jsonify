@@ -9,7 +9,7 @@ namespace jsonify {
 namespace api {
 
   inline Rcpp::StringVector to_json(
-    SEXP& lst, 
+    SEXP lst, 
     bool unbox = false, 
     int digits = -1, 
     bool numeric_dates = true, 
