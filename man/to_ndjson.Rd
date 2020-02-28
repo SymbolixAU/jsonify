@@ -4,8 +4,14 @@
 \alias{to_ndjson}
 \title{To ndjson}
 \usage{
-to_ndjson(x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
-  factors_as_string = TRUE, by = "row")
+to_ndjson(
+  x,
+  unbox = FALSE,
+  digits = NULL,
+  numeric_dates = TRUE,
+  factors_as_string = TRUE,
+  by = "row"
+)
 }
 \arguments{
 \item{x}{object to convert to JSON}

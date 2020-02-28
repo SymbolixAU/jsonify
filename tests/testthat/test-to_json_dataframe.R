@@ -22,44 +22,44 @@ test_that("data.frame - all R data types are converted", {
   expect_true( validate_json( js ) ) 
   expect_equal('[{"id":"a"},{"id":"b"}]', as.character( js ) )
   
-  df <- data.frame(id = c(T,FALSE))                       ## logical
+  df <- data.frame(id = c(T,FALSE), stringsAsFactors = TRUE)                       ## logical
   js <- to_json( df )
   expect_true( validate_json( js ) ) 
   expect_equal('[{"id":true},{"id":false}]', as.character( js ) )
   
-  df <- data.frame(id = as.Date("2018-01-01"))            ## Date
+  df <- data.frame(id = as.Date("2018-01-01"), stringsAsFactors = TRUE)            ## Date
   js <- to_json( df, numeric_dates = FALSE )
   expect_true( validate_json( js ) ) 
   expect_equal('[{"id":"2018-01-01"}]', as.character( js ) )
   
-  df <- data.frame(id = as.POSIXct("2018-01-01 00:00:59", tz = "Australia/Melbourne"))            ## Posixct
+  df <- data.frame(id = as.POSIXct("2018-01-01 00:00:59", tz = "Australia/Melbourne"), stringsAsFactors = TRUE)            ## Posixct
   js <- to_json( df, numeric_dates = FALSE )
   expect_true( validate_json( js ) ) 
   expect_equal('[{"id":"2017-12-31T13:00:59"}]', as.character( js ) )
   
-  df <- data.frame(id = as.POSIXlt("2018-01-01 00:00:59", tz = "Australia/Melbourne"))            ## Posixct
+  df <- data.frame(id = as.POSIXlt("2018-01-01 00:00:59", tz = "Australia/Melbourne"), stringsAsFactors = TRUE)            ## Posixct
   js <- to_json( df, numeric_dates = FALSE )
   expect_true( validate_json( js ) ) 
   expect_equal('[{"id":"2017-12-31T13:00:59"}]', as.character( js ) )
 })
 
 test_that("data.frame - complex columns are jsonified", {
-  df <- data.frame( id = 1, val = I(list(c(0))))
+  df <- data.frame( id = 1, val = I(list(c(0))), stringsAsFactors = TRUE)
   js <- to_json( df )
   expect_equal( as.character( js ), "[{\"id\":1.0,\"val\":[0.0]}]")
   expect_true( jsonify::validate_json( js ) ) 
   
-  df <- data.frame( id = 1, val = I(list(c(0))))
+  df <- data.frame( id = 1, val = I(list(c(0))), stringsAsFactors = TRUE)
   js <- to_json( df, unbox = TRUE  )
   expect_equal( as.character( js ), "[{\"id\":1.0,\"val\":0.0}]")
   expect_true( jsonify::validate_json( js ) ) 
   
-  df <- data.frame( id = 1, val = I(list(c(0,0))))
+  df <- data.frame( id = 1, val = I(list(c(0,0))), stringsAsFactors = TRUE)
   js <- to_json( df )
   expect_equal( as.character( js ), "[{\"id\":1.0,\"val\":[0.0,0.0]}]")
   expect_true( jsonify::validate_json( js ) ) 
   
-  df <- data.frame( id = 1, val = I(list(letters[1:5])))
+  df <- data.frame( id = 1, val = I(list(letters[1:5])), stringsAsFactors = TRUE)
   js <- to_json( df )
   expect_equal( as.character( js ), "[{\"id\":1.0,\"val\":[\"a\",\"b\",\"c\",\"d\",\"e\"]}]")
   expect_true( jsonify::validate_json( js ) ) 
@@ -101,6 +101,7 @@ test_that("data.frame - complex columns are jsonified", {
     , val = I(list( x = 1:2, y = 3:6 ) )
     , val2 = I(list( a = "a", b = c("b","c") ) )
     , val3 = I(list( l = list( 1:3, l2 = c("a","b")), 1))
+    , stringsAsFactors = TRUE
     )
   
   js <- to_json( df )
@@ -114,7 +115,7 @@ test_that("data.frame - complex columns are jsonified", {
 
 test_that("column factors return levels and characters", {
   
-  df <- data.frame( id = 1:5, val = letters[1:5] )
+  df <- data.frame( id = 1:5, val = letters[1:5], stringsAsFactors = TRUE )
   js <- to_json( df, by = "column", factors_as_string = FALSE )
   expect_equal( as.character( js ), '{"id":[1,2,3,4,5],"val":[1,2,3,4,5]}')
   expect_true( validate_json( js ) )
@@ -177,6 +178,7 @@ test_that("ISSUE 38 - data.frames inside data.frames works", {
   df <- data.frame(
     id = 1
     , details = I(details)
+    , stringsAsFactors = TRUE
   )
   
   js <- to_json( df )
@@ -186,6 +188,7 @@ test_that("ISSUE 38 - data.frames inside data.frames works", {
   df <- data.frame(
     id = 1
     , details = details
+    , stringsAsFactors = TRUE
   )
   
   js <- to_json( df )
@@ -196,7 +199,7 @@ test_that("ISSUE 38 - data.frames inside data.frames works", {
 
 test_that("data.frame with a matrix-column works", {
   
-  df <- data.frame( id = 1:2, mat = I(matrix(1:4, ncol = 2)))
+  df <- data.frame( id = 1:2, mat = I(matrix(1:4, ncol = 2)), stringsAsFactors = TRUE)
   js <- to_json( df )
   expect_equal( as.character(js), '[{"id":1,"mat":[1,3]},{"id":2,"mat":[2,4]}]')
   expect_true( validate_json( js ) )
@@ -218,7 +221,7 @@ test_that("data.frame with a matrix-column works", {
 
 test_that("issue 55 is solved",{
   
-  df <- data.frame(string = c("first", NA))
+  df <- data.frame(string = c("first", NA), stringsAsFactors = TRUE)
   js <- to_json( df )
   expect_equal( as.character( js ), '[{"string":"first"},{"string":null}]')
   

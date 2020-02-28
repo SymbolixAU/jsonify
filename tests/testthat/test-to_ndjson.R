@@ -11,7 +11,7 @@ test_that("objects converted to ndjson",{
   expect_equal( unclass( to_ndjson( x = mat ) ), '[1,4]\n[2,5]\n[3,6]')
   expect_equal( unclass( to_ndjson( x = mat, by = "col" ) ), '[1,2,3]\n[4,5,6]' )
 
-  df <- data.frame(x = 1)
+  df <- data.frame(x = 1, stringsAsFactors = TRUE)
   expect_equal( unclass( to_ndjson( df ) ), '{"x":1.0}')
   lst <- list(x = 1, 3)
   expect_equal( unclass( to_ndjson( lst ) ), '{"x":[1.0]}\n{"":[3.0]}')
@@ -20,6 +20,7 @@ test_that("objects converted to ndjson",{
     x = 1:5
     , y = letters[1:5]
     , z = as.Date(seq(18262, 18262 + 4, by = 1 ), origin = "1970-01-01" )
+    , stringsAsFactors = TRUE
     )
 
   expect_equal( unclass( to_ndjson( x = df ) ) , "{\"x\":1,\"y\":\"a\",\"z\":18262.0}\n{\"x\":2,\"y\":\"b\",\"z\":18263.0}\n{\"x\":3,\"y\":\"c\",\"z\":18264.0}\n{\"x\":4,\"y\":\"d\",\"z\":18265.0}\n{\"x\":5,\"y\":\"e\",\"z\":18266.0}" )
@@ -33,7 +34,7 @@ test_that("objects converted to ndjson",{
     x = 1:5
     , y = list(
       a = letters[1:5]
-      , b = data.frame(i = 10:15, j = 20:25)
+      , b = data.frame(i = 10:15, j = 20:25, stringsAsFactors = TRUE)
     )
   )
 

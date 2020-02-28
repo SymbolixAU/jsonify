@@ -32,7 +32,7 @@ test_that("new-line separated json is parsed correctly",{
     1:5
     , list(
       a = letters[1:5]
-      , b = data.frame(i = 10:15, j = 20:25)
+      , b = data.frame(i = 10:15, j = 20:25, stringsAsFactors = TRUE)
     )
   )
   
@@ -43,12 +43,22 @@ test_that("new-line separated json is parsed correctly",{
     x = 1:5
     , y = list(
       a = letters[1:5]
-      , b = data.frame(i = 10:15, j = 20:25)
+      , b = data.frame(i = 10:15, j = 20:25, stringsAsFactors = TRUE)
     )
   )
   
-  expect_equal( lst, from_ndjson( "{\"x\":[1,2,3,4,5]}\n{\"y\":{\"a\":[\"a\",\"b\",\"c\",\"d\",\"e\"],\"b\":[{\"i\":10,\"j\":20},{\"i\":11,\"j\":21},{\"i\":12,\"j\":22},{\"i\":13,\"j\":23},{\"i\":14,\"j\":24},{\"i\":15,\"j\":25}]}}" ) )
+  # nd <- "{\"x\":[1,2,3,4,5]}\n{\"y\":{\"a\":[\"a\",\"b\",\"c\",\"d\",\"e\"],\"b\":[{\"i\":10,\"j\":20},{\"i\":11,\"j\":21},{\"i\":12,\"j\":22},{\"i\":13,\"j\":23},{\"i\":14,\"j\":24},{\"i\":15,\"j\":25}]}}"
+  # js <- "{\"x\":[1,2,3,4,5]},{\"y\":{\"a\":[\"a\",\"b\",\"c\",\"d\",\"e\"],\"b\":[{\"i\":10,\"j\":20},{\"i\":11,\"j\":21},{\"i\":12,\"j\":22},{\"i\":13,\"j\":23},{\"i\":14,\"j\":24},{\"i\":15,\"j\":25}]}}]"
+  # 
+  # from_ndjson( nd )
+  # from_json( js )
   
+  ## See comments in issue 58 as to why this is necessary
+  ## https://github.com/SymbolixAU/jsonify/issues/58#issuecomment-585098163
+  expect_equal(
+    from_ndjson( to_ndjson( lst ) )
+    , from_ndjson( "{\"x\":[1,2,3,4,5]}\n{\"y\":{\"a\":[\"a\",\"b\",\"c\",\"d\",\"e\"],\"b\":[{\"i\":10,\"j\":20},{\"i\":11,\"j\":21},{\"i\":12,\"j\":22},{\"i\":13,\"j\":23},{\"i\":14,\"j\":24},{\"i\":15,\"j\":25}]}}" )
+    )
   
 })
 

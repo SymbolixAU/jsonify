@@ -80,7 +80,7 @@ namespace from_json {
     // them in an R vector
     
     int r_type = 0;
-    int first_r_type; // for keeping track if the vector has been coerced when simplified
+    // int first_r_type; // for keeping track if the vector has been coerced when simplified
     // every member of the array will be coerced to the max d-type sexp type
     // but first, get each element and put into a list
     R_xlen_t arr_len = array.Size();
@@ -136,9 +136,9 @@ namespace from_json {
         Rcpp::stop("jsonify - array_to_vector only able to parse int, double, string and bool");
       }
       }
-      if( i == 0 ) {
-        first_r_type = r_type;
-      }
+      // if( i == 0 ) {
+      //   first_r_type = r_type;
+      // }
     }
     
     if( simplify ) {
@@ -299,8 +299,8 @@ namespace from_json {
   inline void list_to_vector(
       Rcpp::List& columns,
       std::string& this_name,
-      int& r_type,
-      int& struct_type, // 1 vector, 2 matrix, 3 list
+      R_xlen_t& r_type,
+      R_xlen_t& struct_type, // 1 vector, 2 matrix, 3 list
       bool fill_na
   ) {
     
@@ -454,14 +454,14 @@ namespace from_json {
     // keep track of it's type
     Rcpp::List columns;        // will grow when a new column name is found
     
-    std::unordered_map< std::string, int > column_types;
-    std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
+    std::unordered_map< std::string, R_xlen_t > column_types;
+    std::unordered_map< std::string, R_xlen_t > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
     std::unordered_map< std::string, R_xlen_t > column_lengths;
     
-    int struct_type;
+    R_xlen_t struct_type;
     R_xlen_t sexp_length;
-    int tp;
-    int st;
+    R_xlen_t tp;
+    R_xlen_t st;
     R_xlen_t ln;
     
     Rcpp::StringVector list_names;
@@ -552,7 +552,7 @@ namespace from_json {
     for( auto& it: column_types ) {
       
       std::string this_name = it.first;
-      int r_type = it.second;
+      R_xlen_t r_type = it.second;
       struct_type = column_value( column_structs, this_name.c_str() );
       if( struct_type == 3 ) {
         // can it be a data.frame?
@@ -589,14 +589,14 @@ namespace from_json {
     // keep track of it's type
     Rcpp::List columns;        // will grow when a new column name is found
     
-    std::unordered_map< std::string, int > column_types;
-    std::unordered_map< std::string, int > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
+    std::unordered_map< std::string, R_xlen_t > column_types;
+    std::unordered_map< std::string, R_xlen_t > column_structs; // int : 1 == vector element, 2 == matrix, 3 == list;
     std::unordered_map< std::string, R_xlen_t > column_lengths;
     
-    int struct_type;
+    R_xlen_t struct_type;
     R_xlen_t sexp_length;
-    int tp;
-    int st;
+    R_xlen_t tp;
+    R_xlen_t st;
     R_xlen_t ln;
     
     Rcpp::StringVector list_names;
@@ -688,7 +688,7 @@ namespace from_json {
     for( auto& it: column_types ) {
       
       std::string this_name = it.first;
-      int r_type = it.second;
+      R_xlen_t r_type = it.second;
       struct_type = column_value( column_structs, this_name.c_str() );
       if( struct_type == 3 ) {
         // can it be a data.frame?

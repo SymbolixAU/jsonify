@@ -120,20 +120,20 @@ namespace from_json {
   
   // returns -1 if doens't exist
   // else the stored r_type
-  inline R_xlen_t column_value(
-      std::unordered_map< std::string, int >& column_map,
-      const char* to_find
-    ) {
-    std::string str( to_find );
-    std::unordered_map< std::string, int >::iterator it;
-    it = column_map.find( str );
-    
-    if( it != column_map.end() ) {
-      R_xlen_t res = it->second;
-      return res;
-    }
-    return -1;
-  }
+  // inline R_xlen_t column_value(
+  //     std::unordered_map< std::string, int >& column_map,
+  //     const char* to_find
+  //   ) {
+  //   std::string str( to_find );
+  //   std::unordered_map< std::string, int >::iterator it;
+  //   it = column_map.find( str );
+  //   
+  //   if( it != column_map.end() ) {
+  //     R_xlen_t res = it->second;
+  //     return res;
+  //   }
+  //   return -1;
+  // }
   
   inline R_xlen_t column_value(
       std::unordered_map< std::string, R_xlen_t >& column_map,

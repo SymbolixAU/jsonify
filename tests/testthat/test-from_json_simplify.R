@@ -58,7 +58,7 @@ test_that("simplify types",{
   ## type 4, length 4
   ## - array == matrix( row = 4, col = ?? )
   
-  x <- data.frame(x = 1:2, y = 3:4)
+  x <- data.frame(x = 1:2, y = 3:4, stringsAsFactors = TRUE)
   js <- to_json( x )
   #js
   types <- jsonify:::rcpp_get_dtypes( js )
@@ -74,7 +74,7 @@ test_that("simplify types",{
   ## type 4, length 1
   ## - array == vector, matrix or list??
   
-  x <- data.frame(x = 1:2, y = I(matrix(1:4, ncol = 2)))
+  x <- data.frame(x = 1:2, y = I(matrix(1:4, ncol = 2)), stringsAsFactors = TRUE)
   js <- to_json( x )
   types <- jsonify:::rcpp_get_dtypes( js )
   expect_equal( types, 3 )
@@ -82,7 +82,7 @@ test_that("simplify types",{
   ## - object == data.frame( row = 2, col = ?? )
   
   ## won't work because it's not an array
-  x <- data.frame(x = 1:2, y = I(matrix(1:4, ncol = 2)))
+  x <- data.frame(x = 1:2, y = I(matrix(1:4, ncol = 2)), stringsAsFactors = TRUE)
   js <- to_json( x, by = "col" )
   types <- jsonify:::rcpp_get_dtypes( js )
   expect_equal( types, integer() );

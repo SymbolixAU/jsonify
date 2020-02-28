@@ -268,6 +268,7 @@ test_that("data frame returned properly", {
   df1 <- data.frame(
     x = 1:2
     , y = 3:4
+    , stringsAsFactors = T
   )
   df2 <- data.frame(
     z = c("a","b")
@@ -307,7 +308,7 @@ test_that("data frame returned properly", {
   x <- from_json( js )
   expect_equal( as.character( to_json(x, unbox = T) ), js )
 
-  df <- data.frame( id = 1:2, mat = I(matrix(1:4, ncol = 2)))
+  df <- data.frame( id = 1:2, mat = I(matrix(1:4, ncol = 2)), stringsAsFactors = TRUE )
   js <- to_json( df )
   x <- from_json( js )
   ## I can't recreate 'AsIs' columns

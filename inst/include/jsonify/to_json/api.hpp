@@ -262,7 +262,7 @@ namespace api {
     // return sv;
   }
 
-  inline Rcpp::StringVector to_ndjson(
+  inline void to_ndjson(
       Rcpp::StringMatrix& mat,
       std::ostringstream& os,
       bool unbox = false,

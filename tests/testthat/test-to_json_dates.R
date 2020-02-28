@@ -32,7 +32,7 @@ test_that("Different R objects with dates are handled", {
   expect_equal( as.character( js ), '["2018-01-01","2018-01-02","2018-01-03","2018-01-04","2018-01-05","2018-01-06"]')
   
   ## data.frame
-  df <- data.frame( dte = x )
+  df <- data.frame( dte = x, stringsAsFactors = TRUE )
   js <- to_json( df, numeric_dates = FALSE )
   expect_true( validate_json( js ) )
   expect_equal( as.character( js ), '[{"dte":"2018-01-01"},{"dte":"2018-01-02"},{"dte":"2018-01-03"},{"dte":"2018-01-04"},{"dte":"2018-01-05"},{"dte":"2018-01-06"}]')
@@ -45,7 +45,7 @@ test_that("Different R objects with dates are handled", {
   expect_equal( as.character( js ), '["2017-12-31T13:00:00","2018-01-01T13:00:00","2018-01-02T13:00:00","2018-01-03T13:00:00","2018-01-04T13:00:00","2018-01-05T13:00:00"]')
   
   ## data.frame
-  df <- data.frame( dte = x )
+  df <- data.frame( dte = x, stringsAsFactors = TRUE )
   js <- to_json( df, numeric_dates = FALSE )
   expect_true( validate_json( js ) )
   expect_equal( as.character( js ), '[{"dte":"2017-12-31T13:00:00"},{"dte":"2018-01-01T13:00:00"},{"dte":"2018-01-02T13:00:00"},{"dte":"2018-01-03T13:00:00"},{"dte":"2018-01-04T13:00:00"},{"dte":"2018-01-05T13:00:00"}]')
@@ -57,7 +57,7 @@ test_that("Different R objects with dates are handled", {
   expect_equal( as.character( js ), '["2017-12-31T13:00:01","2018-01-01T13:00:01","2018-01-02T13:00:01","2018-01-03T13:00:01","2018-01-04T13:00:01","2018-01-05T13:00:01"]')
   
   ## data.frame
-  df <- data.frame( dte = x )
+  df <- data.frame( dte = x, stringsAsFactors = TRUE )
   js <- to_json( df, numeric_dates = FALSE )
   expect_true( validate_json( js ) )
   expect_equal( as.character( js ), '[{"dte":"2017-12-31T13:00:01"},{"dte":"2018-01-01T13:00:01"},{"dte":"2018-01-02T13:00:01"},{"dte":"2018-01-03T13:00:01"},{"dte":"2018-01-04T13:00:01"},{"dte":"2018-01-05T13:00:01"}]')
@@ -71,7 +71,7 @@ test_that("Different R objects with dates are handled", {
   expect_equal( as.character( js ), '["2017-12-31T13:00:00","2018-01-01T13:00:00","2018-01-02T13:00:00","2018-01-03T13:00:00","2018-01-04T13:00:00","2018-01-05T13:00:00"]')
   
   ## data.frame
-  df <- data.frame( dte = x )
+  df <- data.frame( dte = x, stringsAsFactors = TRUE )
   js <- to_json( df, numeric_dates = FALSE )
   expect_true( validate_json( js ) )
   expect_equal( as.character( js ), '[{"dte":"2017-12-31T13:00:00"},{"dte":"2018-01-01T13:00:00"},{"dte":"2018-01-02T13:00:00"},{"dte":"2018-01-03T13:00:00"},{"dte":"2018-01-04T13:00:00"},{"dte":"2018-01-05T13:00:00"}]')
@@ -84,7 +84,7 @@ test_that("Different R objects with dates are handled", {
   
   ## data.frame
   ## same as POSIXct, because data.frames coerce POSIXlt to POSIXct
-  df <- data.frame( dte = x )
+  df <- data.frame( dte = x, stringsAsFactors = TRUE )
   js <- to_json( df, numeric_dates = FALSE )
   expect_true( validate_json( js ) )
   expect_equal( as.character( js ), '[{"dte":"2017-12-31T13:00:01"},{"dte":"2018-01-01T13:00:01"},{"dte":"2018-01-02T13:00:01"},{"dte":"2018-01-03T13:00:01"},{"dte":"2018-01-04T13:00:01"},{"dte":"2018-01-05T13:00:01"}]')

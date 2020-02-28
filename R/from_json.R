@@ -62,6 +62,7 @@ from_json <- function(json, simplify = TRUE, fill_na = FALSE, buffer_size = 1024
 #' 
 #' Converts ndjson into R objects
 #' 
+#' @param ndjson new-line delimited JSON to convert to R object. Can be a string, url or link to a file.
 #' @inheritParams from_json
 #' 
 #' @examples
