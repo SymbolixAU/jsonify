@@ -17,7 +17,11 @@
 #' 
 #' to_json(1:3)
 #' to_json(letters[1:3])
-#' to_json(data.frame(x = 1:3, y = letters[1:3]))
+#' 
+#' ## factors treated as strings
+#' to_json(data.frame(x = 1:3, y = letters[1:3], stringsAsFactors = TRUE ))
+#' to_json(data.frame(x = 1:3, y = letters[1:3], stringsAsFactors = FALSE ))
+#' 
 #' to_json(list(x = 1:3, y = list(z = letters[1:3])))
 #' to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5))
 #' to_json(seq(as.Date("2018-01-01"), as.Date("2018-01-05"), length.out = 5), numeric_dates = FALSE)
@@ -36,7 +40,7 @@
 #' 
 #' ## rounding numbers using the digits argument
 #' to_json(1.23456789, digits = 2)
-#' df <- data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3])
+#' df <- data.frame(x = 1L:3L, y = rnorm(3), z = letters[1:3], stringsAsFactors = TRUE )
 #' to_json(df, digits = 0 )
 #' 
 #' ## keeping factors
