@@ -5,4 +5,6 @@
 
 ## R CMD check results
 
+checked using R Under development (unstable) (2020-03-06 r77913)
+
 0 errors | 0 warnings | 0 notes

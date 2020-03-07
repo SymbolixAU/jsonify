@@ -1,9 +1,9 @@
 ## v1.1.0
 
 * set `stringsAsFactors = TRUE` in tests to comply with R 4.0.0
-* implemented `from_ndjson()` and `to_ndjson()` [issue 29](https://github.com/symbolixAU/jsonify/issue29) and [issue 58](https://github.com/symbolixAU/jsonify/issues58)
-* performance improvement for factors [issue 59](https://github.com/symbolixAU/jsonify/issues59)
-* Fixed encoding issues on Windows [issue 56](https://github.com/symbolixAU/jsonify/issues56)
+* implemented `from_ndjson()` and `to_ndjson()` [issue 29](https://github.com/symbolixAU/jsonify/issues/29) and [issue 58](https://github.com/symbolixAU/jsonify/issues/58)
+* performance improvement for factors [issue 59](https://github.com/symbolixAU/jsonify/issues/59)
+* Fixed encoding issues on Windows [issue 56](https://github.com/symbolixAU/jsonify/issues/56)
 
 ## v1.0
 

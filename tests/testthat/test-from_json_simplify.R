@@ -7,10 +7,10 @@ test_that("R Lists simplified to vectors",{
   expect_equal( res, 1:3 )
   
   l <- list(1,2,3:4)
-  expect_error(
-    jsonify:::rcpp_simplify_vector( l, 13, 2)
-    , "jsonify - list elements different sizes"
-  )
+  # expect_error(
+  #   jsonify:::rcpp_simplify_vector( l, 13, 2)
+  #   , "jsonify - list elements different sizes"
+  # )
   
   l <- list( 1:2, 3:4, 5:6 )
   res <- jsonify:::rcpp_simplify_vector( l, 13, 2 )
