@@ -33,8 +33,6 @@ namespace from_json {
 
 
     R_xlen_t i;
-    //Rcpp::Rcout << "depth: " << depth << std::endl;
-    //Rcpp::Rcout << "i: " << i << std::endl;
 
     std::unordered_set< int > dtypes;
     dtypes = get_dtypes( json );
@@ -47,15 +45,9 @@ namespace from_json {
 
       R_xlen_t i = 0;
       for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
-        
-        // Rcpp::Rcout << "i: " << i << std::endl;
-        // Rcpp::Rcout << "seq: " << sequential_array_counter << std::endl;
 
         // Get current key
         names[i] = Rcpp::String( itr->name.GetString() );
-
-        //Rcpp::Rcout << "names: " << names << std::endl;
-        //Rcpp::Rcout << "type: " << itr->value.GetType() << std::endl;
         
         // Get current value
         switch( itr->value.GetType() ) {
@@ -111,14 +103,12 @@ namespace from_json {
         ++i;
       } // for
       
-      //Rcpp::Rcout << "res[0] = out; " << std::endl;
       out.attr("names") = names;
       res[0] = out;
 
     } else if( json_type == rapidjson::kArrayType && !contains_object_or_array( dtypes ) ) {
       // array of scalars (no internal arrays or objects)
       rapidjson::Value::ConstArray curr_array = json.GetArray();
-      //Rcpp::Rcout << "array_to_vector" << std::endl;
       res[0] = array_to_vector( curr_array, simplify );
 
     } else if ( json_type == rapidjson::kArrayType ) {
