@@ -15,7 +15,6 @@ Imports:
   Rcpp (>= 0.12.18)
 LinkingTo: 
   BH (>= 1.72.0-3),
-  rapidjsonr (>= 1.2.0),
   Rcpp
 RoxygenNote: 7.0.2
 Suggests:

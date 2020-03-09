@@ -3,7 +3,7 @@
 
 #include <Rcpp.h>
 
-// [[Rcpp::depends(rapidjsonr)]]
+/* // [[Rcpp::depends(rapidjsonr)]] */
 #include "rapidjson/document.h"
 
 #define R_NA_VAL Rcpp::LogicalVector::create(NA_LOGICAL);

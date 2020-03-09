@@ -3,7 +3,7 @@
 
 #include <Rcpp.h>
 
-// [[Rcpp::depends(rapidjsonr)]]
+/* // [[Rcpp::depends(rapidjsonr)]] */
 
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
