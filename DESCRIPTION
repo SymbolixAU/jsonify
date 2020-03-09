@@ -13,8 +13,7 @@ License: GPL (>= 2)
 Depends: R (>= 3.0.2)
 Imports: 
   Rcpp (>= 0.12.18)
-LinkingTo: 
-  BH (>= 1.72.0-3),
+LinkingTo:
   Rcpp
 RoxygenNote: 7.0.2
 Suggests:
