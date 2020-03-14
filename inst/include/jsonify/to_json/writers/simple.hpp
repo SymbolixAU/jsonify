@@ -55,6 +55,7 @@ namespace simple {
     }
   }
   
+#ifdef LONG_VECTOR_SUPPORT
   /*
    * for writing a single value of a vector
    */
@@ -72,6 +73,7 @@ namespace simple {
       jsonify::writers::scalars::write_value( writer, s );
     }
   }
+#endif
   
   template< typename Writer>
   inline void write_value(
@@ -147,6 +149,7 @@ namespace simple {
     }
   }
   
+#ifdef LONG_VECTOR_SUPPORT
   /*
    * For writing a single value of a vector
    */
@@ -180,6 +183,7 @@ namespace simple {
       }
     }
   }
+#endif
   
   template < typename Writer >
   inline void write_value(
@@ -291,7 +295,7 @@ namespace simple {
     }
   }
   
-
+#ifdef LONG_VECTOR_SUPPORT
   /*
    * For writing a single value of a vector
    */
@@ -343,6 +347,7 @@ namespace simple {
       }
     }
   }
+#endif
   
   template< typename Writer >
   inline void write_value(
@@ -426,6 +431,7 @@ namespace simple {
     }
   }
   
+#ifdef LONG_VECTOR_SUPPORT
   
   template < typename Writer >
   inline void write_value(
@@ -440,6 +446,7 @@ namespace simple {
       jsonify::writers::scalars::write_value( writer, l );
     }
   }
+#endif
   
   template < typename Writer >
   inline void write_value(
@@ -482,6 +489,7 @@ namespace simple {
   // ---------------------------------------------------------------------------
   // matrix values
   // ---------------------------------------------------------------------------
+#ifdef LONG_VECTOR_SUPPORT
   
   template < typename Writer >
   inline void write_value(
@@ -495,6 +503,8 @@ namespace simple {
     Rcpp::IntegerVector this_row = mat(row, Rcpp::_);
     write_value( writer, this_row, unbox, numeric_dates, factors_as_string );  // true, true : numeric_dates, factors_as_string
   }
+  
+#endif
   
   template < typename Writer >
   inline void write_value(
@@ -538,6 +548,8 @@ namespace simple {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
+#ifdef LONG_VECTOR_SUPPORT
+  
   template < typename Writer >
   inline void write_value(
       Writer& writer, 
@@ -552,6 +564,7 @@ namespace simple {
     Rcpp::NumericVector this_row = mat(row, Rcpp::_);
     write_value( writer, this_row, unbox, digits, numeric_dates );
   }
+#endif
   
   template < typename Writer >
   inline void write_value(
@@ -597,7 +610,8 @@ namespace simple {
     }
     jsonify::utils::end_array( writer, will_unbox );
   }
-  
+
+#ifdef LONG_VECTOR_SUPPORT
   template < typename Writer >
   inline void write_value(
       Writer& writer, 
@@ -609,6 +623,7 @@ namespace simple {
     Rcpp::StringVector this_row = mat(row, Rcpp::_);
     write_value( writer, this_row, unbox );
   }
+#endif
   
   template < typename Writer >
   inline void write_value(
@@ -650,6 +665,8 @@ namespace simple {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
+#ifdef LONG_VECTOR_SUPPORT
+  
   template < typename Writer >
   inline void write_value(
       Writer& writer, 
@@ -661,6 +678,7 @@ namespace simple {
     Rcpp::LogicalVector this_row = mat( row, Rcpp::_ );
     write_value( writer, this_row, unbox );
   }
+#endif
   
   template < typename Writer >
   inline void write_value(
@@ -705,7 +723,7 @@ namespace simple {
     jsonify::utils::end_array( writer, will_unbox );
   }
   
-  
+#ifdef LONG_VECTOR_SUPPORT
   /*
    * template for R SEXPs for single-row from a vector
    */
@@ -766,6 +784,7 @@ namespace simple {
     }
     }
   }
+#endif
   
   /*
    * template for R SEXPs for single-row from a vector
