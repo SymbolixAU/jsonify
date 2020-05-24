@@ -13,12 +13,11 @@ namespace from_json {
     const rapidjson::Value& json,
     bool& simplify,
     bool& fill_na,
-    R_xlen_t sequential_array_counter
+    bool sequential_array
   ) {
 
     Rcpp::List res(1);
     
-
     int json_type = json.GetType();
     R_xlen_t json_length = json.Size();
 
@@ -80,11 +79,11 @@ namespace from_json {
         // array
         case rapidjson::kArrayType: {
           const rapidjson::Value& temp_array = itr->value;
-          out[i] = json_to_sexp( temp_array, simplify, fill_na, sequential_array_counter );
+          out[i] = json_to_sexp( temp_array, simplify, fill_na, sequential_array );
           break;
         }
         case rapidjson::kObjectType: {
-          out[i] = json_to_sexp( itr->value, simplify, fill_na, sequential_array_counter );
+          out[i] = json_to_sexp( itr->value, simplify, fill_na, sequential_array );
           break;
         }
           
@@ -122,24 +121,24 @@ namespace from_json {
         switch( json[i].GetType() ) {
 
         case rapidjson::kNullType: {
-          sequential_array_counter = 0;
+          sequential_array = false;
           array_of_array[i] = R_NA_VAL;
           break;
         }
         case rapidjson::kFalseType: {}
         case rapidjson::kTrueType: {
-          sequential_array_counter = 0;
+          sequential_array = false;
           array_of_array[i] = json[i].GetBool();
           break;
         }
         case rapidjson::kStringType: {
-          sequential_array_counter = 0;
+          sequential_array = false;
           array_of_array[i] = Rcpp::String(json[i].GetString());
           break;
         }
         // numeric
         case rapidjson::kNumberType: {
-          sequential_array_counter = 0;
+          sequential_array = false;
           if(json[i].IsDouble()) {
           // double
           array_of_array[i] = json[i].GetDouble();
@@ -151,15 +150,17 @@ namespace from_json {
         }
         // array
         case rapidjson::kArrayType: {
-          array_of_array[i] = json_to_sexp( json[i], simplify, fill_na, sequential_array_counter );
-          sequential_array_counter++;
+          array_of_array[i] = json_to_sexp( json[i], simplify, fill_na, sequential_array );
+          sequential_array = true;
+          //sequential_array_counter++;
           break;
         }
           // object
         case rapidjson::kObjectType: {
-          sequential_array_counter = 0;
+          //sequential_array_counter = 0;
+          sequential_array = false;
           const rapidjson::Value& temp_val = json[i];
-          array_of_array[i] = json_to_sexp( temp_val, simplify, fill_na, sequential_array_counter );
+          array_of_array[i] = json_to_sexp( temp_val, simplify, fill_na, sequential_array );
           break;
         }
         default: {
@@ -168,7 +169,7 @@ namespace from_json {
         } // switch
       }   // for
 
-      if( sequential_array_counter > 0  && simplify ) {
+      if( sequential_array > 0  && simplify ) {
         //Rcpp::Rcout << "list_to_matrix" << std::endl;
         res[0] = jsonify::from_json::list_to_matrix( array_of_array );
 

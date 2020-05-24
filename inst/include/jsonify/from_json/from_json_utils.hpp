@@ -29,8 +29,8 @@ namespace from_json {
   // Iterate over a rapidjson object and get the unique data types of each value.
   // Save unique data types as ints to unordered_set dtypes.
   // Compatible with rapidjson::Array and rapidjson::Value.
-  template<typename T>
-  inline std::unordered_set< int > get_dtypes(T& doc, bool scalar_only = false) {
+  template< typename T >
+  inline std::unordered_set< int > get_dtypes( T& doc ) {
     
     std::unordered_set< int > dtypes;
     
@@ -57,14 +57,6 @@ namespace from_json {
       }
       
       dtypes.insert(curr_dtype);
-      
-      // If scalar_only is true, break if the current value is
-      // type 3 (JSON object) or 4 (Array object).
-      if(scalar_only) {
-        if(curr_dtype == 3 || curr_dtype == 4) {
-          break;
-        }
-      }
     }
     
     return dtypes;
