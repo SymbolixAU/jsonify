@@ -44,9 +44,9 @@ namespace api {
       return x;
     }
     
-    bool sequential_array = false;
+    R_xlen_t sequential_array_counter = 0;
     
-    return jsonify::from_json::json_to_sexp( doc, simplify, fill_na, sequential_array );
+    return jsonify::from_json::json_to_sexp( doc, simplify, fill_na, sequential_array_counter );
   }
 
   inline SEXP from_json( const char* json, bool& simplify, bool& fill_na ) {
