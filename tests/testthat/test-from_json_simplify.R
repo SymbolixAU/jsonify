@@ -121,6 +121,18 @@ test_that("arrays of arrays of same length go to matrix",{
 
 test_that("array of arrays of different lenghts go to list",{
   
+  ## issue 67
+  js <- '[1,[2]]'
+  x <- from_json( js )
+  expect_equal(x, list(1,2))
+  
+  js <- '{"test":[1,[2,[3]]]}'
+  x <- from_json( js )
+  expect_equal(x, list(test = list(1,list(2,3))))
+  
+  x <- from_json( js, simplify = FALSE )
+  expect_equal(x, list(test = list(1,list(2,list(3)))))
+  
   js <- '[[1,2],[1,2,3]]'
   x <- from_json( js )
   expect_equal( x, list(1:2, 1:3))

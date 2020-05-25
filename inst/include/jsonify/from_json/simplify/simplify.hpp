@@ -259,7 +259,6 @@ namespace from_json {
       Rcpp::List& array_of_array
   ) {
     R_xlen_t n = array_of_array.size();
-    Rcpp::Rcout << "n: " << n << std::endl;
     R_xlen_t j;
     std::unordered_set< R_xlen_t > array_lengths;
     std::unordered_set< int > array_types;
