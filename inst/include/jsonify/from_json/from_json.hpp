@@ -160,11 +160,11 @@ namespace from_json {
         } // switch
       }   // for
 
-      if( dtypes.size() == 1 && contains_array( dtypes ) && simplify ) { 
+      if( simplify && dtypes.size() == 1 && contains_array( dtypes )) { 
         
         res[0] = jsonify::from_json::list_to_matrix( array_of_array );
 
-      } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) && simplify ) {
+      } else if ( simplify && dtypes.size() == 1 && contains_object( dtypes ) && !contains_array( dtypes ) ) {
         
         if( fill_na ) {
           res[0] = jsonify::from_json::simplify_dataframe_fill_na( array_of_array, json_length );
