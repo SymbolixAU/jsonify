@@ -20,7 +20,7 @@ namespace from_json {
     int json_type = json.GetType();
     R_xlen_t json_length = json.Size();
     
-    Rcpp::Rcout << "json_length: " << json_length << std::endl;
+    // Rcpp::Rcout << "json_length: " << json_length << std::endl;
 
     if(json_length == 0) {
       if( json_type == 4 ) {
@@ -32,94 +32,95 @@ namespace from_json {
     }
 
 
-    R_xlen_t i;
+    //R_xlen_t i;
 
     std::unordered_set< int > dtypes;
     dtypes = get_dtypes( json );
 
     if( json_type == rapidjson::kObjectType ) {
-       Rcpp::Rcout << "object" << std::endl;
+       // Rcpp::Rcout << "object" << std::endl;
       // object {}
       
       Rcpp::List out( json_length );
       Rcpp::CharacterVector names( json_length );
     
-      R_xlen_t i = 0;
-    for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
-    
-       // Get current key
-       names[i] = Rcpp::String( itr->name.GetString() );
-       
-       // Get current value
-       switch( itr->value.GetType() ) {
-
-        // bool - false/ true
-        case rapidjson::kFalseType: {}
-        case rapidjson::kTrueType: {
-          out[i] = itr->value.GetBool();
-          break;
-        }
-
-          // string
-        case rapidjson::kStringType: {
-          out[i] = Rcpp::String( itr->value.GetString() );
-          break;
-        }
-
-          // numeric
-        case rapidjson::kNumberType: {
-          if(itr->value.IsDouble()) {
-            // double
-            out[i] = itr->value.GetDouble();
-          } else {
-            // int
-            out[i] = itr->value.GetInt();
+      R_xlen_t itr_counter = 0;
+      for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
+      
+         // Get current key
+         names[itr_counter] = Rcpp::String( itr->name.GetString() );
+         
+         // Get current value
+         switch( itr->value.GetType() ) {
+  
+          // bool - false/ true
+          case rapidjson::kFalseType: {}
+          case rapidjson::kTrueType: {
+            out[itr_counter] = itr->value.GetBool();
+            break;
           }
-          break;
-        }
+  
+            // string
+          case rapidjson::kStringType: {
+            out[itr_counter] = Rcpp::String( itr->value.GetString() );
+            break;
+          }
+  
+            // numeric
+          case rapidjson::kNumberType: {
+            if(itr->value.IsDouble()) {
+              // double
+              out[itr_counter] = itr->value.GetDouble();
+            } else {
+              // int
+              out[itr_counter] = itr->value.GetInt();
+            }
+            break;
+          }
+  
+          // array
+          case rapidjson::kArrayType: {
+            const rapidjson::Value& temp_array = itr->value;
+            out[itr_counter] = json_to_sexp( temp_array, simplify, fill_na );
+            break;
+          }
+          case rapidjson::kObjectType: {
+            out[itr_counter] = json_to_sexp( itr->value, simplify, fill_na );
+            break;
+          }
+  
+          // null
+          case rapidjson::kNullType: {
+            out[itr_counter] = R_NA_VAL;
+            break;
+          }
+          // some other data type not covered
+          default: {
+            Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, array, and json");
+          }
+          }
+  
+          // Bump i
+           ++itr_counter;
+           // Rcpp::Rcout << "itr_counter: " << itr_counter << std::endl;
+      } // for
 
-        // array
-        case rapidjson::kArrayType: {
-          const rapidjson::Value& temp_array = itr->value;
-          out[i] = json_to_sexp( temp_array, simplify, fill_na );
-          break;
-        }
-        case rapidjson::kObjectType: {
-          out[i] = json_to_sexp( itr->value, simplify, fill_na );
-          break;
-        }
+      out.attr("names") = names;
+      res[0] = out;
 
-        // null
-        case rapidjson::kNullType: {
-          out[i] = R_NA_VAL;
-          break;
-        }
-        // some other data type not covered
-        default: {
-          Rcpp::stop("Uknown data type. Only able to parse int, double, string, bool, array, and json");
-        }
-        }
-
-        // Bump i
-         ++i;
-    } // for
-    //   
-    //   out.attr("names") = names;
-    //   res[0] = out;
-    // 
     } else if( json_type == rapidjson::kArrayType && !contains_object_or_array( dtypes ) ) {
-      Rcpp::Rcout << "array of scalars" << std::endl;
-    //   // array of scalars (no internal arrays or objects)
-    //   rapidjson::Value::ConstArray curr_array = json.GetArray();
-    //   res[0] = array_to_vector( curr_array, simplify );
-    // 
+      // Rcpp::Rcout << "array of scalars" << std::endl;
+      // array of scalars (no internal arrays or objects)
+      rapidjson::Value::ConstArray curr_array = json.GetArray();
+      res[0] = array_to_vector( curr_array, simplify );
+
     } else if ( json_type == rapidjson::kArrayType ) {
-      Rcpp::Rcout << "array (mixed)" << std::endl;
+      // Rcpp::Rcout << "array (mixed)" << std::endl;
       // array with internal array
       // possibly simplified to matrix
 
       Rcpp::List array_of_array( json_length );
-     
+      R_xlen_t i;
       for( i = 0; i < json_length; ++i ) {
 
         switch( json[i].GetType() ) {
@@ -163,25 +164,26 @@ namespace from_json {
           Rcpp::stop("jsonify - case not handled");
         }
         } // switch
+        // Rcpp::Rcout << "i: " << i << std::endl;
      }   // for
-    // 
-    //   if( simplify && dtypes.size() == 1 && contains_array( dtypes )) { 
-    //     
-    //     res[0] = jsonify::from_json::list_to_matrix( array_of_array );
-    // 
-    //   } else if ( simplify && dtypes.size() == 1 && contains_object( dtypes ) && !contains_array( dtypes ) ) {
-    //     
-    //     if( fill_na ) {
-    //       res[0] = jsonify::from_json::simplify_dataframe_fill_na( array_of_array, json_length );
-    //     } else {
-    //       res[0] = jsonify::from_json::simplify_dataframe( array_of_array, json_length );
-    //     }
-    //   } else {
-    //     res[0] = array_of_array;
-    //   }
-    // 
-    // } else {
-    //   Rcpp::stop("jsonify - case not handled");
+
+      if( simplify && dtypes.size() == 1 && contains_array( dtypes )) {
+
+        res[0] = jsonify::from_json::list_to_matrix( array_of_array );
+
+      } else if ( simplify && dtypes.size() == 1 && contains_object( dtypes ) && !contains_array( dtypes ) ) {
+
+        if( fill_na ) {
+          res[0] = jsonify::from_json::simplify_dataframe_fill_na( array_of_array, json_length );
+        } else {
+          res[0] = jsonify::from_json::simplify_dataframe( array_of_array, json_length );
+        }
+      } else {
+        res[0] = array_of_array;
+      }
+
+    } else {
+      Rcpp::stop("jsonify - case not handled");
     }
 
     return res[0];
