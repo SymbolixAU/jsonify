@@ -25,8 +25,9 @@ namespace from_json {
     
     R_xlen_t i = 0;
     for ( auto& child : json.GetArray() ) {
-      out[ i++ ] = parse_json( child, simplify, fill_na );
+      out[ i++ ] =  parse_json( child, simplify, fill_na ); // iterating here again makes another list 
     }
+    // Rcpp::Rcout << "array out.Size(): " << out.size() << std::endl;
     return out;
   }
   
@@ -71,34 +72,42 @@ namespace from_json {
     
     R_xlen_t json_length = json.Size();
     
+    // Rcpp::Rcout << "json type: " << json.GetType() << std::endl;
+    
     switch( json.GetType() ) {
     
     case rapidjson::kNullType: {
-      res[0] = R_NA_VAL;
+      //res[0] = R_NA_VAL;
+      return R_NA_VAL;
       break;
     }
     case rapidjson::kFalseType: {}
     case rapidjson::kTrueType: {
-      res[0] = Rcpp::wrap< bool >( json.GetBool() );
+      return Rcpp::wrap< bool >( json.GetBool() );
+      //res[0] = Rcpp::wrap< bool >( json.GetBool() );
       break;
     }
     case rapidjson::kStringType: {
-      res[0] = Rcpp::wrap( std::string( json.GetString() ) );
+      //res[0] = Rcpp::wrap( std::string( json.GetString() ) );
+      return Rcpp::wrap( std::string( json.GetString() ) );
       break;
     }
       // numeric
     case rapidjson::kNumberType: {
       if(json.IsDouble()) {
       // double
-      res[0] = Rcpp::wrap< double >( json.GetDouble() );
+      //res[0] = Rcpp::wrap< double >( json.GetDouble() );
+      return Rcpp::wrap< double >( json.GetDouble() );
     } else {
       // int
-      res[0] = Rcpp::wrap< int >( json.GetInt() );
+      //res[0] = Rcpp::wrap< int >( json.GetInt() );
+      return Rcpp::wrap< int >( json.GetInt() );
     }
     break;
     }
     case rapidjson::kObjectType: {
-      res[0] = parse_object( json, simplify, fill_na );
+      return parse_object( json, simplify, fill_na );
+      //res[0] = parse_object( json, simplify, fill_na );
       break;
     }
     case rapidjson::kArrayType: {
@@ -106,13 +115,16 @@ namespace from_json {
       dtypes = get_dtypes( json );
       
       if( simplify && !contains_object_or_array( dtypes ) ) {
-        res[0] = array_to_vector( json.GetArray(), simplify );
+        //res[0] = array_to_vector( json.GetArray(), simplify );
+        return array_to_vector( json.GetArray(), simplify );
       } else {
         Rcpp::List arr = parse_array( json, simplify, fill_na );
         if( simplify) {
-          res[0] = jsonify::from_json::simplify( arr, dtypes, json_length, fill_na );
+          //res[0] = jsonify::from_json::simplify( arr, dtypes, json_length, fill_na );
+          return jsonify::from_json::simplify( arr, dtypes, json_length, fill_na );
         } else {
-          res[0] = arr;
+          //res[0] = arr;
+          return arr;
         }
       }
       break;

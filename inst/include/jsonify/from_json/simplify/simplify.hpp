@@ -33,10 +33,15 @@ namespace from_json {
   }
   
   inline SEXP simplify_vector( Rcpp::List& x, int r_type, R_xlen_t n = 1 ) {
+    // Rcpp::Rcout << "r_type: " << r_type << std::endl;
     switch( r_type ) {
+    case 0: {
+      //return R_NilValue;
+      return Rcpp::List();
+    }
     case 10: {
-    return simplify_vector< LGLSXP >( x, n );
-  }
+      return simplify_vector< LGLSXP >( x, n );
+    }
     case 13: {
       return simplify_vector< INTSXP >( x, n );
     }
@@ -44,7 +49,10 @@ namespace from_json {
       return simplify_vector< REALSXP >( x, n );
     }
     case 16: {
-      return simplify_vector< STRSXP >( x, n);
+      return simplify_vector< STRSXP >( x, n );
+    }
+    case 19: {
+      return x; // can't simplify
     }
     default: {
       Rcpp::stop("jsonify - unknown vector type");
@@ -137,10 +145,14 @@ namespace from_json {
       R_xlen_t& n_row
   ) {
     
+    // Rcpp::Rcout << "simplify_matrix" << std::endl;
+    // Rcpp::Rcout << "nrow: " << n_row << ", ncol: " << n_col << std::endl;
     typedef typename Rcpp::traits::storage_type< RTYPE >::type T;
     
     R_xlen_t i, j;
     Rcpp::Matrix< RTYPE >mat( n_row, n_col );
+    
+    // Rcpp::Rcout << "RTYPE: " << RTYPE << std::endl;
     
     for( i = 0; i < n_row; ++i ) {
       Rcpp::Vector< RTYPE > this_vec = out[i];
@@ -191,11 +203,14 @@ namespace from_json {
     std::unordered_set< int > array_types;
     bool can_be_matrix = true;
     
+    // Rcpp::Rcout << "simplify array_of_array.Size(): " << n << std::endl;
+    
     for( j = 0; j < n; ++j ) {
       SEXP s = array_of_array[j];
       int this_type = TYPEOF( s );
       if( Rf_isMatrix( s ) || this_type == VECSXP ) {
         // can't be simplified
+        // Rcpp::Rcout << "cant' be matrix 1" << std::endl;
         can_be_matrix = false;
         break;
       } else {
@@ -204,6 +219,7 @@ namespace from_json {
         array_types.insert( this_type );
         if( array_lengths.size() > 1 ) {
           // can't be simplified to matrix
+          // Rcpp::Rcout << "cant' be matrix 2" << std::endl;
           can_be_matrix = false;
           break;
         }
@@ -495,6 +511,9 @@ namespace from_json {
     for( i = 0; i < n_rows; ++i ) {
       // iterating list elements
       Rcpp::List this_list = out[i];
+      
+      // Rcpp::Rcout << "this_list.Size():  " << this_list.size() << std::endl;
+      
       if( i == 0 ) {
         if( !Rf_isNull( this_list.names() ) ) {
           list_names = this_list.names();
@@ -586,6 +605,7 @@ namespace from_json {
         Rcpp::List lst = columns[ this_name ];
         columns[ this_name ] = simplify_dataframe( lst, doc_len );
       } else {
+        // Rcpp::Rcout << "simplify df - list_to_vector: " << std::endl;
         list_to_vector( columns, this_name, r_type, struct_type, false );  // false : fill_na
       }
     }
@@ -602,21 +622,23 @@ namespace from_json {
     Rcpp::List res(1);
     
     if ( dtypes.size() == 1 && contains_array( dtypes ) ) { 
-      Rcpp::Rcout << "simplify 1" << std::endl;
-      res[0] = jsonify::from_json::list_to_matrix( out );
+      // Rcpp::Rcout << "simplify 1" << std::endl;
+      //res[0] = jsonify::from_json::list_to_matrix( out );
+      return jsonify::from_json::list_to_matrix( out );
       
     } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) ) {
-      Rcpp::Rcout << "simplify 2" << std::endl;
+      // Rcpp::Rcout << "simplify 2" << std::endl;
       if( fill_na ) {
-        Rcpp::Rcout << "simplify 2.1" << std::endl;
-        res = jsonify::from_json::simplify_dataframe_fill_na( out, json_length );
+        // Rcpp::Rcout << "simplify 2.1" << std::endl;
+        return jsonify::from_json::simplify_dataframe_fill_na( out, json_length );
       } else {
-        Rcpp::Rcout << "simplify 2.2" << std::endl;
-        res = jsonify::from_json::simplify_dataframe( out, json_length );
+        // Rcpp::Rcout << "simplify 2.2" << std::endl;
+        return jsonify::from_json::simplify_dataframe( out, json_length );
       }
     } else {
-      Rcpp::Rcout << "simplify 3" << std::endl;
-      res[0] = out;
+      // Rcpp::Rcout << "simplify 3" << std::endl;
+      return out;
+      //res[0] = out;
     }
     return res;
   }
