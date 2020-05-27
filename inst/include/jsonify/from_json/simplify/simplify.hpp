@@ -293,6 +293,7 @@ namespace from_json {
         }
         case VECSXP: {
           // TODO ?? (or is it actually correct to not simplify this??)
+          // should it even get here? 
           //list_to_vector< VECSXP >( lst, columns, this_name, fill_na );
           //list_to_vector( lst, )
           break;
@@ -601,15 +602,20 @@ namespace from_json {
     Rcpp::List res(1);
     
     if ( dtypes.size() == 1 && contains_array( dtypes ) ) { 
+      Rcpp::Rcout << "simplify 1" << std::endl;
       res[0] = jsonify::from_json::list_to_matrix( out );
       
     } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) ) {
+      Rcpp::Rcout << "simplify 2" << std::endl;
       if( fill_na ) {
+        Rcpp::Rcout << "simplify 2.1" << std::endl;
         res = jsonify::from_json::simplify_dataframe_fill_na( out, json_length );
       } else {
+        Rcpp::Rcout << "simplify 2.2" << std::endl;
         res = jsonify::from_json::simplify_dataframe( out, json_length );
       }
     } else {
+      Rcpp::Rcout << "simplify 3" << std::endl;
       res[0] = out;
     }
     return res;
