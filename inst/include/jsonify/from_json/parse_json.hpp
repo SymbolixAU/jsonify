@@ -39,16 +39,18 @@ namespace parse_json {
     Rcpp::CharacterVector names( json_length );
     R_xlen_t i = 0;
     
-    for(rapidjson::Value::ConstMemberIterator itr = json.MemberBegin(); itr != json.MemberEnd(); ++itr) {
-  
-      // Get current key
-      names[i] = Rcpp::String( itr->name.GetString() );
-  
-      // Get current value
-      out[i] = parse_json( itr->value );
-      ++i;
-    } // for
-  
+    // https://github.com/Tencent/rapidjson/issues/162#issuecomment-341824061
+#if __cplusplus >= 201703L
+    for ( auto& [key, value] : json.GetObject() ) {
+      out[ i ] = parse_json( value );
+      names[ i++ ] = std::string( key );
+    }
+#else
+    for ( auto& key_value : json.GetObject() ) {
+      out[ i ] = parse_json( key_value.value );
+      names[ i++ ] = std::string( key_value.name.GetString() );
+    }
+#endif
     out.attr("names") = names;
     return out;
   }
