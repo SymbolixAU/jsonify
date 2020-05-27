@@ -5,6 +5,10 @@ rcpp_from_json <- function(json, simplify, fill_na) {
     .Call(`_jsonify_rcpp_from_json`, json, simplify, fill_na)
 }
 
+rcpp_parse_json <- function(json) {
+    .Call(`_jsonify_rcpp_parse_json`, json)
+}
+
 rcpp_from_ndjson <- function(ndjson, simplify, fill_na) {
     .Call(`_jsonify_rcpp_from_ndjson`, ndjson, simplify, fill_na)
 }
