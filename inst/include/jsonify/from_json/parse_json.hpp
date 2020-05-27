@@ -20,14 +20,12 @@ namespace parse_json {
   
     R_xlen_t json_length = json.Size();
     Rcpp::List out( json_length );
-    R_xlen_t i;
   
-    for( i = 0; i < json_length; ++i ) {
-      out[i] = parse_json( json[i] );
-    }   // for
-  
+    R_xlen_t i = 0;
+    for ( auto& child : json.GetArray() ) {
+      out[ i++ ] = parse_json( child );
+    }
     return out;
-    //}
   }
   
   template< typename T >
