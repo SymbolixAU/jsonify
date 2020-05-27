@@ -20,7 +20,9 @@ namespace api {
     
     // If the input is a scalar value of type int, double, string, or bool, 
     // return Rcpp vector with length 1.
-    return jsonify::parse_json::parse_json( doc );
+    return jsonify::parse_json::parse_json< rapidjson::Document >( doc );
+    
+    //return jsonify::parse_json::parse_json( doc );
 
   }
 

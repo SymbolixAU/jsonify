@@ -11,11 +11,12 @@
 namespace jsonify {
 namespace parse_json {
 
-  SEXP parse_json( const rapidjson::Value& json );
-  SEXP parse_object( const rapidjson::Value& json );
-  SEXP parse_array( const rapidjson::Value& json );
+  template< typename T > SEXP parse_json( const T& json );
+  template< typename T > SEXP parse_object( const T& json );
+  template< typename T > SEXP parse_array( const T& json );
   
-  inline SEXP parse_array(const rapidjson::Value& json) {
+  template< typename T >
+  inline SEXP parse_array( const T& json ) {
   
     R_xlen_t json_length = json.Size();
     Rcpp::List out( json_length );
@@ -29,7 +30,8 @@ namespace parse_json {
     //}
   }
   
-  inline SEXP parse_object(const rapidjson::Value& json ) {
+  template< typename T >
+  inline SEXP parse_object( const T& json ) {
   
     R_xlen_t json_length = json.Size();
     
@@ -51,9 +53,8 @@ namespace parse_json {
     return out;
   }
   
-  inline SEXP parse_json(
-      const rapidjson::Value& json
-  ) {
+  template< typename T >
+  inline SEXP parse_json( const T& json ) {
 
     switch( json.GetType() ) {
       
