@@ -7,6 +7,11 @@ SEXP rcpp_from_json(const char * json, bool& simplify, bool& fill_na ) {
   return jsonify::api::from_json( json, simplify, fill_na );
 }
 
+// [[Rcpp::export]]
+SEXP rcpp_from_json2(const char * json, bool& simplify, bool& fill_na ) {
+  return jsonify::api::from_json2( json, simplify, fill_na );
+}
+
 
 // [[Rcpp::export]]
 SEXP rcpp_parse_json(const char * json ) {

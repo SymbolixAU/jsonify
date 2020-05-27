@@ -35,17 +35,17 @@ namespace from_json {
     std::unordered_set< int > dtypes;
     
     R_xlen_t doc_len = doc.Size();
-    
+
     int curr_dtype;
     R_xlen_t i;
     for(i = 0; i < doc_len; ++i) {
-      curr_dtype = doc[i].GetType();
+       curr_dtype = doc[i].GetType();
       // rapidjson uses separate ints for types true (2) and false (1)...combine
       // them into one value such that bool is 1.
       if(curr_dtype == 2) {
         curr_dtype = 1;
       }
-      
+
       // rapidjson uses the same int for types double and int...split them up,
       // such that double is 9 and int is 8.
       if(curr_dtype == 6) {
@@ -55,7 +55,7 @@ namespace from_json {
           curr_dtype = 8;
         }
       }
-      
+
       dtypes.insert(curr_dtype);
     }
     

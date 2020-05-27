@@ -7,7 +7,6 @@
 #include "simplify/simplify.hpp"
 
 
-
 namespace jsonify {
 namespace parse_json {
 
