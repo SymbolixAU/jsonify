@@ -1,3 +1,8 @@
+## v1.2.0
+
+* fixed C Stack Overflow caused by recursion [issue 61](https://github.com/symbolixAU/jsonify/issues/61)
+* Simplified and templated more of the .hpp code
+
 ## v1.1.0
 
 * removed Boost dependency

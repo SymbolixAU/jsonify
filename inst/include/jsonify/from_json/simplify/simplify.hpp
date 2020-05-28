@@ -1,6 +1,8 @@
 #ifndef R_JSONIFY_FROM_JSON_SIMPLIFY_H
 #define R_JSONIFY_FROM_JSON_SIMPLIFY_H
 
+#include "rapidjson/document.h"
+
 namespace jsonify {
 namespace from_json {
 
@@ -33,7 +35,6 @@ namespace from_json {
   }
   
   inline SEXP simplify_vector( Rcpp::List& x, int r_type, R_xlen_t n = 1 ) {
-    // Rcpp::Rcout << "r_type: " << r_type << std::endl;
     switch( r_type ) {
     case 0: {
       //return R_NilValue;
@@ -61,6 +62,11 @@ namespace from_json {
     return Rcpp::List();  // #nocov never reaches
   }
   
+  template< int RTYPE >
+  inline void update_rtype( int& r_type ) {
+    r_type = RTYPE > r_type ? RTYPE : r_type;
+  }
+  
   template< typename T >
   inline SEXP array_to_vector(
       const T& array, 
@@ -68,50 +74,44 @@ namespace from_json {
   ) {
     // takes an array of scalars (any types) and returns
     // them in an R vector
-    
     int r_type = 0;
     
     // int first_r_type; // for keeping track if the vector has been coerced when simplified
     // every member of the array will be coerced to the max d-type sexp type
     // but first, get each element and put into a list
     R_xlen_t arr_len = array.Size();
-    R_xlen_t i;
+    R_xlen_t i = 0;
     Rcpp::List out( arr_len );
     
-    for( i = 0; i < arr_len; ++i ) {
+    for( const auto& child : array ) {
       
-      switch(array[i].GetType()) {
-      // bool - false
-      case rapidjson::kFalseType: {
-        out[i] = array[i].GetBool();
-        r_type = LGLSXP > r_type ? LGLSXP : r_type;
-        break;
-      }
-        
-        // bool - true
+      switch( child.GetType() ) {
+      
+      // bool
+      case rapidjson::kFalseType: {}
       case rapidjson::kTrueType: {
-        out[i] = array[i].GetBool();
-        r_type = LGLSXP > r_type ? LGLSXP : r_type;
+        out[i] = child.GetBool();
+        update_rtype< LGLSXP >( r_type );
         break;
       }
         
         // string
       case rapidjson::kStringType: {
-        out[i] = Rcpp::String(array[i].GetString());
-        r_type = STRSXP > r_type ? STRSXP : r_type;
+        out[i] = Rcpp::String( child.GetString() );
+        update_rtype< STRSXP >( r_type );
         break;
       }
         
         // numeric
       case rapidjson::kNumberType: {
-        if(array[i].IsDouble()) {
+        if( child.IsDouble() ) {
         // double
-        out[i] = array[i].GetDouble();
-        r_type = REALSXP > r_type ? REALSXP : r_type;
+        out[i] = child.GetDouble();
+        update_rtype< REALSXP >( r_type );
       } else {
         // int
-        out[i] = array[i].GetInt();
-        r_type = INTSXP > r_type ? INTSXP : r_type;
+        out[i] = child.GetInt();
+        update_rtype< INTSXP >( r_type );
       }
       break;
       }
@@ -119,7 +119,7 @@ namespace from_json {
         // null
       case rapidjson::kNullType: {
         out[i] = R_NA_VAL;
-        r_type = LGLSXP > r_type ? LGLSXP : r_type;
+        update_rtype< LGLSXP >( r_type );
         break;
       }
         // some other data type not covered, including arrays and objects
@@ -127,9 +127,7 @@ namespace from_json {
         Rcpp::stop("jsonify - array_to_vector only able to parse int, double, string and bool");
       }
       }
-      // if( i == 0 ) {
-      //   first_r_type = r_type;
-      // }
+      ++i;
     }
     
     if( simplify ) {
@@ -145,14 +143,10 @@ namespace from_json {
       R_xlen_t& n_row
   ) {
     
-    // Rcpp::Rcout << "simplify_matrix" << std::endl;
-    // Rcpp::Rcout << "nrow: " << n_row << ", ncol: " << n_col << std::endl;
     typedef typename Rcpp::traits::storage_type< RTYPE >::type T;
     
     R_xlen_t i, j;
     Rcpp::Matrix< RTYPE >mat( n_row, n_col );
-    
-    // Rcpp::Rcout << "RTYPE: " << RTYPE << std::endl;
     
     for( i = 0; i < n_row; ++i ) {
       Rcpp::Vector< RTYPE > this_vec = out[i];
@@ -203,14 +197,11 @@ namespace from_json {
     std::unordered_set< int > array_types;
     bool can_be_matrix = true;
     
-    // Rcpp::Rcout << "simplify array_of_array.Size(): " << n << std::endl;
-    
     for( j = 0; j < n; ++j ) {
       SEXP s = array_of_array[j];
       int this_type = TYPEOF( s );
       if( Rf_isMatrix( s ) || this_type == VECSXP ) {
         // can't be simplified
-        // Rcpp::Rcout << "cant' be matrix 1" << std::endl;
         can_be_matrix = false;
         break;
       } else {
@@ -219,7 +210,6 @@ namespace from_json {
         array_types.insert( this_type );
         if( array_lengths.size() > 1 ) {
           // can't be simplified to matrix
-          // Rcpp::Rcout << "cant' be matrix 2" << std::endl;
           can_be_matrix = false;
           break;
         }
@@ -228,7 +218,8 @@ namespace from_json {
     if( can_be_matrix ) {
       Rcpp::IntegerVector arr_types( array_types.begin(), array_types.end() );
       int r_type = Rcpp::max( arr_types );
-      R_xlen_t n_col = *array_lengths.begin();  // only one sizez
+      
+      R_xlen_t n_col = *array_lengths.begin();  // only one size
       R_xlen_t n_row = n;
       
       return jsonify::from_json::simplify_matrix( array_of_array, n_col, n_row, r_type );
@@ -287,8 +278,6 @@ namespace from_json {
         columns[ this_name ] = simplify_matrix( lst, n_cols, n_rows, r_type );
         
       } else if( struct_type == 1 ) {
-        
-        // Rcpp::Rcout << "r-type: " << r_type << std::endl;
         
         switch( r_type ) {
         case LGLSXP: {
@@ -512,8 +501,6 @@ namespace from_json {
       // iterating list elements
       Rcpp::List this_list = out[i];
       
-      // Rcpp::Rcout << "this_list.Size():  " << this_list.size() << std::endl;
-      
       if( i == 0 ) {
         if( !Rf_isNull( this_list.names() ) ) {
           list_names = this_list.names();
@@ -605,7 +592,6 @@ namespace from_json {
         Rcpp::List lst = columns[ this_name ];
         columns[ this_name ] = simplify_dataframe( lst, doc_len );
       } else {
-        // Rcpp::Rcout << "simplify df - list_to_vector: " << std::endl;
         list_to_vector( columns, this_name, r_type, struct_type, false );  // false : fill_na
       }
     }
@@ -622,23 +608,16 @@ namespace from_json {
     Rcpp::List res(1);
     
     if ( dtypes.size() == 1 && contains_array( dtypes ) ) { 
-      // Rcpp::Rcout << "simplify 1" << std::endl;
-      //res[0] = jsonify::from_json::list_to_matrix( out );
       return jsonify::from_json::list_to_matrix( out );
       
     } else if ( contains_object( dtypes ) && dtypes.size() == 1 && !contains_array( dtypes ) ) {
-      // Rcpp::Rcout << "simplify 2" << std::endl;
       if( fill_na ) {
-        // Rcpp::Rcout << "simplify 2.1" << std::endl;
         return jsonify::from_json::simplify_dataframe_fill_na( out, json_length );
       } else {
-        // Rcpp::Rcout << "simplify 2.2" << std::endl;
         return jsonify::from_json::simplify_dataframe( out, json_length );
       }
     } else {
-      // Rcpp::Rcout << "simplify 3" << std::endl;
       return out;
-      //res[0] = out;
     }
     return res;
   }

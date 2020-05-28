@@ -1,4 +1,3 @@
-#include <Rcpp.h>
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
 
@@ -48,7 +47,6 @@ SEXP rcpp_read_ndjson_file(
     bool& simplify,
     bool& fill_na
 ) {
-  // TODO:
   
   // https://stackoverflow.com/a/51572325/5977215
   std::ifstream infile(file);
@@ -70,9 +68,5 @@ SEXP rcpp_read_ndjson_file(
   os << ']';
   std::string json = os.str();
   return jsonify::api::from_json( json.c_str(), simplify, fill_na );
-  
-  //Rcpp::Rcout << "infile: " << line.c_str() << std::endl;
-  //Rcpp::stop("jsonify - not implemented yet");
-  //return Rcpp::List();
 }
 
