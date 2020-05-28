@@ -83,7 +83,8 @@ namespace from_json {
     }
     case rapidjson::kFalseType: {}
     case rapidjson::kTrueType: {
-      return Rcpp::wrap< bool >( json.GetBool() );
+      //return Rcpp::wrap< bool >( json.GetBool() );
+      return Rcpp::wrap< bool >( json );
     }
     case rapidjson::kStringType: {
       return Rcpp::wrap( std::string( json.GetString() ) );
