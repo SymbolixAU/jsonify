@@ -4,15 +4,9 @@ Title: Convert Between 'R' Objects and Javascript Object Notation (JSON)
 Version: 1.2
 Date: 2020-05-28
 Authors@R: c(
-    person(
-      "David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre")
-    ),
-    person(
-      "Chris", "Muir", role = "ctb"
-      ),
-    person(
-      "Brendan", "Knapp", role = "ctb", comment = c(ORCID = "0000-0003-3284-4982")
-      )
+    person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre")),
+    person("Chris", "Muir", role = "ctb"),
+    person("Brendan", "Knapp", role = "ctb", comment = c(ORCID = "0000-0003-3284-4972"))
     )
 Description: Conversions between 'R' objects and Javascript Object Notation (JSON) using 
     the 'rapidjsonr' library <https://CRAN.R-project.org/package=rapidjsonr>. 
