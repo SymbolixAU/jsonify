@@ -67,6 +67,7 @@ namespace from_json {
     return out;
   }
   
+  // const rapidjson::Value&
   template< typename T >
   inline SEXP parse_json(
       const T& json,
@@ -90,14 +91,14 @@ namespace from_json {
       return Rcpp::wrap< bool >( json );
     }
     case rapidjson::kStringType: {
-      return Rcpp::wrap( std::string( json.GetString() ) );
+      return Rcpp::wrap< const char* >( json );
     }
       // numeric
     case rapidjson::kNumberType: {
       if( json.IsDouble() ) {
-      return Rcpp::wrap< double >( json.GetDouble() );
+      return Rcpp::wrap< double >( json );
     } else {
-      return Rcpp::wrap< int >( json.GetInt() );
+      return Rcpp::wrap< int >( json );
     }
     }
     case rapidjson::kObjectType: {

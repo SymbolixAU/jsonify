@@ -90,14 +90,14 @@ namespace from_json {
       // bool
       case rapidjson::kFalseType: {}
       case rapidjson::kTrueType: {
-        out[i] = child.GetBool();
+        out[i] = Rcpp::wrap< bool >( child );
         update_rtype< LGLSXP >( r_type );
         break;
       }
         
         // string
       case rapidjson::kStringType: {
-        out[i] = Rcpp::String( child.GetString() );
+        out[i] = Rcpp::wrap< const char * >( child );
         update_rtype< STRSXP >( r_type );
         break;
       }
@@ -106,11 +106,11 @@ namespace from_json {
       case rapidjson::kNumberType: {
         if( child.IsDouble() ) {
         // double
-        out[i] = child.GetDouble();
+        out[i] = Rcpp::wrap< double >( child );
         update_rtype< REALSXP >( r_type );
       } else {
         // int
-        out[i] = child.GetInt();
+        out[i] = Rcpp::wrap< int >( child );
         update_rtype< INTSXP >( r_type );
       }
       break;
