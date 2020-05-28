@@ -1,7 +1,10 @@
 #ifndef R_JSONIFY_FROM_JSON_H
 #define R_JSONIFY_FROM_JSON_H
 
+#include "jsonify/jsonify_types.hpp"
+
 #include <Rcpp.h>
+
 
 #include "from_json_utils.hpp"
 #include "simplify/simplify.hpp"
