@@ -2,6 +2,7 @@
 #define R_JSONIFY_FROM_JSON_SIMPLIFY_H
 
 #include "rapidjson/document.h"
+#include "jsonify/jsonify_types.hpp"
 
 namespace jsonify {
 namespace from_json {
@@ -85,10 +86,10 @@ namespace from_json {
     
     for( const auto& child : array ) {
       
-      switch( child.GetType() ) {
+      switch( Rcpp::getType( child ) ) {
       
       // bool
-      case rapidjson::kFalseType: {}
+      case rapidjson::kFalseType : {}
       case rapidjson::kTrueType: {
         out[i] = Rcpp::wrap< bool >( child );
         update_rtype< LGLSXP >( r_type );
@@ -102,17 +103,16 @@ namespace from_json {
         break;
       }
         
-        // numeric
+      // numeric
       case rapidjson::kNumberType: {
-        if( child.IsDouble() ) {
-        // double
-        out[i] = Rcpp::wrap< double >( child );
-        update_rtype< REALSXP >( r_type );
-      } else {
-        // int
-        out[i] = Rcpp::wrap< int >( child );
-        update_rtype< INTSXP >( r_type );
-      }
+        if( Rcpp::isType< double >( child ) ) {
+          out[i] = Rcpp::wrap< double >( child );
+          update_rtype< REALSXP >( r_type );
+        } else {
+          // int
+          out[i] = Rcpp::wrap< int >( child );
+          update_rtype< INTSXP >( r_type );
+        }
       break;
       }
         
