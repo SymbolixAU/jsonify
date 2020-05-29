@@ -1,7 +1,7 @@
 #ifndef R_JSONIFY_H
 #define R_JSONIFY_H
 
-#include "jsonify_types.hpp"
+// #include "jsonify_types.hpp"
 
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"

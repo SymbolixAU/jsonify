@@ -1,7 +1,7 @@
 #ifndef R_JSONIFY_FROM_JSON_H
 #define R_JSONIFY_FROM_JSON_H
 
-#include "jsonify/jsonify_types.hpp"
+//#include "jsonify/jsonify_types.hpp"
 
 #include <Rcpp.h>
 
@@ -16,6 +16,15 @@ namespace from_json {
   template< typename T > SEXP parse_object( const T& json, bool simplify, bool fill_na );
   template< typename T > SEXP parse_array( const T& json, bool simplify, bool fill_na );
   
+  template< typename T > int getType( T& obj );
+  template< typename T, N > N getObject( T& obj );
+  template< typename T, N > N getArray( T& obj );
+  template< typename T > R_xlen_t jsonLength( T& obj );
+  
+  template< typename T > bool getBool( T& obj );
+  template< typename T > double getDouble( T& obj );
+  template< typename T > int getInt( T& obj );
+    
   template< typename T >
   inline SEXP parse_array(
       const T& json,
@@ -23,11 +32,11 @@ namespace from_json {
       bool fill_na
   ) {
     
-    R_xlen_t json_length = json.Size();
+    R_xlen_t json_length = jsonLength( json );
     Rcpp::List out( json_length );
     
     R_xlen_t i = 0;
-    for ( const auto& child : Rcpp::getArray( json ) ) {
+    for ( const auto& child : getArray( json ) ) {
       out[ i++ ] =  parse_json( child, simplify, fill_na ); // iterating here again makes another list 
     }
     return out;
@@ -40,7 +49,7 @@ namespace from_json {
       bool fill_na
   ) {
     
-    R_xlen_t json_length = Rcpp::getSize( json );
+    R_xlen_t json_length = jsonLength( json );
     
     if ( json_length == 0 ) {
       return R_NilValue;
@@ -52,12 +61,12 @@ namespace from_json {
     
     // https://github.com/Tencent/rapidjson/issues/162#issuecomment-341824061
   #if __cplusplus >= 201703L
-    for ( const auto& [key, value] : Rcpp::getObject( json ) ) {
+    for ( const auto& [key, value] : getObject( json ) ) {
       out[ i ] = parse_json( value, simplify, fill_na );
       names[ i++ ] = std::string( key );
     }
   #else
-    for ( const auto& key_value : Rcpp::getObject( json ) ) {
+    for ( const auto& key_value : getObject( json ) ) {
       out[ i ] = parse_json( key_value.value, simplify, fill_na );
       names[ i++ ] = std::string( key_value.name.GetString() );
     }
@@ -67,7 +76,7 @@ namespace from_json {
   }
   
   // const rapidjson::Value&
-  template< typename T, typename N >
+  template< typename T>
   inline SEXP parse_json(
       const T& json,
       bool simplify,
@@ -76,9 +85,9 @@ namespace from_json {
     
     std::unordered_set< int > dtypes;
     
-    R_xlen_t json_length = Rcpp::getSize( json );
+    R_xlen_t json_length = jsonLength( json );
     
-    switch( Rcpp::getType<  >( json ) ) {
+    switch( getType( json ) ) {
     
     case rapidjson::kNullType: {
       return R_NA_VAL;
@@ -87,17 +96,19 @@ namespace from_json {
     case rapidjson::kFalseType: {}
     case rapidjson::kTrueType: {
       //return Rcpp::wrap< bool >( json.GetBool() );
-      return Rcpp::wrap< bool >( json );
+      return Rcpp::wrap< bool >( getBool( json ) );
     }
     case rapidjson::kStringType: {
-      return Rcpp::wrap< const char* >( json );
+      Rcpp::wrap( Rcpp::String( json.GetString() ) );
+      
+      //return Rcpp::wrap< const char* >( getChar( json ) );
     }
       // numeric
     case rapidjson::kNumberType: {
       if( json.IsDouble() ) {
-      return Rcpp::wrap< double >( json );
+      return Rcpp::wrap< double >( getDouble( json ) );
     } else {
-      return Rcpp::wrap< int >( json );
+      return Rcpp::wrap< int >( getInt( json ) );
     }
     }
     case rapidjson::kObjectType: {
@@ -108,7 +119,7 @@ namespace from_json {
       dtypes = get_dtypes( json );
       
       if( simplify && !contains_object_or_array( dtypes ) ) {
-        return array_to_vector( Rcpp::getArray( json ), simplify );
+        return array_to_vector( getArray( json ), simplify );
       } else {
         Rcpp::List arr = parse_array( json, simplify, fill_na );
         if( simplify ) {
@@ -133,8 +144,8 @@ namespace from_json {
       bool fill_na
   ) {
     
-    int json_type = Rcpp::getType( json );
-    R_xlen_t json_length = Rcpp::getSize( json );
+    int json_type = getType( json );
+    R_xlen_t json_length = jsonLength( json );
     
     if(json_length == 0) {
       if( json_type == 4 ) {
