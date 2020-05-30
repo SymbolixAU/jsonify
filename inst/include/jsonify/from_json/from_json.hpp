@@ -6,7 +6,6 @@
 #include "from_json_utils.hpp"
 #include "simplify/simplify.hpp"
 
-
 namespace jsonify {
 namespace from_json {
 
@@ -77,46 +76,46 @@ namespace from_json {
     
     switch( json.GetType() ) {
     
-    case rapidjson::kNullType: {
-      return R_NA_VAL;
-      break;
-    }
-    case rapidjson::kFalseType: {}
-    case rapidjson::kTrueType: {
-      return Rcpp::wrap< bool >( json.GetBool() );
-    }
-    case rapidjson::kStringType: {
-      return Rcpp::wrap( std::string( json.GetString() ) );
-    }
-      // numeric
-    case rapidjson::kNumberType: {
-      if( json.IsDouble() ) {
-      return Rcpp::wrap< double >( json.GetDouble() );
-    } else {
-      return Rcpp::wrap< int >( json.GetInt() );
-    }
-    }
-    case rapidjson::kObjectType: {
-      return parse_object( json, simplify, fill_na );
-    }
-    case rapidjson::kArrayType: {
-      dtypes.clear();
-      dtypes = get_dtypes( json );
-      
-      if( simplify && !contains_object_or_array( dtypes ) ) {
-        return array_to_vector( json.GetArray(), simplify );
+      case rapidjson::kNullType: {
+        return R_NA_VAL;
+        break;
+      }
+      case rapidjson::kFalseType: {}
+      case rapidjson::kTrueType: {
+        return Rcpp::wrap< bool >( json.GetBool() );
+      }
+      case rapidjson::kStringType: {
+        return Rcpp::wrap( std::string( json.GetString() ) );
+      }
+        // numeric
+      case rapidjson::kNumberType: {
+        if( json.IsDouble() ) {
+        return Rcpp::wrap< double >( json.GetDouble() );
       } else {
-        Rcpp::List arr = parse_array( json, simplify, fill_na );
-        if( simplify) {
-          return jsonify::from_json::simplify( arr, dtypes, json_length, fill_na );
+        return Rcpp::wrap< int >( json.GetInt() );
+      }
+      }
+      case rapidjson::kObjectType: {
+        return parse_object( json, simplify, fill_na );
+      }
+      case rapidjson::kArrayType: {
+        dtypes.clear();
+        dtypes = get_dtypes( json );
+        
+        if( simplify && !contains_object_or_array( dtypes ) ) {
+          return array_to_vector( json.GetArray(), simplify );
         } else {
-          return arr;
+          Rcpp::List arr = parse_array( json, simplify, fill_na );
+          if( simplify) {
+            return jsonify::from_json::simplify( arr, dtypes, json_length, fill_na );
+          } else {
+            return arr;
+          }
         }
       }
-    }
-    default: {
-      Rcpp::stop("jsonify - case not handled");
-    }
+      default: {
+        Rcpp::stop("jsonify - case not handled");
+      }
     }
     
     return R_NilValue;  // #nocov never reaches

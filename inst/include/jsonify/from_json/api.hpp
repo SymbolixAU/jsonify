@@ -8,22 +8,6 @@
 namespace jsonify {
 namespace api {
 
-  inline SEXP parse_json(const char* json ) {
-    
-    rapidjson::Document doc;
-    doc.Parse(json);
-    
-    // Make sure there were no parse errors
-    if(doc.HasParseError()) {
-      Rcpp::stop("json parse error");
-    }
-    
-    // If the input is a scalar value of type int, double, string, or bool, 
-    // return Rcpp vector with length 1.
-    return jsonify::parse_json::parse_json< rapidjson::Document >( doc );
-
-  }
-
   //' Parse JSON String
   //'
   //' Takes a JSON string as input, returns an R list of key-value pairs
@@ -31,7 +15,7 @@ namespace api {
   //' @param json const char, JSON string to be parsed. Coming from R, this
   //'  input should be a character vector of length 1.
   //' @export
-  inline SEXP from_json(rapidjson::Value& doc, bool& simplify, bool& fill_na ) {
+  inline SEXP from_json( rapidjson::Value& doc, bool& simplify, bool& fill_na ) {
 
     // If the input is a scalar value of type int, double, string, or bool, 
     // return Rcpp vector with length 1.
