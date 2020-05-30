@@ -423,7 +423,7 @@ test_that("round trips work", {
 
 test_that("UTF-8 encoding is not mangled", {
   
-  testthat::skip()
+  testthat::skip(message = "Tests fail on windows")
   
   test_list <- list(
     id = c("回", "站"),
