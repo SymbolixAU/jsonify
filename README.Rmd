@@ -1,5 +1,7 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 [![R build status](https://github.com/SymbolixAU/jsonify/workflows/R-CMD-check/badge.svg)](https://github.com/SymbolixAU/jsonify/actions)
@@ -19,7 +21,7 @@ library(jsonify)
 
 # jsonify
 
-jsonify between R objects and JSON. 
+Converts between R objects and JSON. 
 
 ```{r}
 js <- '[{"x":1,"y":"a"},{"x":2,"y":"b"}]'

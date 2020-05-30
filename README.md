@@ -8,7 +8,7 @@ downloads](http://cranlogs.r-pkg.org/badges/jsonify)](https://CRAN.R-project.org
 
 # jsonify
 
-jsonify between R objects and JSON.
+Converts between R objects and JSON.
 
 ``` r
 js <- '[{"x":1,"y":"a"},{"x":2,"y":"b"}]'
