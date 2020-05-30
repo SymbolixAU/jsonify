@@ -2,7 +2,7 @@ Package: jsonify
 Type: Package
 Title: Convert Between 'R' Objects and Javascript Object Notation (JSON)
 Version: 1.2
-Date: 2020-05-28
+Date: 2020-05-30
 Authors@R: c(
     person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre")),
     person("Chris", "Muir", role = "ctb"),
@@ -10,7 +10,7 @@ Authors@R: c(
     )
 Description: Conversions between 'R' objects and Javascript Object Notation (JSON) using 
     the 'rapidjsonr' library <https://CRAN.R-project.org/package=rapidjsonr>. 
-License: GPL (>= 2)
+License: MIT + file LICENSE
 Depends: R (>= 3.3.0)
 SystemRequirements: C++11
 Imports: 

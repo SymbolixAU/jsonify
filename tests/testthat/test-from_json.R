@@ -422,6 +422,9 @@ test_that("round trips work", {
 })
 
 test_that("UTF-8 encoding is not mangled", {
+  
+  testthat::skip_on_cran()
+  
   test_list <- list(
     id = c("回", "站"),
     val = list("收", c("غ ظ ض ذ خ ث ت ش ر ق ص ف ع س ن" ,

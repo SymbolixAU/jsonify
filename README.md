@@ -1,14 +1,24 @@
 
+[![R build
+status](https://github.com/SymbolixAU/jsonify/workflows/R-CMD-check/badge.svg)](https://github.com/SymbolixAU/jsonify/actions)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/jsonify)](https://CRAN.R-project.org/package=jsonify)
 ![downloads](http://cranlogs.r-pkg.org/badges/grand-total/jsonify)
 [![CRAN RStudio mirror
 downloads](http://cranlogs.r-pkg.org/badges/jsonify)](https://CRAN.R-project.org/package=jsonify)
-[![Travis build
-status](https://travis-ci.org/SymbolixAU/jsonify.svg?branch=master)](https://travis-ci.org/SymbolixAU/jsonify)
 
 # jsonify
 
 jsonify between R objects and JSON.
+
+``` r
+js <- '[{"x":1,"y":"a"},{"x":2,"y":"b"}]'
+( df <- from_json( js ) )
+#    x y
+#  1 1 a
+#  2 2 b
+( to_json( df ) )
+#  [{"x":1,"y":"a"},{"x":2,"y":"b"}]
+```
 
 ### There are already JSON converters, why did you build this one?
 
