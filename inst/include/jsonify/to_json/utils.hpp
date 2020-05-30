@@ -3,8 +3,6 @@
 
 #include <Rcpp.h>
 
-/* // [[Rcpp::depends(rapidjsonr)]] */
-
 #include "rapidjson/writer.h"
 
 namespace jsonify {
