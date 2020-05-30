@@ -36,27 +36,19 @@ namespace api {
     // If the input is a scalar value of type int, double, string, or bool, 
     // return Rcpp vector with length 1.
     if( doc.IsInt() ) {
-      Rcpp::IntegerVector x(1);
-      x[0] = doc.GetInt();
-      return x;
+      return Rcpp::wrap( doc.GetInt() );
     }
     
     if( doc.IsDouble() ) {
-      Rcpp::NumericVector x(1);
-      x[0] = doc.GetDouble();
-      return x;
+      return Rcpp::wrap( doc.GetDouble() );
     }
     
     if( doc.IsString() ) {
-      Rcpp::CharacterVector x(1);
-      x[0] = Rcpp::String(doc.GetString());
-      return x;
+      return Rcpp::wrap( Rcpp::String( doc.GetString() ) );
     }
     
     if( doc.IsBool() ) {
-      Rcpp::LogicalVector x(1);
-      x[0] = doc.GetBool();
-      return x;
+      return Rcpp::wrap( doc.GetBool() );
     }
     
     return jsonify::from_json::from_json( doc, simplify, fill_na );
@@ -97,7 +89,7 @@ namespace api {
     
   }
 
-}
-} // jsonify
+}  // namespace api
+}  // namespace jsonify
 
 #endif
