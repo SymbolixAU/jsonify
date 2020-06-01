@@ -1,3 +1,7 @@
+## v1.2.1
+
+* patch for correctly allocating strings [issue 61](https://github.com/symbolixAU/jsonify/issues/61)
+
 ## v1.2.0
 
 * fixed C Stack Overflow caused by recursion [issue 61](https://github.com/symbolixAU/jsonify/issues/61)

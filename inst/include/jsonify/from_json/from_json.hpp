@@ -115,15 +115,17 @@ namespace from_json {
         return Rcpp::wrap< bool >( json.GetBool() );
       }
       case rapidjson::kStringType: {
-        return Rcpp::wrap( std::string( json.GetString() ) );
+        size_t sl = json.GetStringLength();
+        std::string s = std::string( json.GetString(), sl);
+        return Rcpp::wrap( s );
       }
         // numeric
       case rapidjson::kNumberType: {
         if( json.IsDouble() ) {
         return Rcpp::wrap< double >( json.GetDouble() );
-      } else {
-        return Rcpp::wrap< int >( json.GetInt() );
-      }
+        } else {
+          return Rcpp::wrap< int >( json.GetInt() );
+        }
       }
       case rapidjson::kObjectType: {
         return parse_object( json, simplify, fill_na );
