@@ -83,52 +83,61 @@ namespace from_json {
     R_xlen_t i = 0;
     Rcpp::List out( arr_len );
     
+    // Rcpp::Rcout << "arr_len: " << arr_len << std::endl;
+    
     for( const auto& child : array ) {
       
-      switch( child.GetType() ) {
+      // Rcpp::Rcout << "child type: " << child.GetType() << std::endl;
       
-      // bool
-      case rapidjson::kFalseType: {}
-      case rapidjson::kTrueType: {
-        out[i] = child.GetBool();
-        update_rtype< LGLSXP >( r_type );
+      switch( child.GetType() ) {
+
+        // bool
+        case rapidjson::kFalseType: {}
+        case rapidjson::kTrueType: {
+          out[i] = child.GetBool();
+          update_rtype< LGLSXP >( r_type );
+          break;
+        }
+
+          // string
+        case rapidjson::kStringType: {
+          //out[i] = "test";
+          size_t sl = child.GetStringLength();
+          std::string s = std::string( child.GetString(), sl);
+          out[i] = s;
+          update_rtype< STRSXP >( r_type );
+          break;
+        }
+
+          // numeric
+        case rapidjson::kNumberType: {
+          if( child.IsDouble() ) {
+          // // double
+          out[i] = child.GetDouble();
+          update_rtype< REALSXP >( r_type );
+          } else {
+          // // int
+          out[i] = child.GetInt();
+          update_rtype< INTSXP >( r_type );
+          }
         break;
-      }
-        
-        // string
-      case rapidjson::kStringType: {
-        out[i] = Rcpp::String( child.GetString() );
-        update_rtype< STRSXP >( r_type );
-        break;
-      }
-        
-        // numeric
-      case rapidjson::kNumberType: {
-        if( child.IsDouble() ) {
-        // double
-        out[i] = child.GetDouble();
-        update_rtype< REALSXP >( r_type );
-      } else {
-        // int
-        out[i] = child.GetInt();
-        update_rtype< INTSXP >( r_type );
-      }
-      break;
-      }
-        
-        // null
-      case rapidjson::kNullType: {
-        out[i] = R_NA_VAL;
-        update_rtype< LGLSXP >( r_type );
-        break;
-      }
-        // some other data type not covered, including arrays and objects
-      default: {
-        Rcpp::stop("jsonify - array_to_vector only able to parse int, double, string and bool");
-      }
+        }
+
+          // null
+        case rapidjson::kNullType: {
+          out[i] = R_NA_VAL;
+          update_rtype< LGLSXP >( r_type );
+          break;
+        }
+          // some other data type not covered, including arrays and objects
+        default: {
+          Rcpp::stop("jsonify - array_to_vector only able to parse int, double, string and bool");
+        }
       }
       ++i;
     }
+    
+    // Rcpp::Rcout << "i: " << i << std::endl;
     
     if( simplify ) {
       return jsonify::from_json::simplify_vector( out, r_type, 1 );
@@ -191,6 +200,9 @@ namespace from_json {
   inline SEXP list_to_matrix(
       Rcpp::List& array_of_array
   ) {
+    
+    // Rcpp::Rcout << "list_to_matrix" << std::endl;
+    
     R_xlen_t n = array_of_array.size();
     R_xlen_t j;
     std::unordered_set< R_xlen_t > array_lengths;

@@ -20,10 +20,40 @@ namespace from_json {
       bool fill_na
   ) {
     
+    // IFF the array doesn't contain anything other than scalars,
+    // we can go straight to a vector
+    // rapidjson::Value::ConstArray  arr = json.GetArray();
+    std::unordered_set< int > dtypes = get_dtypes( json );
+    
+    // for( auto t : dtypes ) {
+    //   Rcpp::Rcout << t << std::endl;
+    // }
+    
+    // Rcpp::Rcout << "parse_array " << std::endl;
     R_xlen_t json_length = json.Size();
     Rcpp::List out( json_length );
     
     R_xlen_t i = 0;
+    // if( simplify && dtypes.size() == 1 && contains_array( dtypes ) ) {
+    //   // Rcpp::Rcout << "returning early" << std::endl;
+    //   // return array_to_vector( json.GetArray(), simplify );
+    // 
+    //   // Rcpp::Rcout << "json size: " << json.Size() << std::endl;
+    //   for( const auto& child : json.GetArray() ) {
+    //     out[ i++ ] = array_to_vector( child.GetArray(), simplify );
+    //   }
+    //   // iff it's just an array of arrays,
+    //   // loop through and convert to matrix
+    // 
+    //   // for( const auto& child : json.GetArray() ) {
+    //   //   //Rcpp::List av = array_to_vector( json.GetArray(), simplify );
+    //   //
+    //   // }
+    //   return out;
+    //   //return list_to_matrix( out );
+    // }
+    
+    
     for ( const auto& child : json.GetArray() ) {
       out[ i++ ] =  parse_json( child, simplify, fill_na ); // iterating here again makes another list 
     }
@@ -70,8 +100,8 @@ namespace from_json {
       bool fill_na
   ) {
     
+    // Rcpp::Rcout << "parse_json" << std::endl;
     std::unordered_set< int > dtypes;
-    
     R_xlen_t json_length = json.Size();
     
     switch( json.GetType() ) {
@@ -99,14 +129,29 @@ namespace from_json {
         return parse_object( json, simplify, fill_na );
       }
       case rapidjson::kArrayType: {
+        
         dtypes.clear();
         dtypes = get_dtypes( json );
         
+        // if the type is ONLY arrays
+        // can it be parsed, then simplifed to matrices straight away?
+        
+        // for( auto t : dtypes ) {
+        //   Rcpp::Rcout << t << std::endl;
+        // }
+        
+        // if( simplify && dtypes.size() == 1 && contains_array( dtypes ) ) {
+        //   
+        //   return parse_array( json, simplify, fill_na );
+        //   //return list_to_matrix( arr );
+          
         if( simplify && !contains_object_or_array( dtypes ) ) {
+          // Rcpp::Rcout << "here" << std::endl;
           return array_to_vector( json.GetArray(), simplify );
         } else {
+          // return parse_array( json, simplify, fill_na );
           Rcpp::List arr = parse_array( json, simplify, fill_na );
-          if( simplify) {
+          if( simplify ) {
             return jsonify::from_json::simplify( arr, dtypes, json_length, fill_na );
           } else {
             return arr;
