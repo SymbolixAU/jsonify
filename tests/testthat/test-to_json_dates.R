@@ -2,6 +2,12 @@ context("Dates")
 
 test_that("Dates are handled", {
   
+  testthat::skip_on_cran()
+  
+  expect_equal(as.character(to_json(as.Date("2018-01-01"))), "[17532.0]")
+  expect_equal(as.character(to_json(as.Date("2018-01-01"), numeric_dates = F)), "[\"2018-01-01\"]")
+  expect_equal(as.character(to_json(as.POSIXct("2018-01-01 01:00:00", tz = "GMT"))), "[1514768400.0]")
+  
   x <- as.Date("2018-01-01")
   expect_equal( as.character( to_json( x, numeric_dates = FALSE ) ), '["2018-01-01"]' )
   
@@ -23,6 +29,8 @@ test_that("Dates are handled", {
 })
 
 test_that("Different R objects with dates are handled", {
+  
+  testthat::skip_on_cran()
   
   ## DATE
   ## vector
@@ -93,6 +101,8 @@ test_that("Different R objects with dates are handled", {
 
 
 test_that("posixlt not converted to numeric",{
+  
+  testthat::skip_on_cran()
   
   p <- as.POSIXlt("2019-01-01 00:00:00", tz = "GMT")  ## so travis works
   res <- to_json(p, numeric_dates = F)

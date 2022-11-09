@@ -1,3 +1,7 @@
+## v1.2.2
+
+* skipped date tests on CRAN
+
 ## v1.2.1
 
 * patch for correctly allocating strings [issue 61](https://github.com/symbolixAU/jsonify/issues/61)
