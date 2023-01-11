@@ -44,18 +44,23 @@ For example, the `LinkingTo` section in **DESCRIPTION** will look something like
 ```yaml
 LinkingTo: 
     Rcpp,
+    rapidjsonr (>= 1.2.0),
     jsonify
 ```
 And in a c++ source file you can `#include` the header and use the available functions
 
 ```c++
-// [[Rcpp::depends(jsonify)]]
 #include "jsonify/jsonify.hpp"
 
 Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
   return jsonify::api::to_json( df );
 }
 ```
+
+You can see an example of this in my `{geojsonsf}` package
+
+- [Description](https://github.com/SymbolixAU/geojsonsf/blob/master/DESCRIPTION#L17)
+- [#include](https://github.com/SymbolixAU/geojsonsf/blob/master/inst/include/geojsonsf/geojson/api/sf_api.hpp#L4)
 
 ### Can I call it from R if I want to?
 

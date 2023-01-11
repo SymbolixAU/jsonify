@@ -1,7 +1,7 @@
 
 [![R build
 status](https://github.com/SymbolixAU/jsonify/workflows/R-CMD-check/badge.svg)](https://github.com/SymbolixAU/jsonify/actions)
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/jsonify)](https://CRAN.R-project.org/package=jsonify)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/jsonify)](https://CRAN.R-project.org/package=jsonify)
 ![downloads](http://cranlogs.r-pkg.org/badges/grand-total/jsonify)
 [![CRAN RStudio mirror
 downloads](http://cranlogs.r-pkg.org/badges/jsonify)](https://CRAN.R-project.org/package=jsonify)
@@ -37,6 +37,7 @@ something like
 ``` yaml
 LinkingTo: 
     Rcpp,
+    rapidjsonr (>= 1.2.0),
     jsonify
 ```
 
@@ -44,13 +45,17 @@ And in a c++ source file you can `#include` the header and use the
 available functions
 
 ``` cpp
-// [[Rcpp::depends(jsonify)]]
 #include "jsonify/jsonify.hpp"
 
 Rcpp::StringVector my_json( Rcpp::DataFrame df ) {
   return jsonify::api::to_json( df );
 }
 ```
+
+You can see an example of this in my `{geojsonsf}` package
+
+- [Description](https://github.com/SymbolixAU/geojsonsf/blob/master/DESCRIPTION#L17)
+- [\#include](https://github.com/SymbolixAU/geojsonsf/blob/master/inst/include/geojsonsf/geojson/api/sf_api.hpp#L4)
 
 ### Can I call it from R if I want to?
 
