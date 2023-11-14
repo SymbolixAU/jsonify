@@ -49,8 +49,10 @@ namespace utils {
     return js;
   }
 
-  inline bool should_unbox( int n, bool unbox ) {
-    return ( unbox && n == 1 );
+  template< typename RTYPE >
+  inline bool should_unbox( RTYPE x, int n, bool unbox ) {
+    Rcpp::CharacterVector attr = rClass( x );
+    return ( unbox && n == 1 && strcmp(attr[0], "AsIs") != 0 );
   }
   
   template< typename Writer >

@@ -1,3 +1,7 @@
+## v1.2.3
+
+* length-1 vectors marked as `AsIs` / `I()` are not unboxed [issue 75](https://github.com/SymbolixAU/jsonify/issues/75)
+
 ## v1.2.2
 
 * skipped date tests on CRAN

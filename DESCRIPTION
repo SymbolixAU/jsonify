@@ -2,7 +2,7 @@ Package: jsonify
 Type: Package
 Title: Convert Between 'R' Objects and Javascript Object Notation (JSON)
 Version: 1.2.3
-Date: 2023-02-11
+Date: 2023-11-14
 Authors@R: c(
     person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre")),
     person("Chris", "Muir", role = "ctb"),
@@ -18,7 +18,7 @@ Imports:
 LinkingTo:
   rapidjsonr (>= 1.2.0),
   Rcpp
-RoxygenNote: 7.1.0
+RoxygenNote: 7.2.3
 Suggests:
   covr,
   testthat,

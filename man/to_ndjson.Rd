@@ -17,7 +17,8 @@ to_ndjson(
 \item{x}{object to convert to JSON}
 
 \item{unbox}{logical indicating if single-value arrays should be 'unboxed', 
-that is, not contained inside an array.}
+that is, not contained inside an array. The exception being vectors created with `I()`, 
+these will not be 'unboxed'.}
 
 \item{digits}{integer specifying the number of decimal places to round numerics.
 Default is \code{NULL} - no rounding}

@@ -23,7 +23,7 @@ namespace simple {
     ) {
     
     R_xlen_t n = sv.size();
-    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    bool will_unbox = jsonify::utils::should_unbox( sv, n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
     R_xlen_t i;
 
@@ -99,7 +99,7 @@ namespace simple {
     } else {
     
       R_xlen_t n = nv.size();
-      bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+      bool will_unbox = jsonify::utils::should_unbox( nv, n, unbox );
       
       jsonify::utils::start_array( writer, will_unbox );
       R_xlen_t i;
@@ -227,7 +227,7 @@ namespace simple {
     } else {
     
       R_xlen_t n = iv.size();
-      bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+      bool will_unbox = jsonify::utils::should_unbox( iv, n, unbox );
       jsonify::utils::start_array( writer, will_unbox );
       R_xlen_t i;
 
@@ -357,7 +357,7 @@ namespace simple {
       int digits
   ) {
     R_xlen_t n = nv.size();
-    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    bool will_unbox = jsonify::utils::should_unbox( nv, n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
     R_xlen_t i;
 
@@ -379,7 +379,7 @@ namespace simple {
     bool unbox
   ) {
     R_xlen_t n = iv.size();
-    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    bool will_unbox = jsonify::utils::should_unbox( iv, n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
     R_xlen_t i;
     
@@ -402,7 +402,7 @@ namespace simple {
     ) {
     
     R_xlen_t n = lv.size();
-    bool will_unbox = jsonify::utils::should_unbox( n, unbox );
+    bool will_unbox = jsonify::utils::should_unbox( lv, n, unbox );
     jsonify::utils::start_array( writer, will_unbox );
     R_xlen_t i;
 

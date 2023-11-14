@@ -17,7 +17,8 @@ to_json(
 \item{x}{object to convert to JSON}
 
 \item{unbox}{logical indicating if single-value arrays should be 'unboxed', 
-that is, not contained inside an array.}
+that is, not contained inside an array. The exception being vectors created with `I()`, 
+these will not be 'unboxed'.}
 
 \item{digits}{integer specifying the number of decimal places to round numerics.
 Default is \code{NULL} - no rounding}
@@ -57,6 +58,7 @@ to_json(psx, numeric_dates = FALSE)
 ## unbox single-value arrays
 to_json(list(x = 1), unbox = TRUE)
 to_json(list(x = 1, y = c("a"), z = list(x = 2, y = c("b"))), unbox = TRUE)
+to_json(list(x = 1, y = I(c("a")), z = list(x = 2, y = c("b"))), unbox = TRUE)
 
 ## rounding numbers using the digits argument
 to_json(1.23456789, digits = 2)
