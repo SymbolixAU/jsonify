@@ -35,7 +35,7 @@ test_that("Posixlt unboxed", {
   
   x <- as.POSIXlt("2018-01-01 01:00:00", tz = "GMT")
   js <- to_json(x, unbox = T)
-  expect_equal( as.character( js ), "{\"sec\":0.0,\"min\":0,\"hour\":1,\"mday\":1,\"mon\":0,\"year\":118,\"wday\":1,\"yday\":0,\"isdst\":0}" )
+  expect_equal( as.character( js ), "{\"sec\":0.0,\"min\":0,\"hour\":1,\"mday\":1,\"mon\":0,\"year\":118,\"wday\":1,\"yday\":0,\"isdst\":0,\"zone\":\"GMT\",\"gmtoff\":0}" )
   expect_true( validate_json( js ) )
 })
 
