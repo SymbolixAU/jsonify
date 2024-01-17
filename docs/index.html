@@ -5,21 +5,24 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Converts 'R' Objects to Javascript Object Notation (JSON) • jsonify</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Converts 'R' Objects to Javascript Object Notation (JSON)">
-<meta property="og:description" content="Converts 'R' objects into Javascript Object Notation (JSON) using 
-    the 'rapidjsonr' library &lt;https://CRAN.R-project.org/package=rapidjsonr&gt;. ">
-<meta name="twitter:card" content="summary">
+<title>Convert Between R Objects and Javascript Object Notation (JSON) • jsonify</title>
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
+<script src="pkgdown.js"></script><meta property="og:title" content="Convert Between R Objects and Javascript Object Notation (JSON)">
+<meta property="og:description" content="Conversions between R objects and Javascript Object Notation (JSON) using 
+    the rapidjsonr library &lt;https://CRAN.R-project.org/package=rapidjsonr&gt;. ">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body>
-    <div class="container template-article">
+<body data-spy="scroll" data-target="#toc">
+    
+
+    <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -31,18 +34,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">jsonify</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.3</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fa fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/jsonify.html">Get started</a>
 </li>
@@ -53,7 +50,14 @@
   <a href="news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/SymbolixAU/jsonify/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -62,332 +66,279 @@
 <!--/.navbar -->
 
       
-      </header><div class="row">
-  <div class="col-md-9 contents">
-    
 
-    
-    
-<p><a href="https://CRAN.R-project.org/package=jsonify"><img src="http://www.r-pkg.org/badges/version/jsonify" alt="CRAN_Status_Badge"></a> <img src="http://cranlogs.r-pkg.org/badges/grand-total/jsonify" alt="downloads"><a href="https://CRAN.R-project.org/package=jsonify"><img src="http://cranlogs.r-pkg.org/badges/jsonify" alt="CRAN RStudio mirror downloads"></a> <a href="https://travis-ci.org/SymbolixAU/jsonify"><img src="https://travis-ci.org/SymbolixAU/jsonify.svg?branch=master" alt="Travis build status"></a> <a href="https://codecov.io/github/SymbolixAU/jsonify?branch=master"><img src="https://codecov.io/gh/SymbolixAU/jsonify/branch/master/graph/badge.svg" alt="Coverage status"></a></p>
-<div id="jsonify" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#jsonify" class="anchor"></a>jsonify</h1></div>
-<p>jsonify converts R objects to JSON.</p>
-<div id="there-are-already-json-converters-why-did-you-build-this-one" class="section level3">
-<h3 class="hasAnchor">
-<a href="#there-are-already-json-converters-why-did-you-build-this-one" class="anchor"></a>There are already JSON converters, why did you build this one?</h3>
+      </header><div class="row">
+  <div class="contents col-md-9">
+
+
+<div class="section level1">
+<div class="page-header"><h1 id="jsonify">jsonify<a class="anchor" aria-label="anchor" href="#jsonify"></a>
+</h1></div>
+<p>Converts between R objects and JSON.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">js</span> <span class="op">&lt;-</span> <span class="st">'[{"x":1,"y":"a"},{"x":2,"y":"b"}]'</span></span>
+<span><span class="op">(</span> <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/from_json.html">from_json</a></span><span class="op">(</span> <span class="va">js</span> <span class="op">)</span> <span class="op">)</span></span>
+<span><span class="co">#    x y</span></span>
+<span><span class="co">#  1 1 a</span></span>
+<span><span class="co">#  2 2 b</span></span>
+<span><span class="op">(</span> <span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">df</span> <span class="op">)</span> <span class="op">)</span></span>
+<span><span class="co">#  [{"x":1,"y":"a"},{"x":2,"y":"b"}]</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="there-are-already-json-converters-why-did-you-build-this-one">There are already JSON converters, why did you build this one?<a class="anchor" aria-label="anchor" href="#there-are-already-json-converters-why-did-you-build-this-one"></a>
+</h3>
 <p>Because I wanted it available at the source ( C++ ) level for integrating into other packages.</p>
 </div>
-<div id="is-it-fast" class="section level3">
-<h3 class="hasAnchor">
-<a href="#is-it-fast" class="anchor"></a>Is it fast?</h3>
-<p>yeah it’s pretty good.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(microbenchmark)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(jsonlite)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">n &lt;-<span class="st"> </span><span class="fl">1e6</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">  <span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span>n</a>
-<a class="sourceLine" id="cb1-8" data-line-number="8">  , <span class="dt">value =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(letters, <span class="dt">size =</span> n, <span class="dt">replace =</span> T)</a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">  , <span class="dt">val2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10">  , <span class="dt">log =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(T,F), <span class="dt">size =</span> n, <span class="dt">replace =</span> T)</a>
-<a class="sourceLine" id="cb1-11" data-line-number="11">  , <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12">)</a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="kw"><a href="https://www.rdocumentation.org/packages/microbenchmark/topics/microbenchmark">microbenchmark</a></span>(</a>
-<a class="sourceLine" id="cb1-15" data-line-number="15">  <span class="dt">jsonlite =</span> {</a>
-<a class="sourceLine" id="cb1-16" data-line-number="16">    js &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonlite/topics/fromJSON">toJSON</a></span>( df )</a>
-<a class="sourceLine" id="cb1-17" data-line-number="17">  },</a>
-<a class="sourceLine" id="cb1-18" data-line-number="18">  <span class="dt">jsonify =</span> {</a>
-<a class="sourceLine" id="cb1-19" data-line-number="19">    js &lt;-<span class="st"> </span>jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( df )</a>
-<a class="sourceLine" id="cb1-20" data-line-number="20">  },</a>
-<a class="sourceLine" id="cb1-21" data-line-number="21">  <span class="dt">times =</span> <span class="dv">3</span></a>
-<a class="sourceLine" id="cb1-22" data-line-number="22">)</a>
-<a class="sourceLine" id="cb1-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb1-24" data-line-number="24"><span class="co"># Unit: seconds</span></a>
-<a class="sourceLine" id="cb1-25" data-line-number="25"><span class="co">#      expr      min       lq     mean   median       uq      max neval</span></a>
-<a class="sourceLine" id="cb1-26" data-line-number="26"><span class="co">#  jsonlite 2.017081 2.063732 2.540350 2.110383 2.801984 3.493585     3</span></a>
-<a class="sourceLine" id="cb1-27" data-line-number="27"><span class="co">#   jsonify 1.186239 1.202719 1.514067 1.219198 1.677981 2.136763     3</span></a>
-<a class="sourceLine" id="cb1-28" data-line-number="28"></a>
-<a class="sourceLine" id="cb1-29" data-line-number="29">n &lt;-<span class="st"> </span><span class="fl">1e4</span></a>
-<a class="sourceLine" id="cb1-30" data-line-number="30">x &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb1-31" data-line-number="31">  <span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)</a>
-<a class="sourceLine" id="cb1-32" data-line-number="32">  , <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n))</a>
-<a class="sourceLine" id="cb1-33" data-line-number="33">  , <span class="dt">z =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>( <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>( <span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)))</a>
-<a class="sourceLine" id="cb1-34" data-line-number="34">  , <span class="dt">xx =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)</a>
-<a class="sourceLine" id="cb1-35" data-line-number="35">  , <span class="dt">yy =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb1-36" data-line-number="36">      <span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span>n</a>
-<a class="sourceLine" id="cb1-37" data-line-number="37">      , <span class="dt">value =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(letters, <span class="dt">size =</span> n, <span class="dt">replace =</span> T)</a>
-<a class="sourceLine" id="cb1-38" data-line-number="38">      , <span class="dt">val2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)</a>
-<a class="sourceLine" id="cb1-39" data-line-number="39">      , <span class="dt">log =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(T,F), <span class="dt">size =</span> n, <span class="dt">replace =</span> T)</a>
-<a class="sourceLine" id="cb1-40" data-line-number="40">    )</a>
-<a class="sourceLine" id="cb1-41" data-line-number="41">)</a>
-<a class="sourceLine" id="cb1-42" data-line-number="42"></a>
-<a class="sourceLine" id="cb1-43" data-line-number="43"><span class="kw"><a href="https://www.rdocumentation.org/packages/microbenchmark/topics/microbenchmark">microbenchmark</a></span>(</a>
-<a class="sourceLine" id="cb1-44" data-line-number="44">  <span class="dt">jsonlite =</span> {</a>
-<a class="sourceLine" id="cb1-45" data-line-number="45">    js &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonlite/topics/fromJSON">toJSON</a></span>( x )</a>
-<a class="sourceLine" id="cb1-46" data-line-number="46">  },</a>
-<a class="sourceLine" id="cb1-47" data-line-number="47">  <span class="dt">jsonify =</span> {</a>
-<a class="sourceLine" id="cb1-48" data-line-number="48">    js &lt;-<span class="st"> </span>jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( x )</a>
-<a class="sourceLine" id="cb1-49" data-line-number="49">  },</a>
-<a class="sourceLine" id="cb1-50" data-line-number="50">  <span class="dt">times =</span> <span class="dv">5</span></a>
-<a class="sourceLine" id="cb1-51" data-line-number="51">)</a>
-<a class="sourceLine" id="cb1-52" data-line-number="52"> </a>
-<a class="sourceLine" id="cb1-53" data-line-number="53"><span class="co"># Unit: milliseconds</span></a>
-<a class="sourceLine" id="cb1-54" data-line-number="54"><span class="co">#      expr      min       lq     mean   median       uq      max neval</span></a>
-<a class="sourceLine" id="cb1-55" data-line-number="55"><span class="co">#  jsonlite 18.52028 18.82241 19.32112 18.99683 19.18103 21.08508     5</span></a>
-<a class="sourceLine" id="cb1-56" data-line-number="56"><span class="co">#   jsonify 17.72060 18.19092 19.58308 19.52457 21.14687 21.33241     5</span></a>
-<a class="sourceLine" id="cb1-57" data-line-number="57">   </a></code></pre></div>
-</div>
-<div id="i-thought-you-had-an-example-of-it-being-much-quicker-than-jsonlite" class="section level3">
-<h3 class="hasAnchor">
-<a href="#i-thought-you-had-an-example-of-it-being-much-quicker-than-jsonlite" class="anchor"></a>I thought you had an example of it being MUCH quicker than <code>jsonlite</code> ?</h3>
-<p>Yeah, but I realised it was comparing two different methods. When <code>jsonify</code> was parsing nested lists, it was parsing data.frames column-wise, whereas jsonlite was row-wise. Which is a slower operation</p>
-</div>
-<div id="oh-right--so-it-wasnt-a-fair-test-then-" class="section level3">
-<h3 class="hasAnchor">
-<a href="#oh-right--so-it-wasnt-a-fair-test-then-" class="anchor"></a>Oh right. So it wasn’t a fair test then.</h3>
-<p>Correct.</p>
-<p>Here’s a more suitable comparison</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">n &lt;-<span class="st"> </span><span class="fl">1e4</span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">x &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">  , <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n))</a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">  , <span class="dt">z =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>( <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>( <span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)))</a>
-<a class="sourceLine" id="cb2-6" data-line-number="6">  , <span class="dt">xx =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)</a>
-<a class="sourceLine" id="cb2-7" data-line-number="7">  , <span class="dt">yy =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb2-8" data-line-number="8">      <span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span>n</a>
-<a class="sourceLine" id="cb2-9" data-line-number="9">      , <span class="dt">value =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(letters, <span class="dt">size =</span> n, <span class="dt">replace =</span> T)</a>
-<a class="sourceLine" id="cb2-10" data-line-number="10">      , <span class="dt">val2 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)</a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">      , <span class="dt">log =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(T,F), <span class="dt">size =</span> n, <span class="dt">replace =</span> T)</a>
-<a class="sourceLine" id="cb2-12" data-line-number="12">    )</a>
-<a class="sourceLine" id="cb2-13" data-line-number="13">)</a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="kw"><a href="https://www.rdocumentation.org/packages/microbenchmark/topics/microbenchmark">microbenchmark</a></span>(</a>
-<a class="sourceLine" id="cb2-16" data-line-number="16">  <span class="dt">jsonlite_row =</span> {</a>
-<a class="sourceLine" id="cb2-17" data-line-number="17">    js &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonlite/topics/fromJSON">toJSON</a></span>( x )</a>
-<a class="sourceLine" id="cb2-18" data-line-number="18">  },</a>
-<a class="sourceLine" id="cb2-19" data-line-number="19">  <span class="dt">jsonlite_col =</span> {</a>
-<a class="sourceLine" id="cb2-20" data-line-number="20">    js &lt;-<span class="st"> </span>jsonlite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonlite/topics/fromJSON">toJSON</a></span>( x, <span class="dt">dataframe =</span> <span class="st">"columns"</span> )</a>
-<a class="sourceLine" id="cb2-21" data-line-number="21">  },</a>
-<a class="sourceLine" id="cb2-22" data-line-number="22">  <span class="dt">jsonify_row =</span> {</a>
-<a class="sourceLine" id="cb2-23" data-line-number="23">    js &lt;-<span class="st"> </span>jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( x )</a>
-<a class="sourceLine" id="cb2-24" data-line-number="24">  },</a>
-<a class="sourceLine" id="cb2-25" data-line-number="25">  <span class="dt">jsonify_col =</span> {</a>
-<a class="sourceLine" id="cb2-26" data-line-number="26">    js &lt;-<span class="st"> </span>jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( x, <span class="dt">by =</span> <span class="st">"column"</span> )</a>
-<a class="sourceLine" id="cb2-27" data-line-number="27">  },</a>
-<a class="sourceLine" id="cb2-28" data-line-number="28">  <span class="dt">times =</span> <span class="dv">5</span></a>
-<a class="sourceLine" id="cb2-29" data-line-number="29">)</a>
-<a class="sourceLine" id="cb2-30" data-line-number="30"></a>
-<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="co"># Unit: milliseconds</span></a>
-<a class="sourceLine" id="cb2-32" data-line-number="32"><span class="co">#          expr       min        lq      mean    median        uq       max neval</span></a>
-<a class="sourceLine" id="cb2-33" data-line-number="33"><span class="co">#  jsonlite_row 20.533642 20.717894 27.294220 21.122860 21.426250 52.670456     5</span></a>
-<a class="sourceLine" id="cb2-34" data-line-number="34"><span class="co">#  jsonlite_col 13.691643 13.812459 15.683795 14.293177 15.655705 20.965993     5</span></a>
-<a class="sourceLine" id="cb2-35" data-line-number="35"><span class="co">#   jsonify_row 17.506507 17.951948 20.929641 19.827791 21.161389 28.200572     5</span></a>
-<a class="sourceLine" id="cb2-36" data-line-number="36"><span class="co">#   jsonify_col  7.262305  7.382238  7.409085  7.434759  7.435476  7.530645     5</span></a></code></pre></div>
-</div>
-<div id="theres-no-date-type-in-json-how-have-you-handled-this" class="section level3">
-<h3 class="hasAnchor">
-<a href="#theres-no-date-type-in-json-how-have-you-handled-this" class="anchor"></a>There’s no <code>Date</code> type in JSON, how have you handled this?</h3>
-<p>At its core <code>Dates</code> in R are numeric, so they are treated as numbers when converted to JSON. However, the user can coerce to character through the <code>numeric_dates</code> argument.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">dte =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.Date">as.Date</a></span>(<span class="st">"2018-01-01"</span>))</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( df )</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#  [{"dte":17532.0}]</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">dte =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.Date">as.Date</a></span>(<span class="st">"2018-01-01"</span>))</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( df, <span class="dt">numeric_dates =</span> <span class="ot">FALSE</span> )</a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#  [{"dte":"2018-01-01"}]</span></a></code></pre></div>
-</div>
-<div id="and-posixct-and-posixlt" class="section level3">
-<h3 class="hasAnchor">
-<a href="#and-posixct-and-posixlt" class="anchor"></a>And <code>POSIXct</code> and <code>POSIXlt</code>?</h3>
-<p>The same</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="st">"2018-01-01 10:00:00"</span>) )</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#  [1514761200.0]</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="st">"2018-01-01 10:00:00"</span>), <span class="dt">numeric_dates =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#  ["2017-12-31T23:00:00"]</span></a></code></pre></div>
-<p>However, here the <strong>POSIXct</strong> values are returned in UTC timezone. This is by design.</p>
-<p><strong>POSIXlt</strong> will return each component of the date-time</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXlt</a></span>(<span class="st">"2018-01-01 01:00:00"</span>, <span class="dt">tz =</span> <span class="st">"GMT"</span>)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( x )</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( x, <span class="dt">numeric_dates =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}</span></a></code></pre></div>
-</div>
-<div id="what-about-lists" class="section level3">
-<h3 class="hasAnchor">
-<a href="#what-about-lists" class="anchor"></a>What about lists?</h3>
-<p><del>The purpose of this library is speed. A lot of overhead is incurred iterating over a list to find and convert objects from one type to another.</del></p>
-<p>For v0.2.0 I’ve managed to get the date handling at the c++ level, so there’s no penalty for recursing through the list to coerce to character.</p>
-<p>Therefore, lists will work too</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">l &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">  <span class="dt">dte =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.Date">as.Date</a></span>(<span class="st">"2018-01-01"</span>)</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">  , <span class="dt">psx =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="st">"2018-01-01 13:00:00"</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="st">"2018-01-05 13:00:00"</span>), <span class="dt">length.out =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">  , <span class="dt">df =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">psx =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="st">"2018-01-01 13:00:00"</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="st">"2018-01-05 13:00:00"</span>), <span class="dt">length.out =</span> <span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb6-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb6-6" data-line-number="6">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( l )</a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#  {"dte":[17532.0],"psx":[1514772000,1514858400,1514944800,1515031200,1515117600],"df":[{"psx":1514772000},{"psx":1514858400},{"psx":1514944800},{"psx":1515031200},{"psx":1515117600}]}</span></a></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">js &lt;-<span class="st"> </span>jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( l, <span class="dt">numeric_dates =</span> <span class="ot">FALSE</span> )</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/pretty_json">pretty_json</a></span>( js )</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#  {</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#      "dte": [</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#          "2018-01-01"</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#      ],</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#      "psx": [</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#          "2018-01-01T02:00:00",</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#          "2018-01-02T02:00:00",</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#          "2018-01-03T02:00:00",</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#          "2018-01-04T02:00:00",</span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#          "2018-01-05T02:00:00"</span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#      ],</span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#      "df": [</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#          {</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#              "psx": "2018-01-01T02:00:00"</span></a>
-<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#          },</span></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#          {</span></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#              "psx": "2018-01-02T02:00:00"</span></a>
-<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#          },</span></a>
-<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#          {</span></a>
-<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="co">#              "psx": "2018-01-03T02:00:00"</span></a>
-<a class="sourceLine" id="cb7-23" data-line-number="23"><span class="co">#          },</span></a>
-<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#          {</span></a>
-<a class="sourceLine" id="cb7-25" data-line-number="25"><span class="co">#              "psx": "2018-01-04T02:00:00"</span></a>
-<a class="sourceLine" id="cb7-26" data-line-number="26"><span class="co">#          },</span></a>
-<a class="sourceLine" id="cb7-27" data-line-number="27"><span class="co">#          {</span></a>
-<a class="sourceLine" id="cb7-28" data-line-number="28"><span class="co">#              "psx": "2018-01-05T02:00:00"</span></a>
-<a class="sourceLine" id="cb7-29" data-line-number="29"><span class="co">#          }</span></a>
-<a class="sourceLine" id="cb7-30" data-line-number="30"><span class="co">#      ]</span></a>
-<a class="sourceLine" id="cb7-31" data-line-number="31"><span class="co">#  }</span></a></code></pre></div>
-<p>And it’s still fast because of the design choice to coerce dates to UTC. All the date handling is done at the C++ leve, not R. So it’s faster.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">dtes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.Date">as.Date</a></span>(<span class="st">"2018-01-01"</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.Date">as.Date</a></span>(<span class="st">"2019-01-01"</span>), <span class="dt">length.out =</span> <span class="dv">365</span>)</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">psx &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="st">"2018-01-01"</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/as.POSIXlt">as.POSIXct</a></span>(<span class="st">"2019-01-01"</span>), <span class="dt">length.out =</span> <span class="dv">365</span>)</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">n &lt;-<span class="st"> </span><span class="fl">1e5</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5">lst &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb8-6" data-line-number="6">  <span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(dtes, <span class="dt">size =</span> n, <span class="dt">replace =</span> T)</a>
-<a class="sourceLine" id="cb8-7" data-line-number="7">  , <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb8-8" data-line-number="8">    <span class="dt">ya =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(dtes, <span class="dt">size =</span> n, <span class="dt">replace =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb8-9" data-line-number="9">    , <span class="dt">yb =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/Normal">rnorm</a></span>(<span class="dt">n =</span> n)</a>
-<a class="sourceLine" id="cb8-10" data-line-number="10">    , <span class="dt">yx =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>( <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sample">sample</a></span>(dtes, <span class="dt">size =</span> n, <span class="dt">replace =</span> T ) )</a>
-<a class="sourceLine" id="cb8-11" data-line-number="11">  )</a>
-<a class="sourceLine" id="cb8-12" data-line-number="12">  , <span class="dt">p =</span> psx</a>
-<a class="sourceLine" id="cb8-13" data-line-number="13">)</a>
-<a class="sourceLine" id="cb8-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb8-15" data-line-number="15"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>( microbenchmark )</a>
-<a class="sourceLine" id="cb8-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb8-17" data-line-number="17"><span class="kw"><a href="https://www.rdocumentation.org/packages/microbenchmark/topics/microbenchmark">microbenchmark</a></span>(</a>
-<a class="sourceLine" id="cb8-18" data-line-number="18">  <span class="dt">jsonify1 =</span> {</a>
-<a class="sourceLine" id="cb8-19" data-line-number="19">    jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( lst, <span class="dt">numeric_dates =</span> <span class="ot">TRUE</span> )</a>
-<a class="sourceLine" id="cb8-20" data-line-number="20">  },</a>
-<a class="sourceLine" id="cb8-21" data-line-number="21">  <span class="dt">jsonify2 =</span> {</a>
-<a class="sourceLine" id="cb8-22" data-line-number="22">    jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( lst, <span class="dt">numeric_dates =</span> <span class="ot">FALSE</span> )</a>
-<a class="sourceLine" id="cb8-23" data-line-number="23">  },</a>
-<a class="sourceLine" id="cb8-24" data-line-number="24">  <span class="dt">jsonlite =</span> {</a>
-<a class="sourceLine" id="cb8-25" data-line-number="25">    jsonlite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonlite/topics/fromJSON">toJSON</a></span>( lst )</a>
-<a class="sourceLine" id="cb8-26" data-line-number="26">  },</a>
-<a class="sourceLine" id="cb8-27" data-line-number="27">  <span class="dt">times =</span> <span class="dv">3</span></a>
-<a class="sourceLine" id="cb8-28" data-line-number="28">)</a>
-<a class="sourceLine" id="cb8-29" data-line-number="29"><span class="co">#  Unit: milliseconds</span></a>
-<a class="sourceLine" id="cb8-30" data-line-number="30"><span class="co">#       expr       min       lq      mean    median        uq      max neval</span></a>
-<a class="sourceLine" id="cb8-31" data-line-number="31"><span class="co">#   jsonify1  60.26762  62.9191  70.36983  65.57057  75.42093  85.2713     3</span></a>
-<a class="sourceLine" id="cb8-32" data-line-number="32"><span class="co">#   jsonify2 314.75788 315.3369 331.71612 315.91598 340.19524 364.4745     3</span></a>
-<a class="sourceLine" id="cb8-33" data-line-number="33"><span class="co">#   jsonlite 674.26576 709.8997 737.83201 745.53362 769.61514 793.6967     3</span></a></code></pre></div>
-</div>
-<div id="that-output-looks-nice-is-that-pretty_json-function-new" class="section level3">
-<h3 class="hasAnchor">
-<a href="#that-output-looks-nice-is-that-pretty_json-function-new" class="anchor"></a>That output looks nice, is that <code><a href="reference/pretty_json.html">pretty_json()</a></code> function new?</h3>
-<p>Yep, it’s a new feature in v0.2.0</p>
-</div>
-<div id="what-do-you-mean-by-available-at-the-source" class="section level3">
-<h3 class="hasAnchor">
-<a href="#what-do-you-mean-by-available-at-the-source" class="anchor"></a>What do you mean by “available at the source” ?</h3>
+<div class="section level3">
+<h3 id="what-do-you-mean-by-available-at-the-source-">What do you mean by “available at the source” ?<a class="anchor" aria-label="anchor" href="#what-do-you-mean-by-available-at-the-source-"></a>
+</h3>
 <p>I want to be able to call the C++ code from another package, without going to &amp; from R. Therefore, the C++ code is implemented in headers, so you can “link to” it in your own package.</p>
 <p>For example, the <code>LinkingTo</code> section in <strong>DESCRIPTION</strong> will look something like</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="fu">LinkingTo:</span><span class="at"> </span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">    Rcpp,</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3">    jsonify</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">LinkingTo</span><span class="kw">:</span><span class="at"> </span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="at">    Rcpp,</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="at">    rapidjsonr (&gt;= 1.2.0),</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="at">    jsonify</span></span></code></pre></div>
 <p>And in a c++ source file you can <code>#include</code> the header and use the available functions</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode cpp"><code class="sourceCode cpp"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co">// [[Rcpp::depends(jsonify)]]</span></a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="pp">#include </span><span class="im">"jsonify/jsonify.hpp"</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">Rcpp::StringVector my_json( Rcpp::DataFrame df ) {</a>
-<a class="sourceLine" id="cb10-5" data-line-number="5">  <span class="cf">return</span> jsonify::api::to_json( df );</a>
-<a class="sourceLine" id="cb10-6" data-line-number="6">}</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="pp">#include </span><span class="im">"jsonify/jsonify.hpp"</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>Rcpp<span class="op">::</span>StringVector my_json<span class="op">(</span> Rcpp<span class="op">::</span>DataFrame df <span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="cf">return</span> jsonify<span class="op">::</span>api<span class="op">::</span>to_json<span class="op">(</span> df <span class="op">);</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>You can see an example of this in my <a href="https://github.com/SymbolixAU/geojsonsf" class="external-link">geojsonsf</a> package</p>
+<ul>
+<li><a href="https://github.com/SymbolixAU/geojsonsf/blob/master/DESCRIPTION#L17" class="external-link">Description</a></li>
+<li><a href="https://github.com/SymbolixAU/geojsonsf/blob/master/inst/include/geojsonsf/geojson/api/sf_api.hpp#L4" class="external-link">#include</a></li>
+</ul>
 </div>
-<div id="can-i-call-it-from-r-if-i-want-to" class="section level3">
-<h3 class="hasAnchor">
-<a href="#can-i-call-it-from-r-if-i-want-to" class="anchor"></a>Can I call it from R if I want to?</h3>
+<div class="section level3">
+<h3 id="can-i-call-it-from-r-if-i-want-to">Can I call it from R if I want to?<a class="anchor" aria-label="anchor" href="#can-i-call-it-from-r-if-i-want-to"></a>
+</h3>
 <p>Yes. Just like the examples in this readme use <code><a href="reference/to_json.html">to_json()</a></code></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3">  , <span class="dt">val =</span> letters[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">  )</a>
-<a class="sourceLine" id="cb11-5" data-line-number="5">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( df )</a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span></span>
+<span>  , val <span class="op">=</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">df</span> <span class="op">)</span></span>
+<span><span class="co">#  [{"id":1,"val":"a"},{"id":2,"val":"b"},{"id":3,"val":"c"}]</span></span></code></pre></div>
 </div>
-<div id="i-see-factors-are-converted-to-strings" class="section level3">
-<h3 class="hasAnchor">
-<a href="#i-see-factors-are-converted-to-strings" class="anchor"></a>I see factors are converted to strings</h3>
-<p>Yep. Even though I constructed a <code><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame()</a></code> without setting <code>stringsAsFactros = FALSE</code>, jsonify automatically treats factors as strings.</p>
+<div class="section level3">
+<h3 id="is-it-fast">Is it fast?<a class="anchor" aria-label="anchor" href="#is-it-fast"></a>
+</h3>
+<p>yeah it’s pretty good.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshuaulrich/microbenchmark/" class="external-link">microbenchmark</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jeroen.r-universe.dev/jsonlite" class="external-link">jsonlite</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1e6</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span></span>
+<span>  , value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, size <span class="op">=</span> <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span>  , val2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span>  , log <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">T</span>,<span class="cn">F</span><span class="op">)</span>, size <span class="op">=</span> <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span>  , stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">microbenchmark</span><span class="op">(</span></span>
+<span>  jsonlite <span class="op">=</span> <span class="op">{</span></span>
+<span>    <span class="va">jlt</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/fromJSON.html" class="external-link">toJSON</a></span><span class="op">(</span> <span class="va">df</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  jsonify <span class="op">=</span> <span class="op">{</span></span>
+<span>    <span class="va">jfy</span> <span class="op">&lt;-</span> <span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">df</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Unit: seconds</span></span>
+<span><span class="co">#      expr      min       lq     mean   median       uq      max neval</span></span>
+<span><span class="co">#  jsonlite 2.017081 2.063732 2.540350 2.110383 2.801984 3.493585     3</span></span>
+<span><span class="co">#   jsonify 1.186239 1.202719 1.514067 1.219198 1.677981 2.136763     3</span></span>
+<span></span>
+<span></span>
+<span><span class="fu">microbenchmark</span><span class="op">(</span></span>
+<span>  jsonlite <span class="op">=</span> <span class="op">{</span></span>
+<span>    <span class="va">df_jlt</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span> <span class="va">jlt</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  jsonify <span class="op">=</span> <span class="op">{</span></span>
+<span>    <span class="va">df_jfy</span> <span class="op">&lt;-</span> <span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/from_json.html">from_json</a></span><span class="op">(</span> <span class="va">jfy</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Unit: seconds</span></span>
+<span><span class="co">#      expr      min       lq     mean   median       uq      max neval</span></span>
+<span><span class="co">#  jsonlite 5.034888 5.149688 5.229363 5.264489 5.326601 5.388713     3</span></span>
+<span><span class="co">#   jsonify 4.551434 4.629683 4.678198 4.707932 4.741579 4.775227     3</span></span>
+<span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1e4</span></span>
+<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span>  , y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
+<span>  , z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  , xx <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span>  , yy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>      id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span></span>
+<span>      , value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, size <span class="op">=</span> <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span>      , val2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
+<span>      , log <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">T</span>,<span class="cn">F</span><span class="op">)</span>, size <span class="op">=</span> <span class="va">n</span>, replace <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">microbenchmark</span><span class="op">(</span></span>
+<span>  jsonlite <span class="op">=</span> <span class="op">{</span></span>
+<span>    <span class="va">jlt</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/fromJSON.html" class="external-link">toJSON</a></span><span class="op">(</span> <span class="va">x</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  jsonify <span class="op">=</span> <span class="op">{</span></span>
+<span>    <span class="va">jfy</span> <span class="op">&lt;-</span> <span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">x</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">5</span></span>
+<span><span class="op">)</span></span>
+<span> </span>
+<span><span class="co"># Unit: milliseconds</span></span>
+<span><span class="co">#      expr      min       lq     mean   median       uq      max neval</span></span>
+<span><span class="co">#  jsonlite 18.52028 18.82241 19.32112 18.99683 19.18103 21.08508     5</span></span>
+<span><span class="co">#   jsonify 17.72060 18.19092 19.58308 19.52457 21.14687 21.33241     5</span></span>
+<span>   </span>
+<span></span>
+<span><span class="fu">microbenchmark</span><span class="op">(</span></span>
+<span>  jsonlite <span class="op">=</span> <span class="op">{</span></span>
+<span>    <span class="va">df_jlt</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jsonlite/man/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span> <span class="va">jlt</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  jsonify <span class="op">=</span> <span class="op">{</span></span>
+<span>    <span class="va">df_jfy</span> <span class="op">&lt;-</span> <span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/from_json.html">from_json</a></span><span class="op">(</span> <span class="va">jfy</span> <span class="op">)</span></span>
+<span>  <span class="op">}</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Unit: milliseconds</span></span>
+<span><span class="co">#      expr      min       lq     mean   median       uq      max neval</span></span>
+<span><span class="co">#  jsonlite 62.53554 62.96435 63.12574 63.39316 63.42084 63.44853     3</span></span>
+<span><span class="co">#   jsonify 42.47449 42.53826 43.38475 42.60204 43.83988 45.07773     3</span></span></code></pre></div>
 </div>
-<div id="has-this-changed-from-v0-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#has-this-changed-from-v0-1" class="anchor"></a>Has this changed from v0.1?</h3>
+<div class="section level3">
+<h3 id="theres-no-date-type-in-json-how-have-you-handled-this">There’s no <code>Date</code> type in JSON, how have you handled this?<a class="anchor" aria-label="anchor" href="#theres-no-date-type-in-json-how-have-you-handled-this"></a>
+</h3>
+<p>At its core <code>Dates</code> in R are numeric, so they are treated as numbers when converted to JSON. However, the user can coerce to character through the <code>numeric_dates</code> argument.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>dte <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2018-01-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">df</span> <span class="op">)</span></span>
+<span><span class="co">#  [{"dte":17532.0}]</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>dte <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2018-01-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">df</span>, numeric_dates <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">)</span></span>
+<span><span class="co">#  [{"dte":"2018-01-01"}]</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="and-posixct-and-posixlt">And <code>POSIXct</code> and <code>POSIXlt</code>?<a class="anchor" aria-label="anchor" href="#and-posixct-and-posixlt"></a>
+</h3>
+<p>The same</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2018-01-01 10:00:00"</span><span class="op">)</span> <span class="op">)</span></span>
+<span><span class="co">#  [1514761200.0]</span></span>
+<span><span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2018-01-01 10:00:00"</span><span class="op">)</span>, numeric_dates <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#  ["2017-12-31T23:00:00"]</span></span></code></pre></div>
+<p>However, here the <strong>POSIXct</strong> values are returned in UTC timezone. This is by design.</p>
+<p><strong>POSIXlt</strong> will return each component of the date-time</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXlt</a></span><span class="op">(</span><span class="st">"2018-01-01 01:00:00"</span>, tz <span class="op">=</span> <span class="st">"GMT"</span><span class="op">)</span></span>
+<span><span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">x</span> <span class="op">)</span></span>
+<span><span class="co">#  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}</span></span>
+<span></span>
+<span><span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">x</span>, numeric_dates <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#  {"sec":[0.0],"min":[0],"hour":[1],"mday":[1],"mon":[0],"year":[118],"wday":[1],"yday":[0],"isdst":[0]}</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="i-see-factors-are-converted-to-strings">I see factors are converted to strings<a class="anchor" aria-label="anchor" href="#i-see-factors-are-converted-to-strings"></a>
+</h3>
+<p>Yep. Even though I constructed a <code><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame()</a></code> without setting <code>stringsAsFactros = FALSE</code>, jsonify automatically treats factors as strings.</p>
+</div>
+<div class="section level3">
+<h3 id="has-this-changed-from-v01">Has this changed from v0.1?<a class="anchor" aria-label="anchor" href="#has-this-changed-from-v01"></a>
+</h3>
 <p>Yes. And it’s to keep the data more inline with modern concepts and design patterns.</p>
 <p>If you want factors, use <code>factors_as_string = FALSE</code> in the <code><a href="reference/to_json.html">to_json()</a></code> call</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">jsonify<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/jsonify/topics/to_json">to_json</a></span>( df, <span class="dt">factors_as_string =</span> <span class="ot">FALSE</span> )</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#  [{"id":1,"val":1},{"id":2,"val":2},{"id":3,"val":3}]</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">jsonify</span><span class="fu">::</span><span class="fu"><a href="reference/to_json.html">to_json</a></span><span class="op">(</span> <span class="va">df</span>, factors_as_string <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">)</span></span>
+<span><span class="co">#  [{"dte":17532.0}]</span></span></code></pre></div>
 </div>
-<div id="how-do-i-install-it" class="section level3">
-<h3 class="hasAnchor">
-<a href="#how-do-i-install-it" class="anchor"></a>How do I install it?</h3>
+<div class="section level3">
+<h3 id="how-do-i-install-it">How do I install it?<a class="anchor" aria-label="anchor" href="#how-do-i-install-it"></a>
+</h3>
 <p>Get the latest release version from CRAN</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"jsonify"</span>)</a></code></pre></div>
-<p>Or the development version from <a href="https://github.com/">GitHub</a> with:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># install.packages("devtools")</span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"SymbolixAU/jsonify"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"jsonify"</span><span class="op">)</span></span></code></pre></div>
+<p>Or the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"SymbolixAU/jsonify"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
+
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=jsonify">https://​cloud.r-project.org/​package=jsonify</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=jsonify" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/SymbolixAU/jsonify/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/SymbolixAU/jsonify/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li>GPL (&gt;= 2)</li>
+<li><a href="LICENSE.html">Full license</a></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing jsonify</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>David Cooley <br><small class="roles"> Author, maintainer </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
-      </div>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/SymbolixAU/jsonify/actions" class="external-link"><img src="https://github.com/SymbolixAU/jsonify/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://CRAN.R-project.org/package=jsonify" class="external-link"><img src="http://www.r-pkg.org/badges/version/jsonify" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://CRAN.R-project.org/package=jsonify" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/jsonify" alt="CRAN RStudio mirror downloads"></a></li>
+</ul>
+</div>
 
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by David Cooley.</p>
+  <p></p>
+<p>Developed by David Cooley.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
+
       </footer>
 </div>
+
+  
+
 
   
 
