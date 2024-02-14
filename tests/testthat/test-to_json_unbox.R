@@ -75,4 +75,49 @@ test_that("single-column matrices are unboxed", {
   expect_true( validate_json( js ) )
 })
 
+test_that("AsIs boxing", {
 
+  prepend_class <- function(x, cls) {
+    structure(x, class = unique(c(cls, class(x))))
+  }
+
+  ## baseline: no AsIs
+  x <- 1L
+  js <- to_json(x, unbox = FALSE)
+  expect_equal(as.character(js), "[1]")
+  expect_true(validate_json(js))
+  js <- to_json(x, unbox = TRUE)
+  expect_equal(as.character(js), "1" )
+  expect_true(validate_json(js))
+
+  ## now with AsIs (in the non-first class() location):
+  x <- prepend_class(I(1L), "foo")
+  expect_identical(class(x), c("foo", "AsIs"))
+  ## AsIs should not affect when not unboxing:
+  js <- to_json(x, unbox = FALSE)
+  expect_equal(as.character(js), "[1]")
+  expect_true(validate_json(js))
+  ## AsIs should now protect the length-1 vector:
+  js <- to_json(x, unbox = TRUE)
+  expect_equal(as.character(js), "[1]")
+  expect_true(validate_json(js))
+
+  ## verify that length-zero vectors are unaffected by I():
+  x <- I(integer(0))
+  js <- to_json(x, unbox = FALSE)
+  expect_equal(as.character(js), "[]")
+  expect_true(validate_json(js))
+  js <- to_json(x, unbox = TRUE)
+  expect_equal(as.character(js), "[]")
+  expect_true(validate_json(js))
+
+  ## verify that length > 1 vectors are unaffected by I():
+  x <- 1:3
+  js <- to_json(x, unbox = FALSE)
+  expect_equal(as.character(js), "[1,2,3]")
+  expect_true(validate_json(js))
+  js <- to_json(x, unbox = TRUE)
+  expect_equal(as.character(js), "[1,2,3]")
+  expect_true(validate_json(js))
+  
+})
