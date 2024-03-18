@@ -121,10 +121,15 @@ namespace from_json {
       }
         // numeric
       case rapidjson::kNumberType: {
-        if( json.IsDouble() ) {
-        return Rcpp::wrap< double >( json.GetDouble() );
-        } else {
+        // if( json.IsDouble() || json.IsUint64() || json.IsInt64() ) {
+        //   return Rcpp::wrap< double >( json.GetDouble() );
+        // } else {
+        //   return Rcpp::wrap< int >( json.GetInt() );
+        // }
+        if( json.IsInt() ) {
           return Rcpp::wrap< int >( json.GetInt() );
+        } else {
+          return Rcpp::wrap< double >( json.GetDouble() );
         }
       }
       case rapidjson::kObjectType: {
