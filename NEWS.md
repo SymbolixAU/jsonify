@@ -1,3 +1,7 @@
+## v1.2.3
+
+* patch for handling Int64 [issue 81](https://github.com/symbolixAU/jsonify/issues/81)
+
 ## v1.2.2
 
 * skipped date tests on CRAN
