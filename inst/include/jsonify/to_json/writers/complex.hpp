@@ -13,6 +13,9 @@ namespace jsonify {
 namespace writers {
 namespace complex {
 
+  // MT: I'm not sure this `switch_vector()` function is ever called.
+  //     I can't find any usage that doesn't also pass an additional `row` arg.
+  //     (I.e. all usages seem to call the other overloaded `switch_vector()` func.
   template < typename Writer >
   inline void switch_vector(
       Writer& writer, 
@@ -75,7 +78,8 @@ namespace complex {
       bool& unbox, 
       int& digits, 
       bool& numeric_dates, 
-      bool& factors_as_string, 
+      bool& factors_as_string,
+      bool& json_verbatim, 
       R_xlen_t& row
     ) {
     
@@ -117,10 +121,10 @@ namespace complex {
     default: {
       if( Rf_isMatrix( this_vec ) ) {
         Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( this_vec );
-        jsonify::writers::simple::write_value( writer, sm, row, unbox );
+        jsonify::writers::simple::write_value( writer, sm, row, unbox, json_verbatim );
       } else {
         Rcpp::StringVector sv = Rcpp::as< Rcpp::StringVector >( this_vec );
-        jsonify::writers::simple::write_value( writer, sv, row );
+        jsonify::writers::simple::write_value( writer, sv, row, json_verbatim );
       }
       break;
     }
@@ -135,7 +139,8 @@ namespace complex {
       int digits = -1, 
       bool numeric_dates = true,
       bool factors_as_string = true, 
-      std::string by = "row", 
+      std::string by = "row",
+      bool json_verbatim = false,
       R_xlen_t row = -1,   // for when we are recursing into a row of a data.frame
       bool in_data_frame = false  // for keeping track of when we're in a column of a data.frame
       ) {
@@ -168,7 +173,7 @@ namespace complex {
       }
       default :{
         Rcpp::StringMatrix sm = Rcpp::as< Rcpp::StringMatrix >( list_element );
-        return jsonify::writers::simple::write_value( writer, sm, unbox, by );
+        return jsonify::writers::simple::write_value( writer, sm, unbox, by, json_verbatim );
         break;
       }
       }
@@ -222,7 +227,7 @@ namespace complex {
           const char *h = column_names[ df_col ];
           writer.String( h );
           SEXP this_vec = df[ h ];
-          write_value( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, by, -1, in_data_frame );
+          write_value( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim, -1, in_data_frame );  // recurse
           
         }
         writer.EndObject();
@@ -243,11 +248,11 @@ namespace complex {
             
             case VECSXP: {
               Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-              write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, row, in_data_frame );
+              write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim, row, in_data_frame );  // recurse
               break;
             }
             default: {
-              switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, row );
+              switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, json_verbatim, row );
             }
             } // end switch
             
@@ -270,11 +275,11 @@ namespace complex {
               switch( TYPEOF( this_vec ) ) {
               case VECSXP: {
                 Rcpp::List lst = Rcpp::as< Rcpp::List >( this_vec );
-                write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, df_row, in_data_frame );
+                write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim, df_row, in_data_frame );  // recurse
                 break;
               }
               default: {
-                switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, df_row );
+                switch_vector( writer, this_vec, unbox, digits, numeric_dates, factors_as_string, json_verbatim, df_row );
               }
               }
             }
@@ -308,7 +313,7 @@ namespace complex {
             lst.names() = this_name;
           }
 
-          write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, -1, in_data_frame );  
+          write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim, -1, in_data_frame );  
           
         } else {
           lst = temp_lst;
@@ -346,7 +351,7 @@ namespace complex {
               writer.String( s );
             }
             // setting in_data_frame to false because we're no longer at the data.frame top-level
-            write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by, -1, false ); 
+            write_value( writer, recursive_list, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim, -1, false ); 
           }
           
           jsonify::utils::writer_ender( writer, has_names, in_data_frame );
@@ -374,7 +379,7 @@ namespace complex {
       case LANGSXP: {   // language constructs (special lists)
         Rcpp::Pairlist s = Rcpp::as< Rcpp::Pairlist >( list_element );
         Rcpp::List l = Rcpp::as< Rcpp::List >( s );
-        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim );
         break;
       }
       case CLOSXP: {}   // closures
@@ -383,7 +388,7 @@ namespace complex {
       case ENVSXP: {}
       case FUNSXP: {
         Rcpp::List l = Rcpp::as< Rcpp::List >( list_element );
-        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by );
+        write_value( writer, l, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim );
         break;
       }
       default: {

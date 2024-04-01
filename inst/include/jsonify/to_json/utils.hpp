@@ -8,6 +8,21 @@
 namespace jsonify {
 namespace utils {
 
+  // true if `vec` contains `target`; else false
+  inline bool contains(const Rcpp::CharacterVector& vec, const std::string& target) {
+    for (int i = 0; i < vec.size(); ++i) {
+      if (Rcpp::as<std::string>(vec[i]) == target) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // true if `sv` is length-one and has class "json"
+  inline bool is_raw_json(Rcpp::StringVector sv) {
+    return contains(rClass(sv), "json");
+  }
+
   template < int RTYPE >
   inline Rcpp::CharacterVector rClass( Rcpp::Vector< RTYPE > v ) {
     if( Rf_isNull( v.attr("class")) ) {
@@ -51,8 +66,8 @@ namespace utils {
 
   template< typename RTYPE >
   inline bool should_unbox( RTYPE x, int n, bool unbox ) {
-    Rcpp::CharacterVector attr = rClass( x );
-    return ( unbox && n == 1 && strcmp(attr[0], "AsIs") != 0 );
+    Rcpp::CharacterVector klasses = rClass( x );
+    return ( unbox && n == 1 && !contains(klasses, "AsIs") );
   }
   
   template< typename Writer >
