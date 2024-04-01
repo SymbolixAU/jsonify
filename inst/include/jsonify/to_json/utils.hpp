@@ -18,6 +18,11 @@ namespace utils {
     return false;
   }
 
+  // true if `sv` is length-one and has class "json"
+  inline bool is_raw_json(Rcpp::StringVector sv) {
+    return contains(rClass(sv), "json");
+  }
+
   template < int RTYPE >
   inline Rcpp::CharacterVector rClass( Rcpp::Vector< RTYPE > v ) {
     if( Rf_isNull( v.attr("class")) ) {

@@ -14,11 +14,12 @@ namespace api {
     int digits = -1, 
     bool numeric_dates = true, 
     bool factors_as_string = true, 
-    std::string by = "row"
+    std::string by = "row",
+    bool json_verbatim = false
   ) {
     rapidjson::StringBuffer sb;
     rapidjson::Writer < rapidjson::StringBuffer > writer( sb );
-    jsonify::writers::complex::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by );
+    jsonify::writers::complex::write_value( writer, lst, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim );
     return jsonify::utils::finalise_json( sb );
   }
 
@@ -28,7 +29,8 @@ namespace api {
   //   int digits = -1,
   //   bool numeric_dates = true,
   //   bool factors_as_string = true,
-  //   std::string by = "row"
+  //   std::string by = "row",
+  //   bool json_verbatim = false
   // ) {
   //   // loop over rows or columns, 
   // }
@@ -373,7 +375,8 @@ namespace api {
     int digits = -1,
     bool numeric_dates = true,
     bool factors_as_string = true,
-    std::string by = "row"
+    std::string by = "row",
+    bool json_verbatim = false
   ) {
 
     std::ostringstream os; // for storing the final string of ndjson

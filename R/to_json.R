@@ -51,11 +51,12 @@
 #' 
 #' @export
 to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE, 
-                     factors_as_string = TRUE, by = "row" ) {
+                     factors_as_string = TRUE, by = "row",
+                     json_verbatim = FALSE ) {
   if( "col" %in% by ) by <- "column"
   by <- match.arg( by, choices = c("row", "column") )
   digits <- handle_digits( digits )
-  rcpp_to_json( x, unbox, digits, numeric_dates, factors_as_string, by )
+  rcpp_to_json( x, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim )
 }
 
 #' To ndjson
@@ -107,11 +108,12 @@ to_json <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE,
 #' 
 #' @export
 to_ndjson <- function( x, unbox = FALSE, digits = NULL, numeric_dates = TRUE, 
-                       factors_as_string = TRUE, by = "row" ) {
+                       factors_as_string = TRUE, by = "row",
+                       json_verbatim = FALSE ) {
   if( "col" %in% by ) by <- "column"
   by <- match.arg( by, choices = c("row", "column") )
   digits <- handle_digits( digits )
-  rcpp_to_ndjson( x, unbox, digits, numeric_dates, factors_as_string, by )
+  rcpp_to_ndjson( x, unbox, digits, numeric_dates, factors_as_string, by, json_verbatim )
 }
 
 handle_digits <- function( digits ) {

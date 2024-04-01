@@ -1,6 +1,7 @@
 #ifndef JSONIFY_WRITERS_SCALARS_H
 #define JSONIFY_WRITERS_SCALARS_H
 
+#include <cstring>
 
 namespace jsonify {
 namespace writers {
@@ -9,6 +10,11 @@ namespace scalars {
   // ---------------------------------------------------------------------------
   // scalar values
   // ---------------------------------------------------------------------------
+  template <typename Writer>
+  inline void write_raw_json( Writer& writer, const char* value ) {
+    writer.RawValue( value, strlen(length), rapidjson::kTypeNull );
+  }
+
   template <typename Writer>
   inline void write_value( Writer& writer, const char* value ) {
     writer.String( value );
