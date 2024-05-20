@@ -19,7 +19,7 @@ test_that("scalar values handled properly", {
 
 test_that("Int64 treated as double", {
   json_str <- '{"value" : 5500000000}'
-  expect_equal(from_json(json_obj)$value, 5.5e+09)
+  expect_equal(from_json(json_str)$value, 5.5e+09)
 })
 
 test_that("vector / array values handled properly", {

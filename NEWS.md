@@ -1,5 +1,6 @@
 ## v1.2.3
 
+* removed C++11 System requirement
 * patch for handling Int64 [issue 81](https://github.com/symbolixAU/jsonify/issues/81)
 
 ## v1.2.2
