@@ -1,6 +1,6 @@
 ## v1.2.3
 
-* length-1 vectors marked as `AsIs` / `I()` are not unboxed [issue 75](https://github.com/SymbolixAU/jsonify/issues/75)
+* vectors marked as `AsIs` / `I()` are not unboxed [issue 75](https://github.com/SymbolixAU/jsonify/issues/75)
 * removed C++11 System requirement
 * patch for handling Int64 [issue 81](https://github.com/symbolixAU/jsonify/issues/81)
 
