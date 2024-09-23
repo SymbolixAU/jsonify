@@ -2,7 +2,7 @@ Package: jsonify
 Type: Package
 Title: Convert Between 'R' Objects and Javascript Object Notation (JSON)
 Version: 1.2.3
-Date: 2023-11-14
+Date: 2024-05-21
 Authors@R: c(
     person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre")),
     person("Chris", "Muir", role = "ctb"),
@@ -11,12 +11,11 @@ Authors@R: c(
 Description: Conversions between 'R' objects and Javascript Object Notation (JSON) using 
     the 'rapidjsonr' library <https://CRAN.R-project.org/package=rapidjsonr>. 
 License: MIT + file LICENSE
-Depends: R (>= 3.3.0)
-SystemRequirements: C++11
+Depends: R (>= 4.0.0)
 Imports: 
-  Rcpp (>= 0.12.18)
+  Rcpp (>= 1.0.10)
 LinkingTo:
-  rapidjsonr (>= 1.2.0),
+  rapidjsonr (>= 1.2.1),
   Rcpp
 RoxygenNote: 7.3.1
 Suggests:
@@ -25,4 +24,8 @@ Suggests:
   knitr,
   rmarkdown
 Encoding: UTF-8
+URL: https://symbolixau.github.io/jsonify/, https://github.com/SymbolixAU/jsonify
+BugReports: https://github.com/SymbolixAU/jsonify/issues
 VignetteBuilder: knitr
+remotes:
+	https://github.com/SymbolixAU/rapidjsonr

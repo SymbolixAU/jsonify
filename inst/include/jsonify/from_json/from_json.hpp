@@ -2,7 +2,6 @@
 #define R_JSONIFY_FROM_JSON_H
 
 #include <Rcpp.h>
-
 #include "from_json_utils.hpp"
 #include "simplify/simplify.hpp"
 
@@ -77,18 +76,19 @@ namespace from_json {
     Rcpp::CharacterVector names( json_length );
     R_xlen_t i = 0;
     
+    // removed in 1.2.3 
     // https://github.com/Tencent/rapidjson/issues/162#issuecomment-341824061
-  #if __cplusplus >= 201703L
-    for ( const auto& [key, value] : json.GetObject() ) {
-      out[ i ] = parse_json( value, simplify, fill_na );
-      names[ i++ ] = std::string( key );
-    }
-  #else
+  // #if __cplusplus >= 201703L
+  //   for ( const auto& [key, value] : json.GetObject() ) {
+  //     out[ i ] = parse_json( value, simplify, fill_na );
+  //     names[ i++ ] = std::string( key );
+  //   }
+  // #else
     for ( const auto& key_value : json.GetObject() ) {
       out[ i ] = parse_json( key_value.value, simplify, fill_na );
       names[ i++ ] = std::string( key_value.name.GetString() );
     }
-  #endif
+  // #endif
     out.attr("names") = names;
     return out;
   }
@@ -121,10 +121,15 @@ namespace from_json {
       }
         // numeric
       case rapidjson::kNumberType: {
-        if( json.IsDouble() ) {
-        return Rcpp::wrap< double >( json.GetDouble() );
-        } else {
+        // if( json.IsDouble() || json.IsUint64() || json.IsInt64() ) {
+        //   return Rcpp::wrap< double >( json.GetDouble() );
+        // } else {
+        //   return Rcpp::wrap< int >( json.GetInt() );
+        // }
+        if( json.IsInt() ) {
           return Rcpp::wrap< int >( json.GetInt() );
+        } else {
+          return Rcpp::wrap< double >( json.GetDouble() );
         }
       }
       case rapidjson::kObjectType: {

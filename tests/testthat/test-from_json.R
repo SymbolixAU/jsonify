@@ -17,6 +17,11 @@ test_that("scalar values handled properly", {
   expect_equal(from_json("true"), TRUE)
 })
 
+test_that("Int64 treated as double", {
+  json_str <- '{"value" : 5500000000}'
+  expect_equal(from_json(json_str)$value, 5.5e+09)
+})
+
 test_that("vector / array values handled properly", {
 
   target <- list(a = list(1L, 2L, 3L, NA), b = list(1L, "cats", 3L, NA))
