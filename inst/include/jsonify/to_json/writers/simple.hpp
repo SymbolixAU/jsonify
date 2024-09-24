@@ -19,18 +19,22 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::StringVector sv, 
-      bool unbox
+      bool unbox,
+      bool json_verbatim
     ) {
     
     R_xlen_t n = sv.size();
     bool will_unbox = jsonify::utils::should_unbox( sv, n, unbox );
+    bool is_raw_json = jsonify::utils::is_raw_json(sv);
     jsonify::utils::start_array( writer, will_unbox );
     R_xlen_t i;
 
     for ( i = 0; i < n; ++i ) {
       if (Rcpp::StringVector::is_na( sv[i] ) ) {
         writer.Null();
-      } else{
+      } else if (is_raw_json && json_verbatim) {
+        jsonify::writers::scalars::write_raw_json( writer, sv[i] );
+      } else {
         jsonify::writers::scalars::write_value( writer, sv[i] );
       }
     }
@@ -44,11 +48,14 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::StringVector& sv, 
-      int row
+      int row,
+      bool json_verbatim
   ) {
     
     if ( Rcpp::StringVector::is_na( sv[ row ] ) ) {
       writer.Null();
+    } else if (jsonify::utils::is_raw_json(sv) && json_verbatim) {
+      jsonify::writers::scalars::write_raw_json( writer, sv[row] );
     } else {
       const char *s = sv[ row ];
       jsonify::writers::scalars::write_value( writer, s );
@@ -63,11 +70,14 @@ namespace simple {
   inline void write_value(
       Writer& writer, 
       Rcpp::StringVector sv, 
-      R_xlen_t& row
+      R_xlen_t& row,
+      bool json_verbatim
     ) {
     
     if ( Rcpp::StringVector::is_na( sv[ row ] ) ) {
       writer.Null();
+    } else if (jsonify::utils::is_raw_json(sv) && json_verbatim) {
+      jsonify::writers::scalars::write_raw_json( writer, sv[row] );
     } else {
       const char *s = sv[ row ];
       jsonify::writers::scalars::write_value( writer, s );
@@ -630,19 +640,21 @@ namespace simple {
       Writer& writer, 
       Rcpp::StringMatrix& mat, 
       int& row, 
-      bool unbox = false
+      bool unbox = false,
+      bool json_verbatim = false
   ) {
     
     Rcpp::StringVector this_row = mat(row, Rcpp::_);
-    write_value( writer, this_row, unbox );
+    write_value( writer, this_row, unbox, json_verbatim );
   }
   
   template < typename Writer >
   inline void write_value(
       Writer& writer, 
-      Rcpp::CharacterMatrix mat, 
+      Rcpp::StringMatrix mat,
       bool unbox = false,
-      std::string by = "row"
+      std::string by = "row",
+      bool json_verbatim = false
   ) {
     
     bool will_unbox = false;
@@ -653,13 +665,13 @@ namespace simple {
       n = mat.nrow();
       for ( i = 0; i < n; ++i ) {
         Rcpp::StringVector this_row = mat( i, Rcpp::_ );
-        write_value( writer, this_row, unbox );
+        write_value( writer, this_row, unbox, json_verbatim );
       }
     } else { // by == column
       n = mat.ncol();
       for ( i = 0; i < n; ++i ) {
         Rcpp::StringVector this_col = mat( Rcpp::_, i );
-        write_value( writer, this_col, unbox );
+        write_value( writer, this_col, unbox, json_verbatim );
       }
     }
     jsonify::utils::end_array( writer, will_unbox );
