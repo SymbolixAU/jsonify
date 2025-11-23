@@ -27,5 +27,3 @@ Encoding: UTF-8
 URL: https://symbolixau.github.io/jsonify/, https://github.com/SymbolixAU/jsonify
 BugReports: https://github.com/SymbolixAU/jsonify/issues
 VignetteBuilder: knitr
-remotes:
-	https://github.com/SymbolixAU/rapidjsonr
