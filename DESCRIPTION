@@ -15,7 +15,7 @@ Depends: R (>= 4.0.0)
 Imports: 
   Rcpp (>= 1.0.10)
 LinkingTo:
-  rapidjsonr (>= 1.2.1),
+  rapidjsonr (>= 1.2.0),
   Rcpp
 RoxygenNote: 7.3.1
 Suggests:
