@@ -10,3 +10,4 @@
 ^LICENSE\.md$
 ^\.github$
 ^vignettes/
+^CRAN-SUBMISSION$
